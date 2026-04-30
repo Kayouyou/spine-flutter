@@ -55,8 +55,11 @@ class CancelTokenManager {
   /// 清理页面Token记录
   ///
   /// 页面彻底销毁时调用，移除该页面的Token映射
-  /// 注意：仅移除记录，不取消请求（请求已在cancelPage中取消）
+  /// 安全性：自动取消未完成的请求，避免孤立Token
   void cleanup(String pageTag) {
+    // 安全：先取消未完成的请求
+    cancelPage(pageTag, 'Cleanup: $pageTag');
+    // 再移除记录
     _pageTokens.remove(pageTag);
   }
 
