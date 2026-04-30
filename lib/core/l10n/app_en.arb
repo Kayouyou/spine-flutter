@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+
+  "networkError": "Network connection failed",
+  "requestCancelled": "Request cancelled",
+  "connectionTimeout": "Connection timeout",
+  "unauthorized": "Please login first",
+  "tokenExpired": "Session expired",
+  "forbidden": "Access denied",
+  "notFound": "Resource not found",
+  "serverError": "Server error",
+  "invalidInput": "Invalid input",
+  "unknown": "Unknown error",
+  "retry": "Retry",
+  "loading": "Loading...",
+  "appName": "My App",
+  "homeTitle": "Home",
+  "detailTitle": "Detail"
+}
