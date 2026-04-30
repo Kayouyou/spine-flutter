@@ -31,7 +31,7 @@ class AppRouter {
           ],
         ),
         GoRoute(
-          path: '/detail-c',
+          path: '/detail',
           builder: (context, state) => Scaffold(
             appBar: AppBar(title: Text('Detail')),
             body: Center(child: Text('This is a detail page')),
