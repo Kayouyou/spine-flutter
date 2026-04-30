@@ -6,3 +6,5 @@ export 'src/http/http_constant.dart';
 export 'src/http/error_handler.dart';
 export 'src/http/token_supplier.dart';
 export 'src/dio/log_reporting_interceptor.dart';
+// Phase 2新增：错误处理
+export 'src/error/dio_mapper.dart';
