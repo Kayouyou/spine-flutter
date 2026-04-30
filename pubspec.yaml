@@ -26,6 +26,7 @@ dependencies:
 
   # Dependency Injection
   get_it: ^7.6.0
+  equatable: ^2.0.5
 
   # State Management
   flutter_bloc: ^8.1.0
@@ -58,4 +59,5 @@ dependency_overrides:
   flutter_spinkit: 5.1.0
 
 flutter:
+  generate: true
   uses-material-design: true
