@@ -34,10 +34,9 @@ class OVSTheme extends InheritedWidget {
           : LightOVSThemeData();
     }
 
-    assert(inheritedTheme != null, 'No OvsTheme found in context');
     final currentBrightness = Theme.of(context).brightness;
     return currentBrightness == Brightness.dark
-        ? inheritedTheme!.darkTheme
-        : inheritedTheme!.lightTheme;
+        ? inheritedTheme.darkTheme
+        : inheritedTheme.lightTheme;
   }
 }

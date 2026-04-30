@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:api/src/http/http_constant.dart';
-import 'package:api/src/http/token_supplier.dart';
-import 'package:dio/dio.dart';
 import 'package:domain_models/domain_models.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../api.dart';

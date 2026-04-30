@@ -6,5 +6,4 @@
 
 // Re-export all router components from router.dart for backward compatibility
 export 'router.dart' show AppRouter;
-export 'router.dart' show AnalyticsObserver;
 export 'route_context.dart';

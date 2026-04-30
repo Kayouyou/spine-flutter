@@ -1,8 +1,5 @@
-import 'package:key_value_storage/key_value_storage.dart';
-
 import 'http/http_manager.dart';
 import 'http/token_supplier.dart';
-import 'http/http_method.dart';
 import 'modules/modules.dart';
 
 typedef UserTokenSupplier = Future<String?> Function();
@@ -14,17 +11,19 @@ class Api extends ApiBase with DemoApiMixin {
 
   final HttpManager _httpManager;
   final UserTokenSupplier _userTokenSupplier;
-  final NetworkDisconnectedCallback _networkDisconnectedCallback;
+  final NetworkDisconnectedCallback? _networkDisconnectedCallback;
 
   Api({
     required UserTokenSupplier userTokenSupplier,
-    required NetworkDisconnectedCallback networkDisconnectedCallback,
+    NetworkDisconnectedCallback? networkDisconnectedCallback,
     HttpManager? http,
   })  : _userTokenSupplier = userTokenSupplier,
         _networkDisconnectedCallback = networkDisconnectedCallback,
         _httpManager = http ?? HttpManager.getInstance() {
     _httpManager.userTokenSupplier = _userTokenSupplier;
-    _httpManager.networkDisconnectedCallBack = _networkDisconnectedCallback;
+    if (_networkDisconnectedCallback != null) {
+      _httpManager.networkDisconnectedCallBack = _networkDisconnectedCallback!;
+    }
   }
 
   @override

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'route_context.dart';
-import 'route_module.dart';
 import 'module_a.dart';
 import 'module_b.dart';
 

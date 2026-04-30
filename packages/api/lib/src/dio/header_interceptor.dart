@@ -60,13 +60,6 @@ class HeaderInterceptor extends Interceptor {
       signBody.addAll(options.data);
     }
 
-    // GET 特殊处理
-    const addGetIdValue = false;
-    if (options.method == 'GET' && addGetIdValue) {
-      //如果url后有参数传入则获取最后字段值
-      signBody['Id'] = '';
-    }
-
     // signBody sorted by key
     final sortedKeys = signBody.keys.toList()
       ..sort((a, b) {
