@@ -33,6 +33,9 @@ void setupDependencies() {
     ),
   );
 
+  // 注入Logger到Api（Token续期拦截器使用）
+  sl<Api>().setLogger(sl<AppLogger>());
+
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
   // ===== BoxService =====

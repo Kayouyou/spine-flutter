@@ -15,3 +15,5 @@ export 'src/error/dio_mapper.dart';
 export 'src/cancel/cancel_manager.dart';
 // Phase 3a新增：请求追踪
 export 'src/tracking/request_tracker.dart';
+// Phase 3d新增：日志接口
+export 'src/http/app_logger.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:api/api.dart';
 
 /// 日志级别
 enum LogLevel {
@@ -12,7 +13,9 @@ enum LogLevel {
 ///
 /// 职责：统一日志输出管理，支持级别过滤和生产环境禁用
 /// 使用：通过DI获取 `sl<AppLogger>()`
-class AppLogger {
+///
+/// 实现AppLoggerInterface接口，可注入到api包的Token续期拦截器
+class AppLogger implements AppLoggerInterface {
   /// 是否在生产环境启用日志
   final bool enableInProduction;
 
@@ -25,15 +28,19 @@ class AppLogger {
   });
 
   /// 输出调试日志
+  @override
   void debug(String message) => log(LogLevel.debug, message);
 
   /// 输出信息日志
+  @override
   void info(String message) => log(LogLevel.info, message);
 
   /// 输出警告日志
+  @override
   void warning(String message) => log(LogLevel.warning, message);
 
   /// 输出错误日志
+  @override
   void error(String message, [dynamic error]) => log(LogLevel.error, message, error);
 
   /// 核心日志输出方法

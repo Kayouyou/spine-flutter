@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
 import 'package:api/src/http/token_supplier.dart';
+import 'package:api/src/http/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 import 'package:synchronized/synchronized.dart';
 
 import 'package:uuid/uuid.dart';
@@ -119,11 +119,24 @@ class TokenRenewalInterceptor extends Interceptor {
   ) {
     _tokenSupplier = tokenSupplier;
     _renewalLock = Lock();
+    _logger = DefaultLogger(); // 默认使用DefaultLogger
   }
 
   final Dio _dio;
   TokenSupplier? _tokenSupplier;
   late final Lock _renewalLock;
+
+  /// 日志输出实例
+  ///
+  /// 默认使用DefaultLogger（debugPrint输出）
+  /// 可通过setter注入主应用的AppLogger
+  AppLoggerInterface _logger;
+
+  /// 设置Logger（支持依赖注入）
+  ///
+  /// 在App启动后注入，替换默认debugPrint输出
+  /// 主应用的AppLogger需实现AppLoggerInterface接口
+  set logger(AppLoggerInterface logger) => _logger = logger;
 
   /// 设置TokenSupplier（支持延迟注入）
   set tokenSupplier(TokenSupplier supplier) {
@@ -166,10 +179,9 @@ class TokenRenewalInterceptor extends Interceptor {
       );
 
       _pendingRequests.add(request);
-      debugPrint(
-          '添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}');
+      _logger.debug('添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}');
     } catch (e) {
-      debugPrint('添加请求到队列时出错: $e');
+      _logger.error('添加请求到队列时出错: $e');
     }
   }
 
@@ -189,7 +201,7 @@ class TokenRenewalInterceptor extends Interceptor {
     try {
       needsRenewal = await _shouldRenewToken(response);
     } catch (e) {
-      debugPrint('检查是否需要续期时出错: $e');
+      _logger.error('检查是否需要续期时出错: $e');
       return handler.next(response);
     }
 
@@ -198,7 +210,7 @@ class TokenRenewalInterceptor extends Interceptor {
       return handler.next(response);
     }
 
-    debugPrint('请求需要续期: ${response.requestOptions.path}');
+    _logger.info('请求需要续期: ${response.requestOptions.path}');
 
     // 创建一个Completer来控制响应流程
     final completer = Completer<Response>();
@@ -207,7 +219,7 @@ class TokenRenewalInterceptor extends Interceptor {
     completer.future.then((newResponse) {
       handler.next(newResponse);
     }).catchError((error) {
-      debugPrint('续期过程中出错，返回原始响应: $error');
+      _logger.warning('续期过程中出错，返回原始响应: $error');
       handler.next(response);
     });
 
@@ -223,7 +235,7 @@ class TokenRenewalInterceptor extends Interceptor {
     await _renewalLock.synchronized(() async {
       // 如果已经有续期在进行，等待其完成
       if (_renewalState == TokenRenewalState.renewing) {
-        debugPrint('已有续期正在进行，等待续期完成: ${response.requestOptions.path}');
+        _logger.debug('已有续期正在进行，等待续期完成: ${response.requestOptions.path}');
         return;
       }
 
@@ -231,7 +243,7 @@ class TokenRenewalInterceptor extends Interceptor {
       if (_renewalState == TokenRenewalState.success &&
           _lastRenewalTime != null &&
           DateTime.now().difference(_lastRenewalTime!) < Duration(seconds: 5)) {
-        debugPrint('短时间内已经续期成功，直接重试请求');
+        _logger.debug('短时间内已经续期成功，直接重试请求');
         await _retryAllPendingRequests();
         return;
       }
@@ -243,7 +255,7 @@ class TokenRenewalInterceptor extends Interceptor {
       // 使用Future.microtask确保不阻塞当前线程
       Future.microtask(() async {
         try {
-          debugPrint('开始执行token续期流程');
+          _logger.info('开始执行token续期流程');
 
           // 执行续期
           final success = await _performTokenRenewal();
@@ -251,13 +263,13 @@ class TokenRenewalInterceptor extends Interceptor {
           if (success) {
             _renewalState = TokenRenewalState.success;
             _lastRenewalTime = DateTime.now();
-            debugPrint('续期成功，开始重试队列中的请求');
+            _logger.info('续期成功，开始重试队列中的请求');
 
             // 重试所有缓存的请求
             await _retryAllPendingRequests();
           } else {
             _renewalState = TokenRenewalState.failed;
-            debugPrint('续期失败，完成所有等待的请求（使用原始响应）');
+            _logger.warning('续期失败，完成所有等待的请求（使用原始响应）');
 
             // 续期失败，使用原始响应完成所有等待的请求（fire-and-forget）
             _completeAllPendingRequestsWithOriginalResponse();
@@ -268,7 +280,7 @@ class TokenRenewalInterceptor extends Interceptor {
             _renewalCompleter!.complete(success);
           }
         } catch (e) {
-          debugPrint('续期过程中出错: $e');
+          _logger.error('续期过程中出错: $e');
 
           // 出错时，使用原始响应完成所有等待的请求（fire-and-forget）
           _completeAllPendingRequestsWithOriginalResponse();
@@ -297,14 +309,14 @@ class TokenRenewalInterceptor extends Interceptor {
     // 如果不是第一个续期请求，等待已有的续期完成
     if (_renewalState == TokenRenewalState.renewing &&
         _renewalCompleter != null) {
-      debugPrint('已有被动续期请求在执行，等待被动续期完成: ${response.requestOptions.path}');
+      _logger.debug('已有被动续期请求在执行，等待被动续期完成: ${response.requestOptions.path}');
 
       try {
         // 等待续期完成
         final success = await _renewalCompleter!.future.timeout(
           Duration(seconds: 10),
           onTimeout: () {
-            debugPrint('等待被动续期超时');
+            _logger.warning('等待被动续期超时');
             return false;
           },
         );
@@ -329,7 +341,7 @@ class TokenRenewalInterceptor extends Interceptor {
           }
         }
       } catch (e) {
-        debugPrint('等待被动续期出错: $e');
+        _logger.error('等待被动续期出错: $e');
       }
 
       // 如果等待失败，返回原始响应
@@ -338,7 +350,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
     // 这是第一个续期请求，处理它
     try {
-      debugPrint('处理续期请求: ${response.requestOptions.path}');
+      _logger.info('处理续期请求: ${response.requestOptions.path}');
 
       // 设置状态为正在续期
       _renewalState = TokenRenewalState.renewing;
@@ -372,7 +384,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
       return handler.next(response);
     } catch (e) {
-      debugPrint('处理续期请求出错: $e');
+      _logger.error('处理续期请求出错: $e');
 
       // 重置状态
       _renewalState = TokenRenewalState.failed;
@@ -394,7 +406,7 @@ class TokenRenewalInterceptor extends Interceptor {
         final timeSinceLastRenewal =
             DateTime.now().difference(_lastRenewalTime!);
         if (timeSinceLastRenewal < Duration(seconds: 5)) {
-          debugPrint('最近已经续期过，跳过本次续期');
+          _logger.debug('最近已经续期过，跳过本次续期');
           return true;
         }
       }
@@ -436,10 +448,10 @@ class TokenRenewalInterceptor extends Interceptor {
         return await _processRenewalResponse(response.data);
       }
 
-      debugPrint('续期失败，状态码: ${response.statusCode}');
+      _logger.warning('续期失败，状态码: ${response.statusCode}');
       return false;
     } catch (e) {
-      debugPrint('执行续期操作时出错: $e');
+      _logger.error('执行续期操作时出错: $e');
       return false;
     }
   }
@@ -451,10 +463,10 @@ class TokenRenewalInterceptor extends Interceptor {
           responseData is String ? jsonDecode(responseData) : responseData;
       final code = data['code'];
 
-      debugPrint('续期响应解析，code: $code');
+      _logger.debug('续期响应解析，code: $code');
 
       if (code == HttpConstant.reLoginCode) {
-        debugPrint('服务器返回需要重新登录的状态');
+        _logger.warning('服务器返回需要重新登录的状态');
         HttpEventBus.instance.commit(EventKeys.logout);
         return false;
       }
@@ -464,17 +476,17 @@ class TokenRenewalInterceptor extends Interceptor {
         final tokenPreview =
             newToken.length > 10 ? newToken.substring(0, 10) + '...' : newToken;
 
-        debugPrint('获取到新token: $tokenPreview');
+        _logger.info('获取到新token: $tokenPreview');
         if (_tokenSupplier != null) {
           await _tokenSupplier!.setToken(newToken);
         }
         return true;
       }
 
-      debugPrint('续期失败，未获取到有效token');
+      _logger.warning('续期失败，未获取到有效token');
       return false;
     } catch (e) {
-      debugPrint('处理续期响应异常: $e');
+      _logger.error('处理续期响应异常: $e');
       return false;
     }
   }
@@ -485,7 +497,7 @@ class TokenRenewalInterceptor extends Interceptor {
       return;
     }
 
-    debugPrint('开始重试队列中的请求，数量: ${_pendingRequests.length}');
+    _logger.debug('开始重试队列中的请求，数量: ${_pendingRequests.length}');
 
     // 复制请求集合，避免并发修改
     final requests = List<_PendingRequest>.from(_pendingRequests);
@@ -507,7 +519,7 @@ class TokenRenewalInterceptor extends Interceptor {
       await Future.wait(
         batch.map((request) async {
           try {
-            debugPrint('重试队列中的请求: ${request.requestOptions.path}');
+            _logger.debug('重试队列中的请求: ${request.requestOptions.path}');
 
             // 重试请求，失败时自动重试一次
             final response =
@@ -521,7 +533,7 @@ class TokenRenewalInterceptor extends Interceptor {
               request.completer.complete(request.originalResponse);
             }
           } catch (e) {
-            debugPrint('重试请求失败: ${request.requestOptions.path}, 错误: $e');
+            _logger.warning('重试请求失败: ${request.requestOptions.path}, 错误: $e');
 
             // 出错时，使用原始响应完成Completer
             request.completer.complete(request.originalResponse);
@@ -535,7 +547,7 @@ class TokenRenewalInterceptor extends Interceptor {
       }
     }
 
-    debugPrint('所有队列请求重试完成');
+    _logger.info('所有队列请求重试完成');
   }
 
   /// 使用原始响应完成所有等待的请求
@@ -545,7 +557,7 @@ class TokenRenewalInterceptor extends Interceptor {
       return;
     }
 
-    debugPrint('开始完成所有等待的请求（使用原始响应），数量: ${_pendingRequests.length}');
+    _logger.debug('开始完成所有等待的请求（使用原始响应），数量: ${_pendingRequests.length}');
 
     // 复制请求集合，避免并发修改
     final requests = List<_PendingRequest>.from(_pendingRequests);
@@ -567,12 +579,12 @@ class TokenRenewalInterceptor extends Interceptor {
       Future.wait(
         batch.map((request) async {
           try {
-            debugPrint('完成等待的请求: ${request.requestOptions.path}');
+            _logger.debug('完成等待的请求: ${request.requestOptions.path}');
 
             // 使用原始响应完成Completer
             request.completer.complete(request.originalResponse);
           } catch (e) {
-            debugPrint('完成等待的请求失败: ${request.requestOptions.path}, 错误: $e');
+            _logger.warning('完成等待的请求失败: ${request.requestOptions.path}, 错误: $e');
           }
         }),
       );
@@ -583,7 +595,7 @@ class TokenRenewalInterceptor extends Interceptor {
       }
     }
 
-    debugPrint('所有等待的请求完成');
+    _logger.info('所有等待的请求完成');
   }
 
   /// 重试单个请求，失败时重试一次
@@ -593,14 +605,14 @@ class TokenRenewalInterceptor extends Interceptor {
       // 第一次尝试
       return await _retryRequest(requestOptions);
     } catch (e) {
-      debugPrint('第一次重试失败，尝试再次重试: ${requestOptions.path}, 错误: $e');
+      _logger.warning('第一次重试失败，尝试再次重试: ${requestOptions.path}, 错误: $e');
 
       try {
         // 短暂延迟后第二次尝试
         await Future.delayed(Duration(milliseconds: 200));
         return await _retryRequest(requestOptions);
       } catch (e) {
-        debugPrint('第二次重试也失败，放弃重试: ${requestOptions.path}, 错误: $e');
+        _logger.warning('第二次重试也失败，放弃重试: ${requestOptions.path}, 错误: $e');
         return null;
       }
     }
@@ -654,7 +666,7 @@ class TokenRenewalInterceptor extends Interceptor {
           response.data is String ? jsonDecode(response.data) : response.data;
       return data['code'] == HttpConstant.renewalTokenCode;
     } catch (e) {
-      debugPrint('解析响应数据出错: $e');
+      _logger.error('解析响应数据出错: $e');
       return false;
     }
   }
@@ -665,7 +677,7 @@ class TokenRenewalInterceptor extends Interceptor {
     final tokenDio = Dio()..interceptors.add(HeaderInterceptor());
     _configureProxy(tokenDio);
 
-    debugPrint('准备发送续期请求: $url');
+    _logger.debug('准备发送续期请求: $url');
 
     // 执行请求
     final response = await tokenDio.post(
@@ -679,7 +691,7 @@ class TokenRenewalInterceptor extends Interceptor {
       ),
     );
 
-    debugPrint('续期请求返回状态码: ${response.statusCode}');
+    _logger.debug('续期请求返回状态码: ${response.statusCode}');
     return response;
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:api/src/dio/renewal_token_intercaptor.dart';
+import 'package:api/src/http/app_logger.dart';
 import 'package:api/src/http/token_supplier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -47,11 +48,32 @@ class DioAdapter extends HttpAdapter {
     _onNetworkDisconnected = _callback;
   }
 
+  /// 设置Logger到Token续期拦截器
+  ///
+  /// 在App启动后注入，替换默认debugPrint输出
+  /// 主应用的AppLogger需实现AppLoggerInterface接口
+  AppLoggerInterface? _logger;
+  set logger(AppLoggerInterface logger) {
+    _logger = logger;
+    _updateInterceptorLogger();
+  }
+
   void _updateInterceptorTokenSupplier() {
     if (_dio != null && _tokenSupplier != null) {
       for (final interceptor in _dio!.interceptors) {
         if (interceptor is TokenRenewalInterceptor) {
           interceptor.tokenSupplier = _tokenSupplier!;
+        }
+      }
+    }
+  }
+
+  /// 更新拦截器的Logger
+  void _updateInterceptorLogger() {
+    if (_dio != null && _logger != null) {
+      for (final interceptor in _dio!.interceptors) {
+        if (interceptor is TokenRenewalInterceptor) {
+          interceptor.logger = _logger!;
         }
       }
     }
@@ -177,6 +199,10 @@ class DioAdapter extends HttpAdapter {
       // 创建 Dio 后，立即注入已设置的 tokenSupplier
       if (_tokenSupplier != null) {
         _updateInterceptorTokenSupplier();
+      }
+      // 注入Logger
+      if (_logger != null) {
+        _updateInterceptorLogger();
       }
       return _dio!;
     } else {
