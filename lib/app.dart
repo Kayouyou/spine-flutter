@@ -9,12 +9,15 @@ import 'src/theme/app_theme.dart';
 import 'core/di/locator.dart';
 import 'core/global/locale/locale_cubit.dart';
 import 'core/global/locale/locale_state.dart';
+import 'core/global/network/network_cubit.dart';
+import 'core/widgets/network/network_banner.dart';
 
 /// 主应用Widget
 ///
 /// 职责：配置全局Provider、主题、路由、国际化
 /// Provider：
 ///   - LocaleCubit：语言管理
+///   - NetworkCubit：网络状态管理
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -36,9 +39,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // 全局BlocProvider包装，提供LocaleCubit
-    return BlocProvider(
-      create: (context) => sl<LocaleCubit>(),
+    // 全局BlocProvider包装，提供LocaleCubit和NetworkCubit
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<LocaleCubit>()),
+        BlocProvider(create: (context) => sl<NetworkCubit>()),
+      ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {
           return MaterialApp.router(
@@ -62,11 +68,13 @@ class _MyAppState extends State<MyApp> {
               final easyLoadingBuilder = EasyLoading.init();
               return easyLoadingBuilder(
                 context,
-                MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaler: const TextScaler.linear(1.0),
+                NetworkBanner(
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      textScaler: const TextScaler.linear(1.0),
+                    ),
+                    child: child ?? const SizedBox(),
                   ),
-                  child: child ?? const SizedBox(),
                 ),
               );
             },

@@ -8,6 +8,7 @@ import '../auth/manager.dart';
 import '../sync/manager.dart';
 import '../utils/logger.dart';
 import '../global/locale/locale_cubit.dart';
+import '../global/network/network_cubit.dart';
 import '../../features/home/repository/home_repository.dart';
 import '../../features/home/repository/home_repository_impl.dart';
 import '../../features/home/cubit/home_cubit.dart';
@@ -49,6 +50,9 @@ void setupDependencies() {
   sl.registerSingleton<LocaleCubit>(
     LocaleCubit(sl<KeyValueStorage>())
   );
+
+  // NetworkCubit（单例）
+  sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
   // ===== Repository =====
 
