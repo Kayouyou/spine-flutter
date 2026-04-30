@@ -1,6 +1,12 @@
 import 'app.dart';
-import 'src/app_starter.dart';
+import 'core/startup/launcher.dart';
+import 'core/di/setup.dart';
 
 void main() {
-  AppStarter.start(const MyApp());
+  // 配置依赖注入
+  setupDependencies();
+  configureEasyLoading();
+
+  // 启动App
+  AppLauncher.launch(const MyApp());
 }

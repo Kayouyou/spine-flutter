@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
 
 import 'src/theme/app_theme.dart';
-import 'src/app_configurator.dart';
 
-/// Main App widget
+/// 主应用Widget
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -21,17 +20,14 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    debugPrint('🚀 [MyApp] initState: building router...');
     final ctx = RouteContext(navigatorKey: _navigatorKey);
     _router = AppRouter.getRouter(ctx: ctx);
-    AppConfigurator.configureEasyLoading();
-    debugPrint('✅ [MyApp] initState: ready');
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Scaffold Demo',
+      title: '骨架演示',
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       routerConfig: _router,
