@@ -9,6 +9,7 @@ dependencies:
   json_annotation: ^4.5.0
   azlistview: ^2.0.0
   lpinyin: ^2.0.3
+  hive: ^2.0.4
 
 dev_dependencies:
   lints: ^1.0.1
