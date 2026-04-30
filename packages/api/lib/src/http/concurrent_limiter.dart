@@ -14,6 +14,9 @@ import 'package:domain_models/domain_models.dart';
 ///   - 队列优先级排序
 ///   - tag批量取消
 ///   - 运行状态统计
+///
+/// 注意：本模块已实现，需手动集成到HttpManager.send()方法中
+/// 集成方式：将HttpManager.fireInternal()的请求包装为ConcurrentLimiter.execute()
 class ConcurrentLimiter {
   /// 最大并发数
   final int maxConcurrent;

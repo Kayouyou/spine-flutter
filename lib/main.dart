@@ -1,12 +1,7 @@
 import 'app.dart';
 import 'core/startup/launcher.dart';
-import 'core/di/setup.dart';
 
 void main() {
-  // 配置依赖注入
-  setupDependencies();
-  configureEasyLoading();
-
-  // 启动App
+  // 启动App（内部已处理依赖注入、binding初始化）
   AppLauncher.launch(const MyApp());
 }

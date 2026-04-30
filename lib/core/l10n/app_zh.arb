@@ -75,5 +75,15 @@
   "detailTitle": "详情",
   "@detailTitle": {
     "description": "详情页标题"
+  },
+
+  "networkDisconnected": "网络连接已断开",
+  "@networkDisconnected": {
+    "description": "网络断开状态提示"
+  },
+
+  "checkingNetwork": "正在检查网络...",
+  "@checkingNetwork": {
+    "description": "网络检查中提示"
   }
 }

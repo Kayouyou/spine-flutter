@@ -15,5 +15,8 @@
   "loading": "Loading...",
   "appName": "My App",
   "homeTitle": "Home",
-  "detailTitle": "Detail"
+  "detailTitle": "Detail",
+  "networkDisconnected": "Network connection lost",
+  "checkingNetwork": "Checking network...",
+  "checkNow": "Check Now"
 }

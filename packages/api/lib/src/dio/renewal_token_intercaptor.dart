@@ -119,7 +119,6 @@ class TokenRenewalInterceptor extends Interceptor {
   ) {
     _tokenSupplier = tokenSupplier;
     _renewalLock = Lock();
-    _logger = DefaultLogger(); // 默认使用DefaultLogger
   }
 
   final Dio _dio;
@@ -130,7 +129,7 @@ class TokenRenewalInterceptor extends Interceptor {
   ///
   /// 默认使用DefaultLogger（debugPrint输出）
   /// 可通过setter注入主应用的AppLogger
-  AppLoggerInterface _logger;
+  AppLoggerInterface _logger = DefaultLogger();
 
   /// 设置Logger（支持依赖注入）
   ///

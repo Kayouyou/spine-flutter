@@ -11,6 +11,9 @@ import 'package:flutter/foundation.dart';
 ///   - 监控请求耗时，便于性能分析
 ///   - 追踪未完成请求，避免请求遗漏
 ///   - debugPrint输出，仅在调试模式可见
+///
+/// 注意：本模块已实现，需手动集成到HttpManager.send()方法中
+/// 集成方式：在请求开始时track()，完成时complete()
 class RequestTracker {
   /// 单例实例
   static final instance = RequestTracker._();

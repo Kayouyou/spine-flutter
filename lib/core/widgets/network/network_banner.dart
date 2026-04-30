@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../global/network/network_cubit.dart';
 import '../../global/network/network_state.dart';
 
 /// 网络状态Banner
+///
+/// 包裹在应用根Widget外层，断网时自动显示顶部红色提示条
 class NetworkBanner extends StatelessWidget {
   final Widget child;
 
@@ -30,6 +33,7 @@ class NetworkBanner extends StatelessWidget {
   }
 
   Widget _buildBanner(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: Colors.red.shade400,
       child: SafeArea(
@@ -40,7 +44,10 @@ class NetworkBanner extends StatelessWidget {
             children: [
               const Icon(Icons.wifi_off, color: Colors.white, size: 16),
               const SizedBox(width: 8),
-              const Text('网络连接已断开', style: TextStyle(color: Colors.white)),
+              Text(
+                l10n?.networkDisconnected ?? l10n?.networkError ?? '网络连接已断开',
+                style: const TextStyle(color: Colors.white),
+              ),
             ],
           ),
         ),

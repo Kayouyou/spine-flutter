@@ -66,23 +66,11 @@ class DomainException implements Exception {
     }
   );
 
-  /// 获取本地化错误消息
+  /// 获取错误消息（兜底实现）
   ///
-  /// 使用errorCode.name作为ARB key查找国际化文本
-  /// 示例：ErrorCode.networkError → ARB key "networkError"
-  ///
-  /// 注意：需要BuildContext获取AppLocalizations
-  /// ARB文件必须包含所有ErrorCode.name对应的key
-  ///
-  /// 完整实现需要：
-  /// 1. flutter gen-l10n生成AppLocalizations
-  /// 2. MaterialApp配置localizationsDelegates
-  /// 3. 通过BuildContext获取AppLocalizations实例
-  ///
-  /// 当前返回errorCode.name作为占位
-  /// 完整实现后改为AppLocalizations.of(context)!.translate(errorCode.name)
+  /// 返回errorCode.name作为占位文本
+  /// UI层应通过ErrorCode.name到AppLocalizations查找本地化文本
   String getMessage() {
-    // 占位实现：返回errorCode名称
     return errorCode.name;
   }
 

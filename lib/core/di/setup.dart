@@ -80,6 +80,9 @@ void setupDependencies() {
   sl.registerFactory<DetailCubit>(() =>
     DetailCubit(sl<DetailRepository>())
   );
+
+  // 配置EasyLoading
+  configureEasyLoading();
 }
 
 /// 配置EasyLoading

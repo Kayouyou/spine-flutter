@@ -11,6 +11,9 @@ import 'package:dio/dio.dart';
 ///   - none: 不重试
 ///   - standard: 标准3次重试
 ///   - aggressive: 激进5次重试
+///
+/// 注意：本模块已实现，需手动集成到HttpManager.send()方法中
+/// 集成方式：在请求失败时调用policy.shouldRetry()判断是否重试
 class RetryPolicy {
   /// 最大重试次数
   final int maxRetries;
