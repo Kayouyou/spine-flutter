@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 
 /// SDK初始化器
 ///
@@ -14,6 +15,13 @@ class SDKInitializer {
     if (kDebugMode) {
       debugPrint('🚀 [SDKInitializer] initPlugins: 开始初始化...');
     }
+
+    // 初始化Hive Adapter
+    await HiveRegistrar.registerAll();
+    if (kDebugMode) {
+      debugPrint('✅ [SDKInitializer] Hive Adapter注册完成');
+    }
+
     // TODO: 初始化推送SDK
     // TODO: 初始化统计SDK
     // TODO: 初始化支付SDK

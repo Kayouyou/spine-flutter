@@ -34,6 +34,10 @@ void setupDependencies() {
 
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
+  // ===== BoxService =====
+  // 注意：BoxService需要泛型类型，这里注册示例
+  // sl.registerFactory<BoxService<User>>(() => BoxService<User>('user_box'));
+
   // ===== 业务服务 =====
 
   sl.registerSingleton<AuthManager>(AuthManager());
