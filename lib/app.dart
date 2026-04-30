@@ -51,14 +51,12 @@ class _MyAppState extends State<MyApp> {
               Locale('zh'), // 中文
               Locale('en'), // 英文
             ],
-            // 国际化配置（Phase 2完成后启用）
-            // 需运行 flutter gen-l10n 生成 AppLocalizations
-            // localizationsDelegates: const [
-            //   AppLocalizations.delegate,
-            //   GlobalMaterialLocalizations.delegate,
-            //   GlobalWidgetsLocalizations.delegate,
-            //   GlobalCupertinoLocalizations.delegate,
-            // ],
+            // 国际化配置
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             routerConfig: _router,
             builder: (context, child) {
               final easyLoadingBuilder = EasyLoading.init();
