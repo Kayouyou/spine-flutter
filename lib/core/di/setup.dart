@@ -7,12 +7,20 @@ import 'locator.dart';
 import '../auth/manager.dart';
 import '../sync/manager.dart';
 import '../utils/logger.dart';
+import '../global/locale/locale_cubit.dart';
+import '../../features/home/repository/home_repository.dart';
+import '../../features/home/repository/home_repository_impl.dart';
+import '../../features/home/cubit/home_cubit.dart';
+import '../../features/detail/repository/detail_repository.dart';
+import '../../features/detail/repository/detail_repository_impl.dart';
+import '../../features/detail/cubit/detail_cubit.dart';
 
 /// 依赖注入配置
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies() {
-  // 核心服务
+  // ===== 核心服务 =====
+
   sl.registerSingleton<AppLogger>(AppLogger());
 
   sl.registerSingleton<Api>(
@@ -26,9 +34,41 @@ void setupDependencies() {
 
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
-  // 业务服务
+  // ===== 业务服务 =====
+
   sl.registerSingleton<AuthManager>(AuthManager());
   sl.registerSingleton<DataSyncManager>(DataSyncManager());
+
+  // ===== 全局状态 =====
+
+  // LocaleCubit（单例）
+  sl.registerSingleton<LocaleCubit>(
+    LocaleCubit(sl<KeyValueStorage>())
+  );
+
+  // ===== Repository =====
+
+  // HomeRepository（Factory）
+  sl.registerFactory<HomeRepository>(() =>
+    HomeRepositoryImpl(sl<Api>())
+  );
+
+  // DetailRepository（Factory）
+  sl.registerFactory<DetailRepository>(() =>
+    DetailRepositoryImpl(sl<Api>())
+  );
+
+  // ===== Cubit =====
+
+  // HomeCubit（Factory）
+  sl.registerFactory<HomeCubit>(() =>
+    HomeCubit(sl<HomeRepository>())
+  );
+
+  // DetailCubit（Factory）
+  sl.registerFactory<DetailCubit>(() =>
+    DetailCubit(sl<DetailRepository>())
+  );
 }
 
 /// 配置EasyLoading

@@ -1,9 +1,0 @@
-# 国际化配置文件
-#
-# 使用flutter_intl插件或flutter gen-l10n命令生成代码
-# 生成位置：.dart_tool/flutter_gen/gen_l10n/
-
-arb-dir: lib/core/l10n
-template-arb-file: app_zh.arb
-output-localization-file: app_localizations.dart
-output-class-name: AppLocalizations

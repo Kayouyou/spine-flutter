@@ -111,12 +111,27 @@ class HttpsException implements Exception {
 
 /// HttpsException 扩展 - 转换为 DomainException
 /// 用于 HttpManager.fireInternal() 内部转换
-/// 保证：code 和 message 完全对应，行为一致
+/// Phase 2重构：使用ErrorCode枚举
 extension HttpsExceptionExtension on HttpsException {
   /// 转换为 DomainException
-  /// 关键：使用 exceptionCode getter（已处理 data['code'] 边界情况）
-  DomainException toDomainException() => DomainException(
-    code: this.exceptionCode,  // 业务码优先，HTTP 状态码备用
-    message: this.message,
-  );
+  /// HTTP状态码映射到ErrorCode
+  DomainException toDomainException() {
+    final errorCode = _mapToErrorCode(this.code);
+    return DomainException(
+      errorCode,
+      httpCode: this.code,
+      rawData: this.data as Map<String, dynamic>?,
+    );
+  }
+
+  /// HTTP状态码映射到ErrorCode
+  static ErrorCode _mapToErrorCode(int code) {
+    if (code == 401) return ErrorCode.unauthorized;
+    if (code == 403) return ErrorCode.forbidden;
+    if (code == 404) return ErrorCode.notFound;
+    if (code == 500 || code == 502 || code == 503 || code == 505) {
+      return ErrorCode.serverError;
+    }
+    return ErrorCode.unknown;
+  }
 }
