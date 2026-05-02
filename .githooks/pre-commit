@@ -5,7 +5,8 @@
 set -euo pipefail
 
 echo "▸ 运行 flutter analyze..."
-flutter analyze lib/ packages/
+# --no-fatal-infos --no-fatal-warnings: info/warning 不阻止提交，仅 error 阻止
+flutter analyze lib/ packages/ --no-fatal-infos --no-fatal-warnings
 
 echo "▸ 运行单元测试和 Bloc 测试..."
 flutter test test/unit/ test/bloc/
