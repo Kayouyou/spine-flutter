@@ -1,0 +1,23 @@
+name: auth
+description: Authentication service
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get_it: ^7.6.0
+  api:
+    path: ../../infrastructure/api
+  key_value_storage:
+    path: ../../infrastructure/key_value_storage
+  domain:
+    path: ../../domain
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  mocktail: ^0.3.0
