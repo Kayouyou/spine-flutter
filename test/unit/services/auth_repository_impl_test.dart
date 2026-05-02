@@ -1,8 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
+// Package imports:
+import 'package:auth/auth.dart';
 import 'package:dio/dio.dart';
 import 'package:domain/domain.dart';
-import 'package:auth/auth.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
 

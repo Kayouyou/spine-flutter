@@ -1,8 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
+// Package imports:
 import 'package:bloc_test/bloc_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:domain/domain.dart';
 import 'package:feature_home/feature_home.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockHomeRepository extends Mock implements HomeRepository {}
 

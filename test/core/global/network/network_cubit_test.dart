@@ -1,9 +1,13 @@
+// Dart imports:
 import 'dart:async';
 
+// Package imports:
 import 'package:bloc_test/bloc_test.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+
+// Project imports:
 import 'package:my_app/core/global/network/network_cubit.dart';
 import 'package:my_app/core/global/network/network_state.dart';
 

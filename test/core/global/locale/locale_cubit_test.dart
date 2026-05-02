@@ -1,9 +1,12 @@
-import 'package:bloc_test/bloc_test.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'package:locale/locale.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock KeyValueStorage
 class MockKeyValueStorage extends Mock implements KeyValueStorage {}
