@@ -10,20 +10,18 @@
 | state/ | 全局业务状态 Cubit | 是（flutter_bloc） |
 | usecase/ | 共用业务逻辑编排 | 否 |
 | repository/ | 共用 Repository 接口 | 否 |
-| adapters/ | Hive 适配器 | 否（hive） |
 
 ## 依赖方向
 
 ```
-infrastructure (api, key_value_storage)
+     domain（纯 Dart，不依赖 infrastructure）
        ↓
-     domain
-       ↓
-services, features
+services, features, infrastructure
 ```
 
-- **依赖**: infrastructure packages (api, key_value_storage)
-- **被依赖**: features 和 services 依赖 domain 获取业务数据
+- **依赖**: equatable 仅此而已
+- **被依赖**: features、services、infrastructure 依赖 domain 获取类型和接口
+- **核心原则**: domain 是最内层，只定义接口，不依赖任何 infrastructure 实现
 
 ## DI 注册方式
 
@@ -39,7 +37,6 @@ lib/
 ├── domain.dart           ← barrel file
 └── src/
     ├── demo/             ← 示例模型
-    ├── hive/             ← Hive 适配器
     ├── enum.dart         ← 共用枚举
     └── exceptions.dart   ← 域异常定义
 ```

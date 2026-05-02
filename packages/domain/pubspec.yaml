@@ -7,10 +7,6 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  api:
-    path: ../infrastructure/api
-  key_value_storage:
-    path: ../infrastructure/key_value_storage
   equatable: ^2.0.5
 
 dev_dependencies:
