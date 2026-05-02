@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'initializer.dart';
 import 'profiler.dart';
-import '../auth/manager.dart';
-import '../sync/manager.dart';
+import 'package:auth/auth.dart';
+import 'package:data_sync/data_sync.dart';
 import '../di/setup.dart';
 
 /// App启动器
