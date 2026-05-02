@@ -27,6 +27,8 @@ dependencies:
     path: packages/services/data_sync
   network:
     path: packages/services/network
+  error:
+    path: packages/services/error
   locale:
     path: packages/services/locale
 

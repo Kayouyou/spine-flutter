@@ -1,55 +1,69 @@
+// lib/core/startup/launcher.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:error/error.dart';
+import 'package:auth/auth.dart';
+import 'package:data_sync/data_sync.dart';
 
 import 'initializer.dart';
 import 'profiler.dart';
-import 'package:auth/auth.dart';
-import 'package:data_sync/data_sync.dart';
 import '../di/setup.dart';
+import '../di/locator.dart';
+import '../utils/logger.dart';
 
-/// App启动器
+/// 应用启动编排器
 ///
-/// 职责：管理App完整启动流程
-/// 流程：初始化Flutter binding → 配置系统UI → 依赖注入 → SDK初始化 → 启动App
-/// 使用：main.dart中调用 `AppLauncher.launch(const MyApp())`
+/// 按阶段顺序执行启动流程：
+/// 1. 核心初始化（binding、错误处理、DI、屏幕方向）
+/// 2. SDK 初始化（阻塞等待）
+/// 3. 业务初始化（认证检查、数据同步）
+/// 4. 启动 UI
 class AppLauncher {
   AppLauncher._();
 
-  /// 启动App
+  /// 启动应用
+  ///
+  /// [app] 是根 Widget（通常为 MyApp）。
   static Future<void> launch(Widget app) async {
-    // 1. 初始化Flutter binding（必须在最前面）
+    // ===== 阶段 1: 核心初始化 =====
     WidgetsFlutterBinding.ensureInitialized();
     StartupProfiler.start();
-    StartupProfiler.mark('Flutter binding初始化');
+    StartupProfiler.mark('Flutter binding 初始化');
 
-    // 2. 配置依赖注入（需要binding：LocaleCubit/NetworkCubit使用平台通道）
+    // 全局错误边界 — 在任何可能出错的代码之前安装
+    AppErrorHandler().setup(
+      onError: (error, stack) {
+        sl<AppLogger>().error('未处理错误', error);
+      },
+    );
+    StartupProfiler.mark('错误处理器安装');
+
+    // 依赖注入配置
     setupDependencies();
     StartupProfiler.mark('依赖注入完成');
 
-    // 3. 配置屏幕方向（仅支持竖屏）
+    // 屏幕方向
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     StartupProfiler.mark('屏幕方向配置');
 
-    // 4. 初始化第三方SDK（异步，不阻塞）
+    // ===== 阶段 2: SDK 初始化（阻塞，必须完成后才能进阶段 3）=====
     final sdkInitializer = SDKInitializer();
-    sdkInitializer.initPlugins().then((_) {
-      StartupProfiler.mark('SDK初始化完成');
-    });
+    await sdkInitializer.initPlugins();
+    StartupProfiler.mark('SDK 初始化完成');
 
-    // 5. 检查认证状态
-    final authManager = AuthManager();
-    await authManager.handleLogin();
+    // ===== 阶段 3: 业务初始化 =====
+    // 认证检查 — 通过 DI 获取 AuthManager
+    await sl<AuthManager>().handleLogin();
     StartupProfiler.mark('认证检查完成');
 
-    // 6. 数据同步（登录成功后）
-    final syncManager = DataSyncManager();
-    syncManager.sync();
+    // 数据同步 — 触发后不等待（后台执行）
+    sl<DataSyncManager>().sync();
     StartupProfiler.mark('数据同步启动');
 
-    // 7. 运行App
+    // ===== 阶段 4: 启动 UI =====
     runApp(app);
     StartupProfiler.report();
   }

@@ -1,0 +1,11 @@
+name: error
+description: 全局错误处理与日志边界服务。
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
