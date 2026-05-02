@@ -9,7 +9,7 @@ import 'src/theme/app_theme.dart';
 import 'core/di/locator.dart';
 import 'core/global/locale/locale_cubit.dart';
 import 'core/global/locale/locale_state.dart';
-import 'core/global/network/network_cubit.dart';
+import 'package:network/network.dart';
 import 'core/widgets/network/network_banner.dart';
 
 /// 主应用Widget

@@ -10,7 +10,7 @@ import 'package:feature_detail/feature_detail.dart';
 import 'locator.dart';
 import '../utils/logger.dart';
 import '../global/locale/locale_cubit.dart';
-import '../global/network/network_cubit.dart';
+import 'package:network/network.dart';
 
 /// 依赖注入配置
 ///

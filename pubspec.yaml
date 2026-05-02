@@ -25,6 +25,8 @@ dependencies:
     path: packages/services/auth
   data_sync:
     path: packages/services/data_sync
+  network:
+    path: packages/services/network
 
   # ===== 业务功能层 =====
   feature_home:

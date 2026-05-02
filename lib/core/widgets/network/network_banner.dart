@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_app/core/l10n/generated/app_localizations.dart';
-import '../../global/network/network_cubit.dart';
-import '../../global/network/network_state.dart';
+import 'package:network/network.dart';
 
 /// 网络状态Banner
 ///
