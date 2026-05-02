@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:key_value_storage/key_value_storage.dart';
-import 'package:my_app/core/global/locale/locale_cubit.dart';
-import 'package:my_app/core/global/locale/locale_state.dart';
+import 'package:locale/locale.dart';
 
 /// Mock KeyValueStorage
 class MockKeyValueStorage extends Mock implements KeyValueStorage {}

@@ -549,6 +549,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  locale:
+    dependency: "direct main"
+    description:
+      path: "packages/services/locale"
+      relative: true
+    source: path
+    version: "0.0.1"
   logging:
     dependency: transitive
     description:

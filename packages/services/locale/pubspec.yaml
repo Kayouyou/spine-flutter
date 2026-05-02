@@ -1,0 +1,15 @@
+name: locale
+description: 全局语言/本地化管理服务。
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.0
+  key_value_storage:
+    path: ../../infrastructure/key_value_storage
+  equatable: ^2.0.5

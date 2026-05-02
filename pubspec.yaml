@@ -27,6 +27,8 @@ dependencies:
     path: packages/services/data_sync
   network:
     path: packages/services/network
+  locale:
+    path: packages/services/locale
 
   # ===== 业务功能层 =====
   feature_home:
