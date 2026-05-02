@@ -24,7 +24,7 @@ final config = StartupManager.config;
 ## 依赖关系
 - `lib/core/di` - 服务初始化
 - `lib/core/utils` - 配置工具
-- `lib/core/constants` - 配置常量
+- `packages/infrastructure/` - 配置常量（已迁移至独立 package）
 
 ## 性能警告
 - 启动任务应按优先级排序
