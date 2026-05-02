@@ -1,3 +1,5 @@
+export 'exceptions/domain_exception.dart';
+
 /// 错误码枚举
 ///
 /// 职责：统一定义所有业务错误类型，用于错误处理和国际化
@@ -33,51 +35,6 @@ enum ErrorCode {
 
   /// 未知错误
   unknown,
-}
-
-/// 域异常
-///
-/// 职责：统一应用层异常，携带ErrorCode用于国际化错误消息
-/// 使用：
-///   - API层抛出：throw DomainException(ErrorCode.networkError)
-///   - UI层处理：exception.getMessage(context)获取本地化消息
-/// 注意：所有业务异常都应转换为DomainException
-class DomainException implements Exception {
-  /// 错误码
-  final ErrorCode errorCode;
-
-  /// HTTP状态码（可选）
-  final int? httpCode;
-
-  /// 原始响应数据（可选，用于调试）
-  final Map<String, dynamic>? rawData;
-
-  /// 构造函数
-  ///
-  /// 参数：
-  /// - errorCode: 错误码枚举
-  /// - httpCode: HTTP状态码（可选）
-  /// - rawData: 原始响应数据（可选）
-  DomainException(
-    this.errorCode,
-    {
-      this.httpCode,
-      this.rawData,
-    }
-  );
-
-  /// 获取错误消息（兜底实现）
-  ///
-  /// 返回errorCode.name作为占位文本
-  /// UI层应通过ErrorCode.name到AppLocalizations查找本地化文本
-  String getMessage() {
-    return errorCode.name;
-  }
-
-  @override
-  String toString() {
-    return 'DomainException: ${errorCode.name} (http: $httpCode)';
-  }
 }
 
 // ===== 兼容旧代码的异常类（逐步废弃） =====
