@@ -6,4 +6,6 @@
 arb-dir: lib/core/l10n
 template-arb-file: app_zh.arb
 output-localization-file: app_localizations.dart
-output-class-name: AppLocalizations
+output-class: AppLocalizations
+synthetic-package: false
+output-dir: lib/core/l10n/generated
