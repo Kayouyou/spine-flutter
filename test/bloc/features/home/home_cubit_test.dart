@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:domain/domain.dart';
 import 'package:feature_home/feature_home.dart';
 
 class MockHomeRepository extends Mock implements HomeRepository {}
@@ -32,7 +33,7 @@ void main() {
       'loadData 失败时发出 [loading, error]',
       build: () {
         when(() => mockRepo.getHomeData()).thenThrow(
-          const NetworkException('连接失败'),
+          NetworkException('连接失败'),
         );
         return HomeCubit(mockRepo);
       },
