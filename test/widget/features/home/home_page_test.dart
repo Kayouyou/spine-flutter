@@ -7,6 +7,15 @@ import 'package:feature_home/feature_home.dart';
 class FakeHomeCubit extends Fake implements HomeCubit {
   @override
   HomeState get state => HomeLoaded(<String, dynamic>{});
+
+  @override
+  Future<void> loadData() async {}
+
+  @override
+  Stream<HomeState> get stream => const Stream.empty();
+
+  @override
+  Future<void> close() async {}
 }
 
 void main() {
