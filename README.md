@@ -13,6 +13,8 @@
 - [分层决策树](#分层决策树)
 - [测试命令](#测试命令)
 - [Make 命令参考](#make-命令参考)
+- [环境配置](#环境配置)
+- [列表缓存](#列表缓存)
 - [架构评分](#架构评分)
 
 ---
@@ -355,12 +357,113 @@ fvm flutter test --coverage
 | `make create-repo` | 查看创建 Repository 步骤 |
 | `make create-feature` | 查看创建 Feature 步骤 |
 | `make add-api` | 查看添加 API 端点步骤 |
+| `make dev` | Flavor 开发环境运行 |
+| `make staging` | Flavor 预发布环境运行 |
+| `make prod` | Flavor 生产环境运行 |
+| `make build-prod` | 生产环境构建 APK |
+
+---
+
+## 环境配置
+
+项目支持 dev / staging / prod 三套环境，通过 `--dart-define` 切换。
+
+```bash
+make dev           # 开发环境（默认）
+make staging       # 预发布环境
+make prod          # 生产环境
+make build-prod    # 生产环境构建 APK
+```
+
+每个环境的 API 地址、日志开关、网络超时自动切换：
+
+```dart
+import 'package:my_app/config.dart';
+
+// 当前环境
+if (EnvironmentConfig.isDev) { ... }
+
+// API 地址（自动根据环境切换）
+final url = EnvironmentConfig.apiBaseUrl;
+```
+
+默认 API 地址在 `lib/config.dart` 的 `EnvironmentConfig` 中配置，接入真实项目时替换为实际地址。
+
+---
+
+## 列表缓存
+
+`packages/infrastructure/list_cache/` 提供通用列表缓存策略，任意模块可复用。
+
+### 四种策略
+
+| 策略 | 工厂方法 | 行为 | 适用 |
+|------|----------|------|------|
+| **先缓存后网络** | `CacheConfig.staleWhileRevalidate()` | 立刻显示缓存 → 后台静默刷新 | 社交动态、商品列表 |
+| **先网络后缓存** | `CacheConfig.networkFirst()` | 请求网络 → 成功则缓存 → 失败用缓存兜底 | 关键数据、交易记录 |
+| **仅缓存** | `CacheConfig(cacheOnly)` | 只读缓存，永不请求网络 | 静态配置、说明页 |
+| **仅网络** | `CacheConfig.networkOnly()` | 只请求网络，永不缓存 | 敏感数据、一次性内容 |
+
+### 使用示例
+
+```dart
+import 'package:list_cache/list_cache.dart';
+
+// 1. 在 RepositoryImpl 中注入
+class FeedRepositoryImpl implements FeedRepository {
+  final Dio _dio;
+  final ListCacheManager<FeedItem> _cacheManager;
+
+  FeedRepositoryImpl(this._dio)
+      : _cacheManager = ListCacheManager<FeedItem>(
+          config: CacheConfig.staleWhileRevalidate(pageSize: 20),
+        );
+
+  @override
+  Future<CacheResult<FeedItem>> getFeedList({required int page}) async {
+    // 2. 一行搞定缓存逻辑
+    return _cacheManager.fetch(
+      cacheKey: 'home_feed',           // 不同列表用不同 key
+      page: page,
+      networkFetcher: () async {      // 网络请求函数
+        final res = await _dio.get('/api/feed', queryParameters: {'page': page});
+        return (res.data as List).map((e) => FeedItem.fromJson(e)).toList();
+      },
+    );
+  }
+}
+
+// 3. Cubit 中根据结果决定 UI
+final result = await _repo.getFeedList(page: 1);
+if (result.isFromCache) {
+  // 数据来自缓存，可显示"加载中"指示器
+} else {
+  // 数据来自网络，最新数据
+}
+emit(FeedLoaded(items: result.data, hasMore: result.hasMore));
+```
+
+### 分页行为
+
+- **page=1**：自动清空该 key 的旧缓存，防止新旧数据混合
+- **page>1**：追加到已有缓存
+- **下拉刷新**：重新请求 page=1（自动清空）
+
+### 缓存 key 规范
+
+不同列表用不同 key，建议格式：`'模块名_列表名_参数'`
+
+```dart
+cacheKey: 'home_feed'                 // 首页动态
+cacheKey: 'user_posts_${userId}'      // 用户帖子（按 userId 隔离）
+cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
+```
 
 ---
 
 ## 架构评分
 
-当前架构评分：8.5+/10（2026-05 最佳实践升级后）
+当前架构评分：9.0+/10（2026-05 最佳实践升级后）
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
@@ -370,6 +473,8 @@ fvm flutter test --coverage
 | 依赖约束 | 8/10 | 物理隔离 + lint + CI |
 | 错误处理 | 8/10 | sealed 异常体系 + 全局边界 |
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
+| 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
+| 缓存基础设施 | 8/10 | 通用 ListCacheManager，四种策略，分页感知 |
 
 ---
 
