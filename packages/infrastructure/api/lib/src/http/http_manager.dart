@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../api.dart';
 import '../api_builder.dart';

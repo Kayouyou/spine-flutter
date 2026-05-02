@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 import '../repository/home_repository.dart';
 import 'home_state.dart';
 

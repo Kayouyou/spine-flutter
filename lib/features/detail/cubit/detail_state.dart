@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 
 /// 详情页状态基类
 sealed class DetailState extends Equatable {

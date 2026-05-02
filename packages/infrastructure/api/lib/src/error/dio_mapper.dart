@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 
 /// DioException到DomainException的映射扩展
 ///

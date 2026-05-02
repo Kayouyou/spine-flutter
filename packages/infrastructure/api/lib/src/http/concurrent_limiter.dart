@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 
 /// 并发请求限制器
 ///

@@ -1,6 +1,6 @@
 import 'package:api/api.dart';
 import 'package:dio/dio.dart';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 import 'home_repository.dart';
 
 /// 首页数据仓库实现

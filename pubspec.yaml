@@ -17,8 +17,8 @@ dependencies:
     path: packages/infrastructure/api
   key_value_storage:
     path: packages/infrastructure/key_value_storage
-  domain_models:
-    path: packages/domain_models
+  domain:
+    path: packages/domain
   component_library:
     path: packages/infrastructure/component_library
   routing:

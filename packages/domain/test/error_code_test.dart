@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:domain_models/domain_models.dart';
+import '../lib/domain.dart';
 
 /// ErrorCode枚举测试
 ///

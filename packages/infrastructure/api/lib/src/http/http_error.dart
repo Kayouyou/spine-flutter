@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:domain_models/domain_models.dart';
+import 'package:domain/domain.dart';
 
 ///需要登录的异常
 class NeedLogin extends HttpsException {
