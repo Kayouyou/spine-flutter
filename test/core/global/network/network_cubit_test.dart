@@ -8,8 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 // Project imports:
-import 'package:my_app/core/global/network/network_cubit.dart';
-import 'package:my_app/core/global/network/network_state.dart';
+import 'package:network/network.dart';
 
 /// Mock Connectivity
 class MockConnectivity extends Mock implements Connectivity {}
