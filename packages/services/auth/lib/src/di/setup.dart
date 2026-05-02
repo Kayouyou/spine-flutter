@@ -1,12 +1,22 @@
 import 'package:get_it/get_it.dart';
-import 'package:auth/src/manager.dart';
+import 'package:dio/dio.dart';
+import 'package:domain/domain.dart';
+import 'package:key_value_storage/key_value_storage.dart';
+import '../repository/auth_repository_impl.dart';
+import '../manager.dart';
 
-/// 注册 Auth 服务到 DI 容器
-///
-/// 当前 AuthManager 无外部依赖，后续可扩展：
-/// - api: API 客户端
-/// - storage: 本地存储
-/// - userCubit: 用户状态管理
+/// 注册 auth 服务的所有依赖
 void setupAuth(GetIt sl) {
-  sl.registerSingleton<AuthManager>(AuthManager());
+  // Repository — 组合注入 Dio
+  sl.registerLazySingleton<UserRepository>(
+    () => AuthRepositoryImpl(sl<Dio>()),
+  );
+
+  // AuthManager — 注入 Repository 和存储
+  sl.registerLazySingleton<AuthManager>(
+    () => AuthManager(
+      userRepository: sl<UserRepository>(),
+      keyValueStorage: sl<KeyValueStorage>(),
+    ),
+  );
 }

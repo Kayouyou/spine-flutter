@@ -8,13 +8,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  get_it: ^7.6.0
-  api:
-    path: ../../infrastructure/api
-  key_value_storage:
-    path: ../../infrastructure/key_value_storage
+  dio: ^5.2.0+1
   domain:
     path: ../../domain
+  key_value_storage:
+    path: ../../infrastructure/key_value_storage
+  get_it: ^7.6.0
 
 dev_dependencies:
   flutter_test:
