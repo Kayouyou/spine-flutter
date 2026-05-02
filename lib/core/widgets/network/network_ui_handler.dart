@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:my_app/core/l10n/generated/app_localizations.dart';
 import '../../global/network/network_cubit.dart';
 import '../../global/network/network_state.dart';
 
