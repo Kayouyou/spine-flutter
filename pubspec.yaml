@@ -19,6 +19,13 @@ dependencies:
     path: packages/infrastructure/key_value_storage
   domain:
     path: packages/domain
+
+  # ===== 业务服务层 =====
+  auth:
+    path: packages/services/auth
+  data_sync:
+    path: packages/services/data_sync
+
   component_library:
     path: packages/infrastructure/component_library
   routing:
