@@ -14,15 +14,15 @@ dependencies:
 
   # Infrastructure
   api:
-    path: packages/api
+    path: packages/infrastructure/api
   key_value_storage:
-    path: packages/key_value_storage
+    path: packages/infrastructure/key_value_storage
   domain_models:
     path: packages/domain_models
   component_library:
-    path: packages/component_library
+    path: packages/infrastructure/component_library
   routing:
-    path: packages/routing
+    path: packages/infrastructure/routing
 
   # Dependency Injection
   get_it: ^7.6.0
