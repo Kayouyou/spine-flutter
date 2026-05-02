@@ -1,0 +1,16 @@
+# import 分组规则 — 按架构层次排序
+grouping:
+  - name: dart
+    regex: '^dart:'
+  - name: flutter
+    regex: '^package:flutter'
+  - name: infrastructure
+    regex: '^package:(api|routing|key_value_storage|component_library)'
+  - name: domain
+    regex: '^package:domain'
+  - name: services
+    regex: '^package:(auth|data_sync|network|locale|error)'
+  - name: features
+    regex: '^package:feature_'
+  - name: relative
+    regex: '^\.'
