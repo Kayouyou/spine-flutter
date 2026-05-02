@@ -656,9 +656,6 @@ class TokenRenewalInterceptor extends Interceptor {
 
   /// 检查是否需要续期
   Future<bool> _shouldRenewToken(Response response) async {
-    // 测试模式直接返回true
-      if (false) return true;
-
     try {
       // 检查响应状态
       final data =

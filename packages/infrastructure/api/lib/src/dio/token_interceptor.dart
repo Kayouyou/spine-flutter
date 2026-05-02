@@ -178,10 +178,6 @@ class TokenInterceptor extends Interceptor {
   bool _checkIfNeedRefreshToken(Response<dynamic> response) {
     var mapData =
         response.data is String ? jsonDecode(response.data) : response.data;
-    // this only for debug
-          if (false) {
-      return true;
-    }
     if (mapData['code'] == HttpConstant.renewalTokenCode) {
       return true;
     }
