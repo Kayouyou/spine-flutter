@@ -1,8 +1,6 @@
-// Project imports:
 import 'app_localizations.dart';
 
 /// The translations for Chinese (`zh`).
-// ignore_for_file: use_super_parameters
 class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 

@@ -1,8 +1,6 @@
-// Project imports:
 import 'app_localizations.dart';
 
 /// The translations for English (`en`).
-// ignore_for_file: use_super_parameters
 class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
