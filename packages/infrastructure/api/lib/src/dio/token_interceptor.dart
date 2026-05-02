@@ -53,8 +53,7 @@ class TokenInterceptor extends Interceptor {
         // var globalToken = await _getToken();
 
         // token一致表示需要更新token，不一致则表示token已经在其它请求中更新了
-        if (_refreshTimes == 0 || Api.testToken) {
-          Api.testToken = false;
+        if (_refreshTimes == 0) {
           // if (kDebugMode) {
           //   await _refreshToken();
           //   return Future.delayed(const Duration(seconds: 3), () {
@@ -180,7 +179,7 @@ class TokenInterceptor extends Interceptor {
     var mapData =
         response.data is String ? jsonDecode(response.data) : response.data;
     // this only for debug
-    if (Api.testToken) {
+          if (false) {
       return true;
     }
     if (mapData['code'] == HttpConstant.renewalTokenCode) {

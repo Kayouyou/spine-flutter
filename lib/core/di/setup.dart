@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:api/api.dart';
+import 'package:dio/dio.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
@@ -19,17 +20,12 @@ void setupDependencies() {
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
-  sl.registerSingleton<Api>(
-    Api(
-      userTokenSupplier: () async => null,
-      networkDisconnectedCallback: () {
-        sl<AppLogger>().warning('网络连接已断开');
-      },
-    ),
-  );
-
-  // 注入Logger到Api（Token续期拦截器使用）
-  sl<Api>().setLogger(sl<AppLogger>());
+  sl.registerSingleton<Dio>(createDio(
+    userTokenSupplier: () async => null, // TODO: 接入真实的 token 提供者
+    onNetworkDisconnected: () {
+      sl<AppLogger>().warning('网络连接已断开');
+    },
+  ));
 
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 

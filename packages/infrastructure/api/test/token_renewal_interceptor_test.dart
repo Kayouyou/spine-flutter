@@ -17,16 +17,6 @@ import 'package:api/src/http/token_supplier.dart';
 /// 5. CancelTokenManager、ConcurrentLimiter、RetryPolicy、RequestTracker
 void main() {
   group('续期检测', () {
-    test('Api.testToken为true时触发续期检测', () {
-      Api.testToken = true;
-
-      final data = jsonEncode({'code': HttpConstant.renewalTokenCode});
-      final needsRenewal = jsonDecode(data)['code'] == HttpConstant.renewalTokenCode;
-      expect(needsRenewal, isTrue);
-
-      Api.testToken = false; // reset
-    });
-
     test('正常响应不触发续期', () {
       final data = jsonEncode({'code': 0});
       final needsRenewal = jsonDecode(data)['code'] == HttpConstant.renewalTokenCode;

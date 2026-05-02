@@ -1,5 +1,8 @@
-export 'src/api.dart';
-export 'src/modules/modules.dart';
+/// API 基础设施包
+///
+/// 提供 Dio 工厂函数和标准拦截器，不含业务 API 方法。
+/// 业务 API 调用由各 RepositoryImpl 直接使用 Dio 完成。
+export 'src/dio_factory.dart';
 export 'src/http/http_error.dart';
 export 'src/http/http_event_bus.dart';
 export 'src/http/http_constant.dart';
