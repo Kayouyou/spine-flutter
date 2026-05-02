@@ -20,7 +20,7 @@ packages:
   api:
     dependency: "direct main"
     description:
-      path: "packages/api"
+      path: "packages/infrastructure/api"
       relative: true
     source: path
     version: "0.0.0"
@@ -187,7 +187,7 @@ packages:
   component_library:
     dependency: "direct main"
     description:
-      path: "packages/component_library"
+      path: "packages/infrastructure/component_library"
       relative: true
     source: path
     version: "0.0.0"
@@ -493,7 +493,7 @@ packages:
   key_value_storage:
     dependency: "direct main"
     description:
-      path: "packages/key_value_storage"
+      path: "packages/infrastructure/key_value_storage"
       relative: true
     source: path
     version: "0.0.0"
@@ -748,7 +748,7 @@ packages:
   routing:
     dependency: "direct main"
     description:
-      path: "packages/routing"
+      path: "packages/infrastructure/routing"
       relative: true
     source: path
     version: "0.0.0"
