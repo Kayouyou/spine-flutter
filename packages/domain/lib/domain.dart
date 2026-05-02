@@ -1,8 +1,10 @@
 /// domain 层 — 纯 Dart 业务领域
 ///
-/// 本包不依赖 Flutter，可独立编译和测试。
+/// 本包不依赖 Flutter，不依赖 infrastructure，可独立编译和测试。
 /// 提供：数据模型、仓储接口、用例、枚举、异常定义。
-export 'src/exceptions.dart';
-export 'src/enum.dart';
+export 'src/enums/enum.dart';
+export 'src/exceptions/domain_exception.dart';
+export 'src/models/user.dart';
+export 'src/repositories/user_repository.dart';
 export 'src/demo/demo_user.dart';
 export 'src/demo/demo_response.dart';
