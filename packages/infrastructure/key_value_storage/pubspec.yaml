@@ -1,8 +1,9 @@
 name: key_value_storage
+description: Key-value local storage abstraction based on Hive
 publish_to: 'none'
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 
 dependencies:
