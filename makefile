@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test create-repo create-feature add-api
+.PHONY: get clean debug debug-simulator release lint test create-repo create-feature add-api dev staging prod build-prod
 
 get:
 	cd packages/infrastructure/api && fvm flutter pub get
@@ -63,6 +63,22 @@ add-api:
 	@echo "   }"
 	@echo "4. 在 DI setup 中注册 Repository"
 	@echo "5. 参考 packages/services/auth/lib/src/repository/"
+
+# 开发环境运行
+dev: get
+	fvm flutter run --dart-define=ENV=dev --debug
+
+# 预发布环境运行
+staging: get
+	fvm flutter run --dart-define=ENV=staging --debug
+
+# 生产环境运行
+prod: get
+	fvm flutter run --dart-define=ENV=prod --debug
+
+# 生产环境构建
+build-prod: get
+	fvm flutter build apk --dart-define=ENV=prod --release
 
 %:
 	@:

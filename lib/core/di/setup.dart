@@ -14,6 +14,7 @@ import 'package:locale/locale.dart';
 import 'package:network/network.dart';
 
 // Project imports:
+import '../../config.dart';
 import '../utils/logger.dart';
 import 'locator.dart';
 
@@ -24,12 +25,14 @@ void setupDependencies() {
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
-  sl.registerSingleton<Dio>(createDio(
+  final dio = createDio(
     userTokenSupplier: () async => null, // TODO: 接入真实的 token 提供者
     onNetworkDisconnected: () {
       sl<AppLogger>().warning('网络连接已断开');
     },
-  ));
+  );
+  dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
+  sl.registerSingleton<Dio>(dio);
 
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
