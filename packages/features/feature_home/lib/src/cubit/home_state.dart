@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:domain/domain.dart';
 
 /// 首页状态基类
 ///
