@@ -26,6 +26,12 @@ dependencies:
   data_sync:
     path: packages/services/data_sync
 
+  # ===== 业务功能层 =====
+  feature_home:
+    path: packages/features/feature_home
+  feature_detail:
+    path: packages/features/feature_detail
+
   component_library:
     path: packages/infrastructure/component_library
   routing:

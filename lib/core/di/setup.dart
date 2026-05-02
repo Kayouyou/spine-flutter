@@ -2,26 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:api/api.dart';
 import 'package:key_value_storage/key_value_storage.dart';
+import 'package:auth/auth.dart';
+import 'package:data_sync/data_sync.dart';
+import 'package:feature_home/feature_home.dart';
+import 'package:feature_detail/feature_detail.dart';
 
 import 'locator.dart';
-import '../auth/manager.dart';
-import '../sync/manager.dart';
 import '../utils/logger.dart';
 import '../global/locale/locale_cubit.dart';
 import '../global/network/network_cubit.dart';
-import '../../features/home/repository/home_repository.dart';
-import '../../features/home/repository/home_repository_impl.dart';
-import '../../features/home/cubit/home_cubit.dart';
-import '../../features/detail/repository/detail_repository.dart';
-import '../../features/detail/repository/detail_repository_impl.dart';
-import '../../features/detail/cubit/detail_cubit.dart';
 
 /// 依赖注入配置
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies() {
-  // ===== 核心服务 =====
-
+  // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
   sl.registerSingleton<Api>(
@@ -38,50 +33,21 @@ void setupDependencies() {
 
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
-  // ===== BoxService =====
-  // 注意：BoxService需要泛型类型，这里注册示例
-  // sl.registerFactory<BoxService<User>>(() => BoxService<User>('user_box'));
+  // ===== Step 2: 数据定义层 =====
+  // domain 当前仅导出类型定义，无需注册
 
-  // ===== 业务服务 =====
-
-  sl.registerSingleton<AuthManager>(AuthManager());
-  sl.registerSingleton<DataSyncManager>(DataSyncManager());
-
-  // ===== 全局状态 =====
-
-  // LocaleCubit（单例）
-  sl.registerSingleton<LocaleCubit>(
-    LocaleCubit(sl<KeyValueStorage>())
-  );
-
-  // NetworkCubit（单例）
+  // ===== Step 3: 应用状态 =====
+  sl.registerSingleton<LocaleCubit>(LocaleCubit(sl<KeyValueStorage>()));
   sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
-  // ===== Repository =====
+  // ===== Step 4: 业务服务层 =====
+  setupAuth(sl);
+  setupDataSync(sl);
 
-  // HomeRepository（Factory）
-  sl.registerFactory<HomeRepository>(() =>
-    HomeRepositoryImpl(sl<Api>())
-  );
+  // ===== Step 5: 业务功能层 =====
+  setupFeatureHome(sl);
+  setupFeatureDetail(sl);
 
-  // DetailRepository（Factory）
-  sl.registerFactory<DetailRepository>(() =>
-    DetailRepositoryImpl(sl<Api>())
-  );
-
-  // ===== Cubit =====
-
-  // HomeCubit（Factory）
-  sl.registerFactory<HomeCubit>(() =>
-    HomeCubit(sl<HomeRepository>())
-  );
-
-  // DetailCubit（Factory）
-  sl.registerFactory<DetailCubit>(() =>
-    DetailCubit(sl<DetailRepository>())
-  );
-
-  // 配置EasyLoading
   configureEasyLoading();
 }
 
