@@ -17,6 +17,8 @@ dependencies:
     path: packages/infrastructure/api
   key_value_storage:
     path: packages/infrastructure/key_value_storage
+  list_cache:
+    path: packages/infrastructure/list_cache
   domain:
     path: packages/domain
 

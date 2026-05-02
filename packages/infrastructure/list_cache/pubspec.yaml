@@ -1,0 +1,16 @@
+name: list_cache
+description: 通用列表缓存策略 — 支持先缓存后网络、先网络后缓存等，分页感知。
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  equatable: ^2.0.5
+  key_value_storage:
+    path: ../key_value_storage
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.24.0

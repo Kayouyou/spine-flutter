@@ -3,6 +3,7 @@
 get:
 	cd packages/infrastructure/api && fvm flutter pub get
 	cd packages/infrastructure/key_value_storage && fvm flutter pub get
+	cd packages/infrastructure/list_cache && fvm flutter pub get
 	cd packages/infrastructure/component_library && fvm flutter pub get
 	cd packages/infrastructure/routing && fvm flutter pub get
 	cd packages/domain && fvm flutter pub get
