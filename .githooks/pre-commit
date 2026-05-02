@@ -1,0 +1,13 @@
+#!/bin/bash
+# pre-commit hook — 提交前自动运行静态分析和测试
+# 任何一步失败会阻止提交
+
+set -euo pipefail
+
+echo "▸ 运行 flutter analyze..."
+flutter analyze --fatal-infos lib/ packages/
+
+echo "▸ 运行单元测试和 Bloc 测试..."
+flutter test test/unit/ test/bloc/
+
+echo "✓ pre-commit 检查通过"
