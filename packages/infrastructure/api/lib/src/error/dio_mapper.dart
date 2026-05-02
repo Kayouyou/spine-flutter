@@ -13,11 +13,30 @@ extension DioExceptionMapper on DioException {
   /// HTTP状态码优先，DioException类型其次
   DomainException toDomainException() {
     final errorCode = _mapErrorCode(type, response?.statusCode);
-    return DomainException(
-      errorCode,
-      httpCode: response?.statusCode,
-      rawData: response?.data as Map<String, dynamic>?,
-    );
+    final statusCode = response?.statusCode;
+
+    switch (errorCode) {
+      case ErrorCode.unauthorized:
+        return const UnauthorizedException();
+      case ErrorCode.forbidden:
+        return NetworkException('禁止访问', statusCode: statusCode);
+      case ErrorCode.notFound:
+        return const NotFoundException();
+      case ErrorCode.serverError:
+        return NetworkException('服务器错误', statusCode: statusCode);
+      case ErrorCode.requestCancelled:
+        return NetworkException('请求已取消');
+      case ErrorCode.connectionTimeout:
+        return NetworkException('连接超时', statusCode: statusCode);
+      case ErrorCode.networkError:
+        return NetworkException('网络连接失败', statusCode: statusCode);
+      case ErrorCode.tokenExpired:
+        return const UnauthorizedException();
+      case ErrorCode.invalidInput:
+        return ValidationException('无效的输入');
+      case ErrorCode.unknown:
+        return NetworkException('未知错误', statusCode: statusCode);
+    }
   }
 
   /// 映射ErrorCode

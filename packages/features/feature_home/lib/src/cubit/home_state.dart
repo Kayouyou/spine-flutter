@@ -37,8 +37,8 @@ class HomeLoaded extends HomeState {
 ///
 /// 数据加载出错，展示错误提示
 class HomeError extends HomeState {
-  /// 错误码，用于国际化错误消息
-  final ErrorCode errorCode;
+  /// 错误信息
+  final String errorCode;
 
   HomeError(this.errorCode);
 

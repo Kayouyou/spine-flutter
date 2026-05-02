@@ -20,7 +20,7 @@ class DetailCubit extends Cubit<DetailState> {
       final data = await _repository.getDetailData(id);
       emit(DetailLoaded(data));
     } on DomainException catch (e) {
-      emit(DetailError(e.errorCode));
+      emit(DetailError(e.message));
     }
   }
 

@@ -107,7 +107,7 @@ class ConcurrentLimiter {
   void cancelTag(String tag) {
     final toCancel = _queue.where((p) => p.tag == tag).toList();
     for (final pending in toCancel) {
-      pending.completer.completeError(DomainException(ErrorCode.requestCancelled));
+      pending.completer.completeError(NetworkException('请求已取消'));
       _queue.remove(pending);
     }
   }

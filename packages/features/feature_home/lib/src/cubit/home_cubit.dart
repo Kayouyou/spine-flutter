@@ -32,7 +32,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(HomeLoaded(data));
     } on DomainException catch (e) {
       // 加载失败，传递ErrorCode用于国际化
-      emit(HomeError(e.errorCode));
+      emit(HomeError(e.message));
     }
   }
 
@@ -45,7 +45,7 @@ class HomeCubit extends Cubit<HomeState> {
       final data = await _repository.refreshHomeData();
       emit(HomeLoaded(data));
     } on DomainException catch (e) {
-      emit(HomeError(e.errorCode));
+      emit(HomeError(e.message));
     }
   }
 

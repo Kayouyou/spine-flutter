@@ -188,7 +188,7 @@ class HttpManager {
       throw e.toDomainException();
     } catch (e) {
       // 其他异常也转换为 DomainException（兜底）
-      throw DomainException(ErrorCode.unknown);
+      throw NetworkException('未知错误');
     }
   }
 

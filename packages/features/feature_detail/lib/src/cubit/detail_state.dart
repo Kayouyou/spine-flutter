@@ -24,7 +24,7 @@ class DetailLoaded extends DetailState {
 
 /// 加载失败状态
 class DetailError extends DetailState {
-  final ErrorCode errorCode;
+  final String errorCode;
   DetailError(this.errorCode);
 
   @override

@@ -117,11 +117,27 @@ extension HttpsExceptionExtension on HttpsException {
   /// HTTP状态码映射到ErrorCode
   DomainException toDomainException() {
     final errorCode = _mapToErrorCode(this.code);
-    return DomainException(
-      errorCode,
-      httpCode: this.code,
-      rawData: this.data as Map<String, dynamic>?,
-    );
+    final httpCode = this.code;
+
+    switch (errorCode) {
+      case ErrorCode.unauthorized:
+        return const UnauthorizedException();
+      case ErrorCode.forbidden:
+        return NetworkException('禁止访问', statusCode: httpCode);
+      case ErrorCode.notFound:
+        return const NotFoundException();
+      case ErrorCode.serverError:
+        return NetworkException('服务器错误', statusCode: httpCode);
+      case ErrorCode.networkError:
+      case ErrorCode.requestCancelled:
+      case ErrorCode.connectionTimeout:
+      case ErrorCode.invalidInput:
+        return NetworkException('请求失败', statusCode: httpCode);
+      case ErrorCode.tokenExpired:
+        return const UnauthorizedException();
+      case ErrorCode.unknown:
+        return NetworkException('未知错误', statusCode: httpCode);
+    }
   }
 
   /// HTTP状态码映射到ErrorCode
