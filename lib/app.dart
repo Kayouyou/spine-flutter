@@ -1,15 +1,19 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:routing/routing.dart';
-
-import 'src/theme/app_theme.dart';
-import 'core/di/locator.dart';
 import 'package:locale/locale.dart';
 import 'package:network/network.dart';
+import 'package:routing/routing.dart';
+
+// Project imports:
+import 'core/di/locator.dart';
 import 'core/widgets/network/network_banner.dart';
+import 'src/theme/app_theme.dart';
 
 /// 主应用Widget
 ///

@@ -1,17 +1,21 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+// Package imports:
 import 'package:api/api.dart';
-import 'package:dio/dio.dart';
-import 'package:key_value_storage/key_value_storage.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
-import 'package:feature_home/feature_home.dart';
+import 'package:dio/dio.dart';
 import 'package:feature_detail/feature_detail.dart';
-
-import 'locator.dart';
-import '../utils/logger.dart';
+import 'package:feature_home/feature_home.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:locale/locale.dart';
 import 'package:network/network.dart';
+
+// Project imports:
+import '../utils/logger.dart';
+import 'locator.dart';
 
 /// 依赖注入配置
 ///

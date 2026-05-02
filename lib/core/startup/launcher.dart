@@ -1,15 +1,20 @@
 // lib/core/startup/launcher.dart
+
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:error/error.dart';
+
+// Package imports:
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
+import 'package:error/error.dart';
 
+// Project imports:
+import '../di/locator.dart';
+import '../di/setup.dart';
+import '../utils/logger.dart';
 import 'initializer.dart';
 import 'profiler.dart';
-import '../di/setup.dart';
-import '../di/locator.dart';
-import '../utils/logger.dart';
 
 /// 应用启动编排器
 ///

@@ -1,7 +1,12 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_app/core/l10n/generated/app_localizations.dart';
 import 'package:network/network.dart';
+
+// Project imports:
+import 'package:my_app/core/l10n/generated/app_localizations.dart';
 
 /// 网络状态Banner
 ///

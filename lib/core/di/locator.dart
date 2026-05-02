@@ -1,3 +1,4 @@
+// Package imports:
 import 'package:get_it/get_it.dart';
 
 /// 全局服务定位器
