@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-/// Environment configuration
+/// 环境配置
+///
+/// CHANNEL/DEBUG 来自编译时环境变量，按惯例使用大写下划线命名。
+// ignore_for_file: constant_identifier_names
 class EnvironmentConfig {
   static const CHANNEL = String.fromEnvironment('CHANNEL');
   static const DEBUG = String.fromEnvironment('DEBUG');
