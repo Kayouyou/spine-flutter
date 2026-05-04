@@ -14,6 +14,7 @@ get:
 	cd packages/services/error && fvm flutter pub get
 	cd packages/features/feature_home && fvm flutter pub get
 	cd packages/features/feature_detail && fvm flutter pub get
+	cd packages/features/feature_auth && fvm flutter pub get
 	fvm flutter pub get
 
 clean:
