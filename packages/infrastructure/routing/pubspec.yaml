@@ -11,6 +11,8 @@ dependencies:
   go_router: ^14.2.7
   auth:
     path: ../../services/auth
+  feature_auth:
+    path: ../../features/feature_auth
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Package imports:
+import 'package:auth/auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,6 +12,7 @@ import 'package:network/network.dart';
 import 'package:routing/routing.dart';
 
 // Project imports:
+import 'config.dart';
 import 'core/di/locator.dart';
 import 'core/widgets/network/network_banner.dart';
 import 'src/theme/app_theme.dart';
@@ -32,21 +34,26 @@ class _MyAppState extends State<MyApp> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 
-  @override
+@override
   void initState() {
     super.initState();
     // 构建路由
-    final ctx = RouteContext(navigatorKey: _navigatorKey);
+    final ctx = RouteContext(
+      navigatorKey: _navigatorKey,
+      authManager: sl<AuthManager>(),
+      enableAuthGuard: EnvironmentConfig.enableAuthGuard,
+    );
     _router = AppRouter.getRouter(ctx: ctx);
   }
 
   @override
   Widget build(BuildContext context) {
-    // 全局BlocProvider包装，提供LocaleCubit和NetworkCubit
+// 全局BlocProvider包装，提供LocaleCubit、NetworkCubit和AuthCubit
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<LocaleCubit>()),
         BlocProvider(create: (context) => sl<NetworkCubit>()),
+        BlocProvider(create: (context) => sl<AuthCubit>()),
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {

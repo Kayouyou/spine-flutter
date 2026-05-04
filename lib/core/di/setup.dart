@@ -6,6 +6,7 @@ import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
 import 'package:dio/dio.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -50,6 +51,7 @@ void setupDependencies() {
   // ===== Step 5: 业务功能层 =====
   setupFeatureHome(sl);
   setupFeatureDetail(sl);
+  setupFeatureAuth(sl);
 
   configureEasyLoading();
 }
