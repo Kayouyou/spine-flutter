@@ -1,9 +1,7 @@
-// 注入字段暂未使用（TODO 阶段），待实现时启用。
-// ignore_for_file: unused_field
-
 import 'package:flutter/foundation.dart';
 import 'package:domain/domain.dart';
 import 'package:key_value_storage/key_value_storage.dart';
+import 'cubit/auth_cubit.dart';
 
 /// 认证管理器
 ///
@@ -12,12 +10,17 @@ import 'package:key_value_storage/key_value_storage.dart';
 class AuthManager {
   final UserRepository _userRepository;
   final KeyValueStorage _keyValueStorage;
+  final AuthCubit _authCubit;
 
   AuthManager({
     required UserRepository userRepository,
     required KeyValueStorage keyValueStorage,
+    required AuthCubit authCubit,
   })  : _userRepository = userRepository,
-        _keyValueStorage = keyValueStorage;
+        _keyValueStorage = keyValueStorage,
+        _authCubit = authCubit;
+
+  bool get isLoggedIn => _authCubit.isLoggedIn;
 
   /// 处理登录流程
   ///

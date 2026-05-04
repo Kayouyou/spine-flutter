@@ -51,6 +51,19 @@ class EnvironmentConfig {
 
   /// 网络请求超时（秒）
   static int get networkTimeout => isProd ? 10 : 30;
+
+  /// 是否启用路由守卫覆盖
+  static bool get enableAuthGuardOverride {
+    return const bool.fromEnvironment('ENABLE_AUTH_GUARD', defaultValue: true);
+  }
+
+  /// 是否启用路由守卫
+  static bool get enableAuthGuard {
+    if (isProd) {
+      return enableAuthGuardOverride;
+    }
+    return true; // debug/staging default enabled
+  }
 }
 
 /// 应用配置

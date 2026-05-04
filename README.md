@@ -16,6 +16,10 @@
 - [环境配置](#环境配置)
 - [列表缓存](#列表缓存)
 - [架构评分](#架构评分)
+- [路由守卫](#路由守卫)
+- [Domain 测试](#domain-测试)
+- [Login/Register 示例](#loginregister-示例)
+- [测试覆盖率](#测试覆盖率)
 
 ---
 
@@ -475,6 +479,36 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
 | 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
 | 缓存基础设施 | 8/10 | 通用 ListCacheManager，四种策略，分页感知 |
+
+---
+
+## 路由守卫
+
+环境自动启用（debug/staging）。白名单：`/`, `/home`, `/login`, `/register`。
+
+详细指南：[docs/auth-route-guard.md](docs/auth-route-guard.md)
+
+---
+
+## Domain 测试
+
+按风险优先覆盖。Phase 1：usecases 100%。
+
+详细指南：[docs/domain-testing-guide.md](docs/domain-testing-guide.md)
+
+---
+
+## Login/Register 示例
+
+脚手架示例页面，无真实 API。位于 `packages/features/feature_auth/`。
+
+---
+
+## 测试覆盖率
+
+双轨报告：CI codecov + 本地 HTML。
+
+详细指南：[docs/coverage-guide.md](docs/coverage-guide.md)
 
 ---
 

@@ -85,5 +85,9 @@ prod: get
 build-prod: get
 	fvm flutter build apk --dart-define=ENV=prod --release
 
+coverage-local:
+	@chmod +x scripts/coverage_local.sh
+	@./scripts/coverage_local.sh
+
 %:
 	@:

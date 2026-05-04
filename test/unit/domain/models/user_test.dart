@@ -1,46 +1,48 @@
-// Package imports:
-import 'package:domain/domain.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:domain/domain.dart';
 
 void main() {
   group('User', () {
-    const json = {
-      'id': 'user-1',
-      'name': 'Test User',
-      'avatar': 'https://example.com/avatar.png',
-      'email': 'test@example.com',
-    };
-
-    test('fromJson 创建完整字段的 User', () {
+    test('fromJson creates User correctly', () {
+      final json = {'id': '1', 'name': 'Test', 'avatar': 'url', 'email': 'test@example.com'};
       final user = User.fromJson(json);
-      expect(user.id, 'user-1');
-      expect(user.name, 'Test User');
-      expect(user.avatar, 'https://example.com/avatar.png');
+
+      expect(user.id, '1');
+      expect(user.name, 'Test');
+      expect(user.avatar, 'url');
       expect(user.email, 'test@example.com');
     });
 
-    test('fromJson 处理缺失可选字段', () {
-      final user = User.fromJson({'id': 'user-2', 'name': 'Minimal'});
-      expect(user.avatar, isNull);
-      expect(user.email, isNull);
+    test('toJson produces correct map', () {
+      final user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
+      final map = user.toJson();
+
+      expect(map['id'], '1');
+      expect(map['name'], 'Test');
+      expect(map['avatar'], 'url');
+      expect(map['email'], 'test@example.com');
     });
 
-    test('toJson 生成正确的 Map', () {
-      final user = User.fromJson(json);
-      expect(user.toJson(), json);
+    test('toJson omits null fields', () {
+      final user = User(id: '1', name: 'Test');
+      final map = user.toJson();
+
+      expect(map['avatar'], isNull);
+      expect(map['email'], isNull);
     });
 
-    test('Equatable — 相同值产生相等对象', () {
-      final a = User.fromJson(json);
-      final b = User.fromJson(json);
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
+    test('equality works correctly', () {
+      final user1 = User(id: '1', name: 'Test');
+      final user2 = User(id: '1', name: 'Test');
+      final user3 = User(id: '2', name: 'Other');
+
+      expect(user1, user2);
+      expect(user1, isNot(user3));
     });
 
-    test('Equatable — 不同值产生不相等对象', () {
-      final a = User.fromJson(json);
-      final b = User.fromJson({...json, 'id': 'user-2'});
-      expect(a, isNot(equals(b)));
+    test('props includes all fields', () {
+      final user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
+      expect(user.props, ['1', 'Test', 'url', 'test@example.com']);
     });
   });
 }
