@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'route_context.dart';
 import 'module_a.dart';
 import 'module_b.dart';
+import '../guards/auth_guard.dart';
 
 /// App Router — GoRouter factory
 class AppRouter {
@@ -12,6 +13,12 @@ class AppRouter {
   static GoRouter getRouter({required RouteContext ctx}) {
     router = GoRouter(
       initialLocation: '/home',
+      redirect: ctx.enableAuthGuard && ctx.authManager != null
+          ? (context, state) {
+              final location = state.matchedLocation;
+              return AuthGuard.check(location, ctx.authManager!);
+            }
+          : null,
       routes: [
         StatefulShellRoute.indexedStack(
           pageBuilder: (context, state, navigationShell) {
