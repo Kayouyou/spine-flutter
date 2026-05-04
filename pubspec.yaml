@@ -39,6 +39,8 @@ dependencies:
     path: packages/features/feature_home
   feature_detail:
     path: packages/features/feature_detail
+  feature_auth:
+    path: packages/features/feature_auth
 
   component_library:
     path: packages/infrastructure/component_library
