@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test create-repo create-feature add-api dev staging prod build-prod
+.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod
 
 get:
 	cd packages/infrastructure/api && fvm flutter pub get
@@ -33,6 +33,10 @@ lint:
 
 test:
 	fvm flutter test
+
+coverage-local:
+	@chmod +x scripts/coverage_local.sh
+	@./scripts/coverage_local.sh
 
 create-repo:
 	@echo "📦 创建新 Repository 的步骤："
