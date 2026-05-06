@@ -41,7 +41,7 @@ void setupDependencies() {
   // domain 当前仅导出类型定义，无需注册
 
   // ===== Step 3: 应用状态 =====
-  sl.registerSingleton<LocaleCubit>(LocaleCubit(sl<KeyValueStorage>()));
+  sl.registerSingleton<LocaleCubit>(LocaleCubit());
   sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
   // ===== Step 4: 业务服务层 =====

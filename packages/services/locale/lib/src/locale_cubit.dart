@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:key_value_storage/key_value_storage.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'locale_state.dart';
 
 /// 语言管理Cubit
@@ -9,42 +8,39 @@ import 'locale_state.dart';
 /// 使用：
 ///   - 获取当前语言：context.read<LocaleCubit>().state.locale
 ///   - 切换语言：context.read<LocaleCubit>().setLocale(Locale('en'))
-/// 持久化：语言设置保存到KeyValueStorage，App重启后恢复
-class LocaleCubit extends Cubit<LocaleState> {
-  /// KeyValueStorage用于持久化语言设置
-  final KeyValueStorage _storage;
+/// 持久化：通过HydratedCubit自动持久化，App重启后恢复
+class LocaleCubit extends HydratedCubit<LocaleState> {
+  static const String _storagePrefix = 'LocaleCubit';
 
-  /// 语言设置存储key
-  static const String _localeKey = 'app_locale';
+  LocaleCubit() : super(LocaleState(locale: Locale('zh')));
 
-  LocaleCubit(this._storage) : super(LocaleState(locale: Locale('zh'))) {
-    // 启动时加载已保存的语言设置
-    _loadSavedLocale();
+  @override
+  String get storagePrefix => _storagePrefix;
+
+  @override
+  LocaleState? fromJson(Map<String, dynamic> json) {
+    final localeCode = json['locale'] as String?;
+    if (localeCode != null) {
+      return LocaleState(locale: Locale(localeCode));
+    }
+    return null;
   }
 
-  /// 加载保存的语言设置
-  ///
-  /// 从KeyValueStorage读取用户上次选择的语言
-  Future<void> _loadSavedLocale() async {
-    final savedLocale = await _storage.getString(_localeKey);
-    if (savedLocale != null) {
-      emit(LocaleState(locale: Locale(savedLocale)));
-    }
+  @override
+  Map<String, dynamic>? toJson(LocaleState state) {
+    return {'locale': state.locale.languageCode};
   }
 
   /// 设置语言
   ///
-  /// 切换应用语言并持久化保存
+  /// 切换应用语言，自动通过HydratedCubit持久化
   /// 支持的语言：zh（中文）、en（英文）
   Future<void> setLocale(Locale locale) async {
-    // 持久化保存
-    await _storage.putString(_localeKey, locale.languageCode);
-    // 更新状态
     emit(LocaleState(locale: locale));
   }
 
   /// 重置为默认语言（中文）
   Future<void> resetToDefault() async {
-    await setLocale(Locale('zh'));
+    emit(LocaleState(locale: Locale('zh')));
   }
 }
