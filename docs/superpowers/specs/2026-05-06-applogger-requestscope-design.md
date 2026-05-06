@@ -123,7 +123,28 @@ interceptor.logger = sl<AppLogger>();
 
 ## 5. Tag 传递策略（混合方案）
 
-### 5.1 主路径：GoRouter meta 自动提取
+### 5.1 Tag 常量管理
+
+**文件**: `lib/core/constants/page_tags.dart`
+
+```dart
+class PageTags {
+  // pages
+  static const homePage = 'home_page';
+  static const detailPage = 'detail_page';
+  static const settingsPage = 'settings_page';
+  // subpages
+  static const authLoginPage = 'auth_login_page';
+  static const authRegisterPage = 'auth_register_page';
+  // dialogs/sheets
+  static const confirmDialog = 'confirm_dialog';
+  static const feedbackSheet = 'feedback_sheet';
+}
+```
+
+**优势**: IDE 自动补全，编译期防拼错，集中管理避免重复。
+
+### 5.2 主路径：GoRouter meta 自动提取
 
 页面路由定义时携带 `page_tag` metadata：
 
@@ -133,9 +154,9 @@ GoRoute(
   path: '/home',
   name: 'home',
   pageBuilder: (context, state) => {
-    metadata: {'page_tag': 'home_page'},  // ← 唯一定义点
+    metadata: {'page_tag': PageTags.homePage},  // ← 常量引用，IDE 补全
     child: RequestScope(
-      tag: 'home_page',
+      tag: PageTags.homePage,                   // ← 同一常量
       child: BlocProvider(
         create: (_) => HomeCubit()..loadData(),
         child: const HomePage(),
@@ -149,20 +170,20 @@ GoRoute(
 - 优先从 Dio `options.extra['page_tag']` 读取（拦截器层面）
 - 若未传，则从 `RequestContext.currentTag` 回退（RequestScope 设置的静态字段）
 
-### 5.2 兜底路径：RequestScope 手动包裹
+### 5.3 兜底路径：RequestScope 手动包裹
 
 场景：`showDialog`、`showModalBottomSheet`、非 GoRouter 子页面
 
 ```dart
 RequestScope(
-  tag: 'detail_page',
+  tag: PageTags.confirmDialog,
   child: SomeDialogContent(),
 )
 ```
 
 `RequestScope.initState()` → `RequestContext.setTag(widget.tag)`，拦截器读到静态字段。
 
-### 5.3 原则
+### 5.4 原则
 
 | 问题 | 答案 |
 |---|---|
@@ -171,15 +192,15 @@ RequestScope(
 | 忘记设 tag 会怎样？ | 请求正常发出，不被自动取消（fail-safe，不崩溃） |
 | 后台请求（无页面）？ | 不调用拦截器或传空 tag → 不受影响 |
 
-### 5.4 Tag 命名规范
+### 5.5 Tag 命名规范
 
-| 格式 | 例子 |
-|---|---|
-| `feature_page` | `home_page`, `detail_page`, `settings_page` |
-| `feature_subpage` | `auth_login_page`, `auth_register_page` |
-| `dialog_component` | `confirm_dialog`, `feedback_sheet` |
+| 格式 | 常量命名 | 值 |
+|---|---|---|
+| `feature_page` | `PageTags.homePage` | `'home_page'` |
+| `feature_subpage` | `PageTags.authLoginPage` | `'auth_login_page'` |
+| `dialog_component` | `PageTags.confirmDialog` | `'confirm_dialog'` |
 
-tag 是纯字符串，无强制验证。
+常量集中管理，新增页面需在 `page_tags.dart` 添加条目。
 
 ---
 
@@ -236,7 +257,7 @@ tag 是纯字符串，无强制验证。
 ## 10. FAQ
 
 ### Q: 每个页面都要手动指定 tag 吗？
-A: 是。tag 定义在两个地方：(1) GoRoute 的 `metadata['page_tag']`（主路径），(2) `RequestScope(tag: 'xxx')` 包裹（Widget 层）。两处写同一个值，确保一致性。GoRouter metadata 是单一数据源。
+A: 是。tag 通过 `PageTags` 常量统一管理，新增页面需在 `lib/core/constants/page_tags.dart` 添加条目。GoRouter `metadata` 和 `RequestScope` 都引用同一常量，确保一致性。
 
 ### Q: Repository 需要改吗？
 A: 不需要。Repository 保持 `await dio.get('/path')` 干净写法，拦截器自动绑定 CancelToken。
