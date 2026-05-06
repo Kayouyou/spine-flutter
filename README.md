@@ -512,6 +512,58 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ---
 
+## UI 层统一模式
+
+本项目建立了 UI 层的统一模式，减少模板代码，提升开发效率。
+
+### 统一导航栏（CustomAppBar）
+
+所有页面使用 CustomAppBar widget，统一 AppBar 样式。
+
+```dart
+AppScaffold(title: '首页', body: ...)
+```
+
+### 统一页面结构（AppScaffold）
+
+AppScaffold widget 封装 Scaffold + CustomAppBar。
+
+**简单模式**：
+```dart
+AppScaffold(title: '首页', body: BlocBuilder<...>(...))
+```
+
+**高级模式**：
+```dart
+AppScaffold(
+  title: state.isLoading ? '登录中...' : '登录',
+  body: BlocBuilder<LoginCubit, LoginState>(
+    builder: (context, state) {
+      return switch (state) {
+        LoginLoading() => const Center(child: CircularProgressIndicator()),
+        LoginLoaded() => LoginContent(data: state.data),
+        LoginError() => ErrorWidget(state.error),
+      };
+    },
+  ),
+)
+```
+
+### 统一生命周期（LifecycleMixin）
+
+```dart
+class _EditPageState extends State<EditPage> with LifecycleMixin<EditPage> {
+  @override
+  void onPageEnter() { context.read<EditCubit>().loadData(); }
+  @override
+  void onPageLeave() { context.read<EditCubit>().saveData(); }
+}
+```
+
+**详细指南**：[docs/ui-lifecycle-patterns-guide.md](docs/ui-lifecycle-patterns-guide.md)
+
+---
+
 ## 常见问题
 
 **Q: 为什么 domain 必须是纯 Dart？**  
