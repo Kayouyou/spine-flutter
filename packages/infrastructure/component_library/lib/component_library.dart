@@ -8,3 +8,6 @@ export 'src/theme/spacing.dart';
 export 'src/constants/app_constants.dart';
 export 'src/constants/api_constants.dart';
 export 'src/constants/cache_constants.dart';
+
+// Widgets
+export 'src/widgets/custom_app_bar.dart';
