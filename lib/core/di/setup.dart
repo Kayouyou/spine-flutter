@@ -17,6 +17,7 @@ import 'package:network/network.dart';
 // Project imports:
 import '../../config.dart';
 import '../utils/logger.dart';
+import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
 import 'locator.dart';
 
 /// 依赖注入配置
@@ -26,11 +27,19 @@ void setupDependencies() {
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
+  // 构造 AutoCancelInterceptor（注入 RequestContext + CancelTokenManager）
+  final autoCancelInterceptor = AutoCancelInterceptor(
+    tagProvider: () => RequestContext.currentTag,
+    registerFn: (tag, token) => CancelTokenManager.instance.register(tag, token),
+  );
+
   final dio = createDio(
     userTokenSupplier: () async => null, // TODO: 接入真实的 token 提供者
     onNetworkDisconnected: () {
       sl<AppLogger>().warning('网络连接已断开');
     },
+    logger: sl<AppLogger>(),
+    autoCancelInterceptor: autoCancelInterceptor,
   );
   dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);
