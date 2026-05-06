@@ -44,18 +44,18 @@ packages:
     dependency: transitive
     description:
       name: bloc
-      sha256: "106842ad6569f0b60297619e9e0b1885c2fb9bf84812935490e6c5275777804e"
+      sha256: a48653a82055a900b88cd35f92429f068c5a8057ae9b136d197b3d56c57efb81
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "8.1.4"
+    version: "9.2.0"
   bloc_test:
     dependency: "direct dev"
     description:
       name: bloc_test
-      sha256: "165a6ec950d9252ebe36dc5335f2e6eb13055f33d56db0eeb7642768849b43d2"
+      sha256: "1dd549e58be35148bc22a9135962106aa29334bc1e3f285994946a1057b29d7b"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "9.1.7"
+    version: "10.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -199,10 +199,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_bloc
-      sha256: b594505eac31a0518bdcb4b5b79573b8d9117b193cc80cc12e17d639b10aa27a
+      sha256: cf51747952201a455a1c840f8171d273be009b932c75093020f9af64f2123e38
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "8.1.6"
+    version: "9.1.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -211,6 +211,19 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_screenutil:
+    dependency: transitive
+    description:
+      name: flutter_screenutil
+      sha256: "8239210dd68bee6b0577aa4a090890342d04a136ce1c81f98ee513fc0ce891de"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.9.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -277,6 +290,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.2"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.19.0"
   io:
     dependency: transitive
     description:

@@ -186,8 +186,10 @@ test/unit/domain/
 - 其他功能（通知、隐私）后续可拆分子页面
 - Feature包结构清晰：cubit/repository/ui分离
 
-## Open Questions
+## Decisions Locked
 
-- Q1: codecov.io vs 本地HTML报告？（倾向codecov免费方案）
-- Q2: ThemeCubit 放 locale包 vs 新建 preferences包？（倾向 locale包内）
-- Q3: FPS监控默认启用还是可选？（倾向可选，通过DI配置）
+| Question | Decision | Rationale |
+|----------|----------|-----------|
+| Q1: codecov.io vs 本地HTML？ | **codecov免费方案** | 免费额度足够，自动化徽章，可视化便捷 |
+| Q2: ThemeCubit放哪？ | **locale包内** | 同属用户偏好，减少包数量，状态集中管理 |
+| Q3: FPS监控默认？ | **默认启用，环境控制** | debug/staging自动启用，prod禁用，通过EnvironmentConfig控制 |
