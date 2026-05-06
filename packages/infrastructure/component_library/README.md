@@ -18,9 +18,12 @@ component_library/
 │       │   ├── api_constants.dart         # API 相关常量
 │       │   ├── app_constants.dart         # 应用通用常量
 │       │   └── cache_constants.dart       # 缓存相关常量
-│       └── l10n/
-│           ├── component_library_localizations.dart        # 国际化生成文件
-│           └── component_library_localizations_zh.dart     # 中文本地化
+│       ├── l10n/
+│       │   ├── component_library_localizations.dart        # 国际化生成文件
+│       │   └── component_library_localizations_zh.dart     # 中文本地化
+│       └── widgets/
+│           ├── custom_app_bar.dart   # 统一导航栏 widget
+│           └── app_scaffold.dart      # 统一页面结构 widget
 ├── l10n.yaml                              # 国际化配置
 └── pubspec.yaml
 ```
@@ -112,3 +115,64 @@ SizedBox(height: AppSpacing.md);
 // 字体
 Text('标题', style: TextStyle(fontSize: AppFontSizes.title));
 ```
+
+## Widgets
+
+### CustomAppBar
+
+统一导航栏 widget，所有页面复用。
+
+```dart
+import 'package:component_library/component_library.dart';
+
+CustomAppBar(
+  title: '首页',
+  actions: [IconButton(icon: Icon(Icons.refresh), onPressed: () {})],
+  showBackButton: true,
+)
+```
+
+参数：
+- `title` — 标题文本（必需）
+- `actions` — AppBar 右侧按钮列表（可选）
+- `showBackButton` — 是否显示返回按钮（默认 true）
+- `leading` — 自定义 leading widget（可选，覆盖 showBackButton）
+- `elevation` — 阴影高度（默认 0）
+- `backgroundColor` — AppBar 背景色（可选）
+
+---
+
+### AppScaffold
+
+统一页面结构 widget，封装 Scaffold + CustomAppBar。
+
+```dart
+// 简单模式（传 title）
+AppScaffold(
+  title: '首页',
+  body: Center(child: Text('内容')),
+  actions: [IconButton(...)],
+)
+
+// 高级模式（传自定义 appBar）
+AppScaffold(
+  appBar: CustomAppBar(title: '自定义标题', ...),
+  body: Center(child: Text('内容')),
+)
+```
+
+参数：
+- `title` — 标题（简单模式，与 appBar 二选一）
+- `appBar` — 自定义 AppBar widget（高级模式）
+- `body` — 页面内容（必需）
+- `actions` — AppBar 右侧按钮（仅在简单模式生效）
+- `showBackButton` — 是否显示返回按钮（默认 true）
+- `floatingActionButton` — FAB（可选）
+- `backgroundColor` — Scaffold 背景色（可选）
+- `bottomNavigationBar` — 底部导航栏（可选）
+- `resizeToAvoidBottomInset` — 键盘弹出时是否调整布局（可选）
+
+**使用场景**：
+- 简单页面：传 title（80% 页面）
+- 复杂页面：传 appBar + BlocBuilder（动态 AppBar）
+- 需生命周期：叠加 LifecycleMixin（单独 mixin）
