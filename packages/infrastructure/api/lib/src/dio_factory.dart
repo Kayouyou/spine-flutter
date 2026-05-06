@@ -1,18 +1,30 @@
 import 'package:dio/dio.dart';
+import 'cancel/auto_cancel_interceptor.dart';
+import 'dio/renewal_token_intercaptor.dart';
+import 'http/app_logger.dart';
 
 /// 创建预配置的 Dio 实例
 ///
-/// 包含标准的请求拦截器（认证令牌注入、网络断开检测）。
+/// 拦截器链顺序（请求方向）:
+///   [0] AutoCancelInterceptor    → 读 tag，生成 CancelToken
+///   [1] TokenRenewalInterceptor  → 检测 401，排队续期
+///   [2] InterceptorsWrapper      → 注入 Authorization header
+///   [3] LogInterceptor           → 记录日志
+///
 /// 使用方式：
 /// ```dart
 /// final dio = createDio(
 ///   userTokenSupplier: () async => token,
 ///   onNetworkDisconnected: () => logger.warning('网络断开'),
+///   logger: appLogger,                        // 注入主应用 AppLogger
+///   autoCancelInterceptor: myInterceptor,      // 从外部注入 AutoCancelInterceptor
 /// );
 /// ```
 Dio createDio({
   required Future<String?> Function() userTokenSupplier,
   required void Function() onNetworkDisconnected,
+  AppLoggerInterface? logger,
+  AutoCancelInterceptor? autoCancelInterceptor,
 }) {
   final dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
@@ -20,7 +32,19 @@ Dio createDio({
     headers: {'Content-Type': 'application/json'},
   ));
 
-  // 认证拦截器 — 自动附加 Bearer 令牌
+  // [0] Auto-cancel — 调用方注入（closes over RequestContext + CancelTokenManager）
+  if (autoCancelInterceptor != null) {
+    dio.interceptors.add(autoCancelInterceptor);
+  }
+
+  // [1] Token 续期 — 处理 401，日志走注入的 AppLogger
+  final renewalInterceptor = TokenRenewalInterceptor(dio);
+  if (logger != null) {
+    renewalInterceptor.logger = logger;
+  }
+  dio.interceptors.add(renewalInterceptor);
+
+  // [2] Auth header — 注入 Authorization token
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       final token = await userTokenSupplier();
@@ -37,7 +61,7 @@ Dio createDio({
     },
   ));
 
-  // 日志拦截器（调试模式）
+  // [3] Log — 最后执行，记录完整请求/响应
   dio.interceptors.add(LogInterceptor(
     requestBody: true,
     responseBody: true,
