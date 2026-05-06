@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'cancel/auto_cancel_interceptor.dart';
 import 'dio/renewal_token_intercaptor.dart';
 import 'http/app_logger.dart';
@@ -49,7 +50,7 @@ Dio createDio({
     onRequest: (options, handler) async {
       final token = await userTokenSupplier();
       if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
+        options.headers['token'] = token;
       }
       handler.next(options);
     },
@@ -61,11 +62,15 @@ Dio createDio({
     },
   ));
 
-  // [3] Log — 最后执行，记录完整请求/响应
-  dio.interceptors.add(LogInterceptor(
-    requestBody: true,
-    responseBody: true,
-  ));
+  // [3] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
+  if (kDebugMode) {
+    dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+      ),
+    );
+  }
 
   return dio;
 }

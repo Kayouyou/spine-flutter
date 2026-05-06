@@ -53,6 +53,24 @@ void setupDependencies() {
   sl.registerSingleton<LocaleCubit>(LocaleCubit());
   sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
+  // 链路图解
+  // lib/core/di/setup.dart
+  // │
+  // │ ① import 'package:auth/auth.dart';
+  // ↓
+  // pubspec.yaml 映射
+  // │ auth: path: packages/services/auth
+  // ↓
+  // packages/services/auth/lib/auth.dart  ← barrel 文件
+  // │ export 'src/di/setup.dart';       ← 把 setup 函数导出
+  // ↓
+  // packages/services/auth/lib/src/di/setup.dart
+  // │ void setupAuth(GetIt sl) {
+  // │   sl.registerSingleton<AuthManager>(...);
+  // │ }
+  // 三步骤
+  // 每个模块负责组装自己的依赖，主应用只需调用一次 setupXxx(sl)
+
   // ===== Step 4: 业务服务层 =====
   setupAuth(sl);
   setupDataSync(sl);
