@@ -15,6 +15,7 @@ import 'package:routing/routing.dart';
 import 'config.dart';
 import 'core/di/locator.dart';
 import 'core/widgets/network/network_banner.dart';
+import 'core/widgets/request_scope.dart';
 import 'src/theme/app_theme.dart';
 
 /// 主应用Widget
@@ -42,6 +43,8 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: _navigatorKey,
       authManager: sl<AuthManager>(),
       enableAuthGuard: EnvironmentConfig.enableAuthGuard,
+      // routeWrapper：在每个路由页面外层包裹 RequestScope，实现页面退出时自动取消请求
+      routeWrapper: (child) => RequestScope(child: child),
     );
     _router = AppRouter.getRouter(ctx: ctx);
   }

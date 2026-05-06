@@ -14,30 +14,49 @@ class ModuleBRouteModule extends RouteModule {
     return [
       GoRoute(
         path: '/settings',
-        pageBuilder: (context, state) => NoTransitionPage(
-          key: state.pageKey,
-          child: const Scaffold(
+        pageBuilder: (context, state) {
+          // 构建页面内容，并用 routeWrapper 包裹以支持 RequestScope 等功能
+          Widget page = const Scaffold(
             body: Center(child: Text('Settings Tab')),
-          ),
-        ),
+          );
+          if (ctx.routeWrapper != null) {
+            page = ctx.routeWrapper!(page);
+          }
+          return NoTransitionPage(
+            key: state.pageKey,
+            child: page,
+          );
+        },
       ),
       GoRoute(
         path: '/login',
-        pageBuilder: (context, state) => NoTransitionPage(
-          key: state.pageKey,
-          child: LoginPage(
+        pageBuilder: (context, state) {
+          Widget page = LoginPage(
             redirect: state.uri.queryParameters['redirect'],
-          ),
-        ),
+          );
+          if (ctx.routeWrapper != null) {
+            page = ctx.routeWrapper!(page);
+          }
+          return NoTransitionPage(
+            key: state.pageKey,
+            child: page,
+          );
+        },
       ),
       GoRoute(
         path: '/register',
-        pageBuilder: (context, state) => NoTransitionPage(
-          key: state.pageKey,
-          child: RegisterPage(
+        pageBuilder: (context, state) {
+          Widget page = RegisterPage(
             redirect: state.uri.queryParameters['redirect'],
-          ),
-        ),
+          );
+          if (ctx.routeWrapper != null) {
+            page = ctx.routeWrapper!(page);
+          }
+          return NoTransitionPage(
+            key: state.pageKey,
+            child: page,
+          );
+        },
       ),
     ];
   }
