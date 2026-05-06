@@ -9,6 +9,7 @@ import 'package:synchronized/synchronized.dart';
 
 import 'package:uuid/uuid.dart';
 import '../../api.dart';
+import 'package:api/src/endpoints/api_endpoints.dart' show ApiBase;
 import '../http/http_constant.dart';
 import 'header_interceptor.dart';
 
@@ -431,8 +432,8 @@ class TokenRenewalInterceptor extends Interceptor {
         headers['token'] = token;
       }
       final url = (HttpConstant.IsRelease
-          ? Uri.https(HttpConstant.Http_Host, '/User/Token/Renewal')
-          : Uri.http(HttpConstant.Http_Host, '/User/Token/Renewal')).toString();
+          ? Uri.https(HttpConstant.Http_Host, ApiBase.tokenRenewal)
+          : Uri.http(HttpConstant.Http_Host, ApiBase.tokenRenewal)).toString();
 
       // 执行续期请求
       final response = await _executeRenewalRequest(
@@ -660,7 +661,7 @@ class TokenRenewalInterceptor extends Interceptor {
       // 检查响应状态
       final data =
           response.data is String ? jsonDecode(response.data) : response.data;
-      return data['code'] == HttpConstant.renewalTokenCode;
+      return data['code'] == HttpConstant.reTokenCode;
     } catch (e) {
       _logger.error('解析响应数据出错: $e');
       return false;

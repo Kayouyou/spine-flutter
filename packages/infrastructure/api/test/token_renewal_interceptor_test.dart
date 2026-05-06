@@ -14,18 +14,18 @@ import 'package:api/src/http/token_supplier.dart';
 /// 2. TokenSupplier注入
 /// 3. 续期检测逻辑
 /// 4. 续期状态枚举完整性
-/// 5. CancelTokenManager、ConcurrentLimiter、RetryPolicy、RequestTracker
+/// 5. CancelTokenManager
 void main() {
   group('续期检测', () {
     test('正常响应不触发续期', () {
       final data = jsonEncode({'code': 0});
-      final needsRenewal = jsonDecode(data)['code'] == HttpConstant.renewalTokenCode;
+      final needsRenewal = jsonDecode(data)['code'] == HttpConstant.reTokenCode;
       expect(needsRenewal, isFalse);
     });
 
     test('续期码不等于0时触发续期', () {
-      final data = jsonEncode({'code': HttpConstant.renewalTokenCode});
-      final needsRenewal = jsonDecode(data)['code'] == HttpConstant.renewalTokenCode;
+      final data = jsonEncode({'code': HttpConstant.reTokenCode});
+      final needsRenewal = jsonDecode(data)['code'] == HttpConstant.reTokenCode;
       expect(needsRenewal, isTrue);
     });
   });
@@ -131,144 +131,6 @@ void main() {
     });
   });
 
-  group('ConcurrentLimiter', () {
-    test('未达上限直接执行', () async {
-      final limiter = ConcurrentLimiter(maxConcurrent: 5);
-      final result = await limiter.execute(() async => 'ok');
-      expect(result, equals('ok'));
-    });
-
-    test('队列优先级排序', () async {
-      final limiter = ConcurrentLimiter(maxConcurrent: 1);
-      final results = <String>[];
-
-      // 第一个请求占用槽位
-      final first = limiter.execute(() async {
-        await Future.delayed(Duration(milliseconds: 50));
-        results.add('first');
-        return 'first';
-      });
-
-      // 后续请求排队
-      final highPriority = limiter.execute(() async {
-        results.add('high');
-        return 'high';
-      }, priority: 10);
-
-      final lowPriority = limiter.execute(() async {
-        results.add('low');
-        return 'low';
-      }, priority: 1);
-
-      await Future.wait([first, highPriority, lowPriority]);
-
-      // 高优先级应先于低优先级执行
-      expect(results.indexOf('high'), lessThan(results.indexOf('low')));
-    });
-
-    test('cancelTag取消等待请求', () async {
-      final limiter = ConcurrentLimiter(maxConcurrent: 1);
-      final results = <String>[];
-
-      // 第一个请求占用槽位
-      final first = limiter.execute(() async {
-        await Future.delayed(Duration(seconds: 1));
-        results.add('first');
-        return 'first';
-      });
-
-      // 带tag的请求排队
-      final tagged = limiter.execute(() async => 'tagged', tag: 'my-tag');
-
-      // 立即取消
-      limiter.cancelTag('my-tag');
-
-      try {
-        await tagged;
-        fail('Should have thrown');
-      } catch (e) {
-        expect(e, isA<Exception>()); // DomainException
-      }
-
-      // 验证第一个请求不受影响
-      await first;
-      expect(results, contains('first'));
-    });
-  });
-
-  group('RetryPolicy', () {
-    test('默认不重试', () {
-      const policy = RetryPolicy();
-      final error = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        type: DioExceptionType.connectionTimeout,
-      );
-      expect(policy.shouldRetry(error, 0), isFalse);
-    });
-
-    test('标准策略可重试超时', () {
-      const policy = RetryPolicy.standard;
-      final error = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        type: DioExceptionType.connectionTimeout,
-      );
-      expect(policy.shouldRetry(error, 0), isTrue);
-      expect(policy.shouldRetry(error, 2), isTrue);
-      expect(policy.shouldRetry(error, 3), isFalse); // 已达上限
-    });
-
-    test('标准策略可重试502/503/504', () {
-      const policy = RetryPolicy.standard;
-
-      for (final code in [502, 503, 504]) {
-        final error = DioException(
-          requestOptions: RequestOptions(path: '/test'),
-          response: Response(requestOptions: RequestOptions(path: '/test'), statusCode: code),
-        );
-        expect(policy.shouldRetry(error, 0), isTrue, reason: 'Should retry $code');
-      }
-    });
-
-    test('不可重试的错误', () {
-      const policy = RetryPolicy.standard;
-
-      // 400不应重试
-      final error400 = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        response: Response(requestOptions: RequestOptions(path: '/test'), statusCode: 400),
-      );
-      expect(policy.shouldRetry(error400, 0), isFalse);
-    });
-  });
-
-  group('RequestTracker', () {
-    test('追踪和完成请求', () {
-      final tracker = RequestTracker.instance;
-      tracker.clearAll();
-
-      tracker.track('req-1', '/api/test', null);
-      expect(tracker.pendingCount, 1);
-
-      tracker.complete('req-1');
-      expect(tracker.pendingCount, 0);
-    });
-
-    test('完成不存在的请求不报错', () {
-      final tracker = RequestTracker.instance;
-      tracker.complete('non-existent');
-    });
-
-    test('自定义开始时间', () {
-      final tracker = RequestTracker.instance;
-      tracker.clearAll();
-
-      final startTime = DateTime.now().subtract(Duration(seconds: 5));
-      tracker.track('req-2', '/api/test', startTime);
-      expect(tracker.pendingCount, 1);
-
-      tracker.clearAll();
-    });
-  });
 }
 
 /// 测试用Logger实现

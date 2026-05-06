@@ -24,15 +24,13 @@ class HttpConstant {
   static var Proxy_Ip = CompanyIp; // 代理服务ip
   static const Proxy_Port = 8888; // 代理服务端口
 
-  static const int renewalTokenCode = 1000102; // token续期的code
+  static const int reTokenCode = 1000102; // token续期的code
   static const int reLoginCode = 1000103; // token长失效，重新登录code
-  static const int msgVCodeMaxLength = 5; // 短信验证码的长度
 
   // 新增错误码
   static const int NetworkErrorCode = -1111; // 网络连接错误
   static const int UnknownErrorCode = -1; // 未知错误
   static const int OssTokenErrorCode = 1111; // OSS Token获取失败
-  static const int EmptyCarListCode = 9; // 车辆列表为空
 }
 
 class AliyunOSSConstant {

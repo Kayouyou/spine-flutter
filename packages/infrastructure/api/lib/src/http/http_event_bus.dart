@@ -31,23 +31,7 @@ class HttpEventBus {
   }
 }
 
-enum OVSTap {
-  home,
-  car,
-  find,
-  story,
-  mine,
-}
-
 class EventKeys {
   static const String logout = "Logout";
   static const String hasToken = "hasToken";
-  static const String addNewCar = "addNewCar";
-  static const String updateLogs = "updateLogs";
-  static const String hideTabBar = "hideTabBar";
-  static const String showTabBar = "showTabBar";
-  static const String exchangeTab = "exchangeTab";
-  static const String updateWeather = "updateWeather";
-  static const String updateCar = "updateCar";
-  static const OVSTap homeTap = OVSTap.home;
 }

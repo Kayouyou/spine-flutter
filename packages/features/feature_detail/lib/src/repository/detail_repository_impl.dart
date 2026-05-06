@@ -13,7 +13,7 @@ class DetailRepositoryImpl implements DetailRepository {
   @override
   Future<Map<String, dynamic>> getDetailData(String id) async {
     try {
-      final response = await _dio.get('/detail/$id');
+      final response = await _dio.get(ApiEndpoints.detail.item(id));
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       throw e.toDomainException();

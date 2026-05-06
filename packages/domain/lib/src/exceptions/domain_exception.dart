@@ -19,6 +19,9 @@ enum ErrorCode {
   /// Token已过期
   tokenExpired,
 
+  /// Token 已失效，需重新登录（对应后端 code 1000103）
+  tokenInvalid,
+
   /// 禁止访问（403）
   forbidden,
 

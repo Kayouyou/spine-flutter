@@ -31,6 +31,7 @@ extension DioExceptionMapper on DioException {
       case ErrorCode.networkError:
         return NetworkException('网络连接失败', statusCode: statusCode);
       case ErrorCode.tokenExpired:
+      case ErrorCode.tokenInvalid:
         return const UnauthorizedException();
       case ErrorCode.invalidInput:
         return ValidationException('无效的输入');

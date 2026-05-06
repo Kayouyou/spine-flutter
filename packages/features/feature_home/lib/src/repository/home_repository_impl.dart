@@ -17,7 +17,7 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<Map<String, dynamic>> getHomeData() async {
     try {
       // 调用API获取首页数据
-      final response = await _dio.get('/home/data');
+      final response = await _dio.get(ApiEndpoints.home.data);
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       // 转换为DomainException
@@ -29,7 +29,7 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<Map<String, dynamic>> refreshHomeData() async {
     try {
       // 强制刷新，不使用缓存
-      final response = await _dio.get('/home/data');
+      final response = await _dio.get(ApiEndpoints.home.data);
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       throw e.toDomainException();
