@@ -16,6 +16,7 @@ export 'src/dio/log_reporting_interceptor.dart';
 export 'src/error/dio_mapper.dart';
 // Phase 3.1新增：请求取消管理
 export 'src/cancel/cancel_manager.dart';
+export 'src/cancel/auto_cancel_interceptor.dart';
 // Phase 3a新增：请求追踪
 export 'src/tracking/request_tracker.dart';
 // Phase 3d新增：日志接口
