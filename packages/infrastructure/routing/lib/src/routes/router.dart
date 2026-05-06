@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:routing/routing.dart';
 
 import 'route_context.dart';
 import 'module_a.dart';
@@ -13,6 +14,7 @@ class AppRouter {
   static GoRouter getRouter({required RouteContext ctx}) {
     router = GoRouter(
       initialLocation: '/home',
+      observers: [AppRouteObserver.instance],
       redirect: ctx.enableAuthGuard && ctx.authManager != null
           ? (context, state) {
               final location = state.matchedLocation;
