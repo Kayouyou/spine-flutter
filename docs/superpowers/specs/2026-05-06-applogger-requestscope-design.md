@@ -1,7 +1,7 @@
 # AppLogger + RequestScope 最佳实践设计
 
 > 日期: 2026-05-06
-> 范围: AppLogger 完整注入 + RequestScope 自动取消 + Tag 传递中间件
+> 范围: AppLogger 完整注入 + RequestScope 自动取消 + Path-as-Tag 自动提取
 > 架构: Clean Architecture + Feature-First Flutter 骨架
 
 ---
@@ -22,38 +22,78 @@
 - 拦截器链自动为请求绑定 CancelToken，Repository 无需手动注册
 - `RequestScope` 包裹页面，dispose 时自动取消该页面所有未完成请求
 - `AppLogger` 全局注入，拦截器日志走统一日志系统
+- Path 自动作为 tag，零手动维护
 
 ---
 
 ## 2. 架构总览
 
 ```
-Dio 拦截器链 (从上往下):
-  ┌──────────────────────────────┐
-  │ AutoCancelInterceptor (新)     │ ← 从 options.extra['page_tag'] 读 tag
-  ├──────────────────────────────┤ 或退 RequestContext.currentTag → 自动注册
-  │ TokenRenewalInterceptor (改)   │ ← 日志改为 AppLogger (非 DefaultLogger)
-  ├──────────────────────────────┤
-  │ 其他拦截器                      │
-  └──────────────────────────────┘
-
 路由层:
-  GoRoute.metadata = {'page_tag': 'home_page'}  ← 唯一定义点
+  GoRoute(path: '/home')  ← path 本身就是 tag，无需额外定义
 
 Widget 层:
-  RequestScope(tag: 'home_page')  ← initState 设置 RequestContext
-    initState → RequestContext.setTag('home_page')
-    dispose   → CancelTokenManager.cancelPage('home_page')
-               + RequestContext.clear()
+  RequestScope(child: HomePage())
+    initState → 自动从 GoRouter 提取 path → 'home' 作为 tag
+    dispose  → CancelTokenManager.cancelPage('home')
+
+Dio 拦截器链:
+  AutoCancelInterceptor → 读 RequestContext.currentTag → 创建 CancelToken 注册
 
 Repository 层:
-  不需要手动注册 CancelToken ← 拦截器全包
-  Dio 调用保持干净
+  await dio.get('/api') ← 干净，拦截器自动绑定 CancelToken
 
-兜底场景 (dialog/bottomSheet):
-  RequestScope(tag: 'confirm_dialog', child: ...)
-  → 设置 RequestContext → 拦截器读取
+兜底场景 (dialog):
+  RequestScope(overrideTag: 'confirm_dialog', child: ...)
 ```
+
+---
+
+## 2.1 Token 取消流程（完整生命周期）
+
+### 页面进入
+
+```
+Push GoRoute('/home')
+    ↓
+RequestScope.initState()
+    ↓
+从 GoRouter 提取 path → 'home'
+    ↓
+RequestContext.setTag('home')
+```
+
+### 发起请求
+
+```
+Repository: dio.get('/api/data')
+    ↓
+AutoCancelInterceptor.onRequest()
+    ↓
+tag = RequestContext.currentTag → 'home'
+    ↓
+创建 CancelToken → 注册到 CancelTokenManager
+    ↓
+Manager._tokens['home'] = [CancelToken#1, #2, ...]  ← 同一页面多次请求累积
+```
+
+### 页面退出
+
+```
+Pop 页面 → RequestScope.dispose()
+    ↓
+CancelTokenManager.cancelPage('home')
+    ↓
+遍历 'home' 下所有 CancelToken → 每个调用 .cancel()
+    ↓
+Dio 请求收到取消信号 → 中断 → DioError(type: cancel)
+    ↓
+cleanup('home') → 移除条目
+    ↓
+RequestContext.clear()
+```
+
+**关键**: 同一页面多次请求 → 同一 tag 下多 CancelToken → 退出时批量取消。
 
 ---
 
@@ -79,28 +119,73 @@ class RequestContext {
 
 **文件**: `packages/infrastructure/api/lib/src/cancel/auto_cancel_interceptor.dart`
 
-- 拦截器优先级: `insert(0)` 插入链头
-- 从 `options.extra['page_tag']` 读取 tag
-- 无 tag → 放行（兼容旧代码/后台请求）
-- 有 tag → 创建 `CancelToken` → `CancelTokenManager.register(tag, token)` → 写回 `options.cancelToken`
+```dart
+class AutoCancelInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final tag = RequestContext.currentTag;
+    if (tag == null) {
+      return handler.next(options);  // 无 tag → 放行
+    }
+
+    final cancelToken = CancelToken();
+    CancelTokenManager.instance.register(tag, cancelToken);
+    options.cancelToken = cancelToken;
+    handler.next(options);
+  }
+}
+```
+
+**逻辑**: 拦截器链头插入，从 RequestContext 读 tag，自动创建并注册 CancelToken。
 
 ### 3.3 TokenRenewalInterceptor (修改)
 
-**现有改动**: 将默认 logger 注入 `sl<AppLogger>()`
+**改动**: 将默认 logger 注入 `sl<AppLogger>()`
 
-**文件改动**: `lib/core/di/setup.dart` 增加注入逻辑
+**文件**: `lib/core/di/setup.dart` 增加注入逻辑
 
 ### 3.4 RequestScope (修改)
 
 **文件**: `lib/core/widgets/request_scope.dart`
 
-改动:
-- `initState` 中调用 `RequestContext.setTag(widget.tag)`
-- `dispose` 中调用 `RequestContext.clear()` 再调用 manager
+```dart
+class RequestScope extends StatefulWidget {
+  final Widget child;
+  final String? overrideTag;  // dialog 兜底场景
 
-### 3.5 路由层 GoRoute pageBuilder 集成
+  const RequestScope({required this.child, this.overrideTag, super.key});
 
-`packages/infrastructure/routing/` 的 GoRoute 定义增加 `metadata: {'page_tag': 'xxx'}`，确保路由系统与 tag 单一数据源。
+  @override
+  State<RequestScope> createState() => _RequestScopeState();
+}
+
+class _RequestScopeState extends State<RequestScope> {
+  late final String _tag;
+
+  @override
+  void initState() {
+    super.initState();
+    _tag = widget.overrideTag ?? _extractPathFromRouter();
+    RequestContext.setTag(_tag);
+  }
+
+  String _extractPathFromRouter() {
+    final path = GoRouter.of(context).routeInformationProvider.value.uri.path;
+    return path.replaceFirst('/', '');  // '/home' → 'home'
+  }
+
+  @override
+  void dispose() {
+    CancelTokenManager.instance.cancelPage(_tag);
+    CancelTokenManager.instance.cleanup(_tag);
+    RequestContext.clear();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+```
 
 ---
 
@@ -110,7 +195,7 @@ class RequestContext {
 
 ```dart
 // 插入 AutoCancelInterceptor 到链头
-dio.interceptors.insert(0, sl<AutoCancelInterceptor>());
+dio.interceptors.insert(0, AutoCancelInterceptor());
 
 // 注入 AppLogger 到 TokenRenewalInterceptor
 final interceptor = dio.interceptors
@@ -121,86 +206,24 @@ interceptor.logger = sl<AppLogger>();
 
 ---
 
-## 5. Tag 传递策略（混合方案）
+## 5. Path-as-Tag 优势
 
-### 5.1 Tag 常量管理
-
-**文件**: `lib/core/constants/page_tags.dart`
-
-```dart
-class PageTags {
-  // pages
-  static const homePage = 'home_page';
-  static const detailPage = 'detail_page';
-  static const settingsPage = 'settings_page';
-  // subpages
-  static const authLoginPage = 'auth_login_page';
-  static const authRegisterPage = 'auth_register_page';
-  // dialogs/sheets
-  static const confirmDialog = 'confirm_dialog';
-  static const feedbackSheet = 'feedback_sheet';
-}
-```
-
-**优势**: IDE 自动补全，编译期防拼错，集中管理避免重复。
-
-### 5.2 主路径：GoRouter meta 自动提取
-
-页面路由定义时携带 `page_tag` metadata：
-
-```dart
-// packages/infrastructure/routing/lib/src/routes/module_x.dart
-GoRoute(
-  path: '/home',
-  name: 'home',
-  pageBuilder: (context, state) => {
-    metadata: {'page_tag': PageTags.homePage},  // ← 常量引用，IDE 补全
-    child: RequestScope(
-      tag: PageTags.homePage,                   // ← 同一常量
-      child: BlocProvider(
-        create: (_) => HomeCubit()..loadData(),
-        child: const HomePage(),
-      ),
-    ),
-  },
-)
-```
-
-**AutoCancelInterceptor 读取来源**: 
-- 优先从 Dio `options.extra['page_tag']` 读取（拦截器层面）
-- 若未传，则从 `RequestContext.currentTag` 回退（RequestScope 设置的静态字段）
-
-### 5.3 兜底路径：RequestScope 手动包裹
-
-场景：`showDialog`、`showModalBottomSheet`、非 GoRouter 子页面
-
-```dart
-RequestScope(
-  tag: PageTags.confirmDialog,
-  child: SomeDialogContent(),
-)
-```
-
-`RequestScope.initState()` → `RequestContext.setTag(widget.tag)`，拦截器读到静态字段。
-
-### 5.4 原则
-
-| 问题 | 答案 |
-|---|---|
-| Repository 需要手动注册 CancelToken 吗？ | **不需要**。拦截器全包 |
-| 每个页面都要指定 tag 吗？ | **是**，通过 GoRouter route metadata + RequestScope |
-| 忘记设 tag 会怎样？ | 请求正常发出，不被自动取消（fail-safe，不崩溃） |
-| 后台请求（无页面）？ | 不调用拦截器或传空 tag → 不受影响 |
-
-### 5.5 Tag 命名规范
-
-| 格式 | 常量命名 | 值 |
+| 维度 | Path 自动提取 | 手动定义 PageTags |
 |---|---|---|
-| `feature_page` | `PageTags.homePage` | `'home_page'` |
-| `feature_subpage` | `PageTags.authLoginPage` | `'auth_login_page'` |
-| `dialog_component` | `PageTags.confirmDialog` | `'confirm_dialog'` |
+| 单一数据源 | ✅ path 即 tag | ❌ 双重维护 |
+| 唯一性保证 | ✅ GoRouter 内置 | ❌ 需断言检测 |
+| 维护成本 | ✅ 只改路由定义 | ❌ 加页面改两处 |
+| 侵入性 | ✅ 零额外定义 | ❌ 需定义常量表 |
 
-常量集中管理，新增页面需在 `page_tags.dart` 添加条目。
+### 动态路由处理
+
+```dart
+GoRoute(path: '/detail/:id')
+```
+
+- path 模板 `'detail/:id'` 作为 tag
+- `/detail/123` 和 `/detail/456` 共享同一 tag
+- 任一退出 → 全部取消（同一功能，符合预期）
 
 ---
 
@@ -226,12 +249,10 @@ RequestScope(
 | `lib/core/middleware/request_context.dart` | 新建 | 静态 tag 上下文 |
 | `packages/infrastructure/api/lib/src/cancel/auto_cancel_interceptor.dart` | 新建 | 自动 CancelToken 绑定 |
 | `packages/infrastructure/api/lib/api.dart` | 改 | 导出 AutoCancelInterceptor |
-| `lib/core/widgets/request_scope.dart` | 改 | 增加 RequestContext 设置 |
+| `lib/core/widgets/request_scope.dart` | 改 | 自动提取 path + overrideTag 兜底 |
 | `lib/core/di/setup.dart` | 改 | 拦截器组装 + AppLogger 注入 |
 | `lib/core/widgets/README.md` | 改 | 更新使用示例 |
 | `packages/features/feature_home/lib/ui/home_page.dart` | 改 | 示例页面包裹 RequestScope |
-| `lib/core/utils/logger.md` | 新建 | AppLogger 使用文档 |
-| `packages/infrastructure/routing/` | 改 | GoRoute 增加 metadata.page_tag |
 
 ---
 
@@ -239,7 +260,7 @@ RequestScope(
 
 | 风险 | 影响 | 缓解 |
 |---|---|---|
-| tag 拼写错误 | 请求不被取消 | 无害失败，不影响功能 |
+| path 提取失败 | tag 为空 | 无 tag → 放行，请求不取消（fail-safe） |
 | 多页面同时存在 | dispose 清理其他页面 tag | 实际不存在（单页面前台） |
 | 拦截器顺序错误 | CancelToken 未绑定 | setup.dart 用 insert(0) 保证位置 |
 | 旧代码兼容性 | 无 tag 请求报错 | 无 tag → 放行，零影响 |
@@ -248,22 +269,26 @@ RequestScope(
 
 ## 9. 测试策略
 
-- `AutoCancelInterceptor` 单元测试: 有 tag 注册 / 无 tag 放行 / RequestContext 回退
+- `AutoCancelInterceptor` 单元测试: 有 tag 注册 / 无 tag 放行
 - `TokenRenewalInterceptor` 集成测试: logger 输出走 AppLogger
 - `RequestScope` Widget 测试: dispose 调用 cancelPage + RequestContext.clear()
+- Path 提取测试: `/home` → `'home'`，`/detail/:id` → `'detail/:id'`
 
 ---
 
 ## 10. FAQ
 
 ### Q: 每个页面都要手动指定 tag 吗？
-A: 是。tag 通过 `PageTags` 常量统一管理，新增页面需在 `lib/core/constants/page_tags.dart` 添加条目。GoRouter `metadata` 和 `RequestScope` 都引用同一常量，确保一致性。
+A: **否**。RequestScope 自动从 GoRouter 提取 path 作为 tag。dialog 等非路由场景用 `overrideTag` 参数。
 
 ### Q: Repository 需要改吗？
-A: 不需要。Repository 保持 `await dio.get('/path')` 干净写法，拦截器自动绑定 CancelToken。
+A: **不需要**。Repository 保持 `await dio.get('/path')` 干净写法，拦截器自动绑定 CancelToken。
 
-### Q: 忘记设 tag 后果？
-A: 请求照常在，只是页面退出时不会被自动取消。fail-safe 设计，不会崩溃。
+### Q: 忘记包 RequestScope 会怎样？
+A: 请求照常发出，tag 为空 → 不注册 CancelToken → 页面退出时不取消。fail-safe，不崩溃。
 
 ### Q: 后台任务（推送、定时同步）需要 tag 吗？
-A: 不需要。无 tag 的请求不受 AutoCancelInterceptor 影响。
+A: **不需要**。无 tag 的请求不受 AutoCancelInterceptor 影响。
+
+### Q: 动态路由 `/detail/:id` 怎么处理？
+A: path 模板 `'detail/:id'` 作为 tag，所有详情页共享。任一退出 → 全部取消（同一功能，合理行为）。
