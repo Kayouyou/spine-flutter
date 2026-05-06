@@ -1,4 +1,8 @@
+import 'dart:ui' show AppExitResponse;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PredictiveBackEvent;
+
 import '../route_observer.dart';
 
 /// 完整生命周期 mixin（RouteAware + WidgetsBindingObserver）
@@ -43,9 +47,41 @@ mixin FullLifecycleMixin<T extends StatefulWidget> on State<T>
         onAppInactive();
         break;
       case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
         break;
     }
   }
+
+  @override
+  void didChangeMetrics() {}
+  @override
+  void didChangeTextScaleFactor() {}
+  @override
+  void didChangePlatformBrightness() {}
+  @override
+  void didChangeLocales(List<Locale>? locales) {}
+  @override
+  void didHaveMemoryPressure() {}
+  @override
+  void didChangeAccessibilityFeatures() {}
+  @override
+  Future<bool> didPopRoute() => Future<bool>.value(false);
+  @override
+  Future<bool> didPushRoute(String route) => Future<bool>.value(false);
+  @override
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) =>
+      Future<bool>.value(false);
+
+  @override
+  bool handleStartBackGesture(PredictiveBackEvent backEvent) => false;
+  @override
+  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {}
+  @override
+  void handleCommitBackGesture() {}
+  @override
+  void handleCancelBackGesture() {}
+  @override
+  Future<AppExitResponse> didRequestAppExit() async => AppExitResponse.exit;
 
   @override
   void didChangeDependencies() {
