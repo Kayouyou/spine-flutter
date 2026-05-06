@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
 import 'package:error/error.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Project imports:
 import '../di/locator.dart';
@@ -15,6 +17,9 @@ import '../di/setup.dart';
 import '../utils/logger.dart';
 import 'initializer.dart';
 import 'profiler.dart';
+
+// Bloc imports:
+import '../bloc/app_bloc_observer.dart';
 
 /// 应用启动编排器
 ///
@@ -34,6 +39,19 @@ class AppLauncher {
     WidgetsFlutterBinding.ensureInitialized();
     StartupProfiler.start();
     StartupProfiler.mark('Flutter binding 初始化');
+
+    // ===== 阶段 1.5: Bloc 扩展初始化 =====
+    // HydratedBloc 存储（必须在任何 Cubit 创建前）
+    HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory(
+        (await getApplicationDocumentsDirectory()).path,
+      ),
+    );
+    StartupProfiler.mark('HydratedStorage 初始化');
+
+    // BlocObserver 注册（全局日志）
+    Bloc.observer = AppBlocObserver();
+    StartupProfiler.mark('BlocObserver 注册');
 
     // 全局错误边界 — 在任何可能出错的代码之前安装
     AppErrorHandler().setup(
