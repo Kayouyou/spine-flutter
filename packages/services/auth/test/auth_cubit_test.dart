@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:auth/src/cubit/auth_cubit.dart';
 import 'package:auth/src/cubit/auth_state.dart';
@@ -8,40 +9,100 @@ class MockAuthRepo extends Mock implements AuthRepository {}
 
 void main() {
   group('AuthCubit', () {
-    late AuthCubit cubit;
     late MockAuthRepo mockRepo;
 
     setUp(() {
       mockRepo = MockAuthRepo();
-      cubit = AuthCubit(mockRepo);
     });
 
-    tearDown(() => cubit.close());
+    blocTest<AuthCubit, AuthState>(
+      'initial state is AuthStatus.initial',
+      build: () => AuthCubit(mockRepo),
+      verify: (cubit) {
+        expect(cubit.state.status, AuthStatus.initial);
+        expect(cubit.state.userId, isNull);
+        expect(cubit.state.errorMessage, isNull);
+        expect(cubit.isLoggedIn, false);
+      },
+    );
 
-    test('initial state is AuthStatus.initial', () {
-      expect(cubit.state.status, AuthStatus.initial);
-    });
+    blocTest<AuthCubit, AuthState>(
+      'login success emits [loading, loggedIn]',
+      build: () => AuthCubit(mockRepo),
+      setUp: () {
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
+      },
+      act: (cubit) => cubit.login('user', 'pass'),
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(status: AuthStatus.loggedIn, userId: 'mock-user-1'),
+      ],
+    );
 
-    test('login success changes state to loggedIn', () async {
-      when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
-      await cubit.login('user', 'pass');
-      expect(cubit.state.status, AuthStatus.loggedIn);
-      expect(cubit.isLoggedIn, true);
-    });
+    blocTest<AuthCubit, AuthState>(
+      'login failure emits [loading, error]',
+      build: () => AuthCubit(mockRepo),
+      setUp: () {
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => false);
+      },
+      act: (cubit) => cubit.login('user', 'pass'),
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(status: AuthStatus.error, errorMessage: '登录失败'),
+      ],
+    );
 
-    test('login failure changes state to error', () async {
-      when(() => mockRepo.login('', '')).thenAnswer((_) async => false);
-      await cubit.login('', '');
-      expect(cubit.state.status, AuthStatus.error);
-    });
+    blocTest<AuthCubit, AuthState>(
+      'login exception emits [loading, error] with exception message',
+      build: () => AuthCubit(mockRepo),
+      setUp: () {
+        when(() => mockRepo.login('user', 'pass'))
+            .thenThrow(Exception('network error'));
+      },
+      act: (cubit) => cubit.login('user', 'pass'),
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(status: AuthStatus.error, errorMessage: 'Exception: network error'),
+      ],
+    );
 
-    test('logout resets state', () async {
-      when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
-      when(() => mockRepo.logout()).thenAnswer((_) async {});
-      await cubit.login('user', 'pass');
-      await cubit.logout();
-      expect(cubit.state.status, AuthStatus.initial);
-      expect(cubit.isLoggedIn, false);
-    });
+    blocTest<AuthCubit, AuthState>(
+      'logout emits [loading, initial] after login',
+      build: () => AuthCubit(mockRepo),
+      setUp: () {
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
+        when(() => mockRepo.logout()).thenAnswer((_) async {});
+      },
+      act: (cubit) async {
+        await cubit.login('user', 'pass');
+        await cubit.logout();
+      },
+      expect: () => [
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(status: AuthStatus.loggedIn, userId: 'mock-user-1'),
+        const AuthState(status: AuthStatus.loading, userId: 'mock-user-1'),
+        const AuthState(status: AuthStatus.initial),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'isLoggedIn getter returns true when loggedIn',
+      build: () => AuthCubit(mockRepo),
+      setUp: () {
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
+      },
+      act: (cubit) => cubit.login('user', 'pass'),
+      verify: (cubit) {
+        expect(cubit.isLoggedIn, true);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'isLoggedIn getter returns false when initial',
+      build: () => AuthCubit(mockRepo),
+      verify: (cubit) {
+        expect(cubit.isLoggedIn, false);
+      },
+    );
   });
 }
