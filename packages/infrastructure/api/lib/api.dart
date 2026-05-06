@@ -17,6 +17,7 @@ export 'src/error/dio_mapper.dart';
 // Phase 3.1新增：请求取消管理
 export 'src/cancel/cancel_manager.dart';
 export 'src/cancel/auto_cancel_interceptor.dart';
+export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截器
 // Phase 3a新增：请求追踪
 export 'src/tracking/request_tracker.dart';
 // Phase 3d新增：日志接口
