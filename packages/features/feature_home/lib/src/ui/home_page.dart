@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:component_library/component_library.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -13,17 +14,15 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('首页'),
-        actions: [
-          // 刷新按钮
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<HomeCubit>().refreshData(),
-          ),
-        ],
-      ),
+    return AppScaffold(
+      title: '首页',
+      actions: [
+        // 刷新按钮
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => context.read<HomeCubit>().refreshData(),
+        ),
+      ],
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           // 根据状态渲染不同UI

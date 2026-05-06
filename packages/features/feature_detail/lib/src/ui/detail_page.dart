@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:component_library/component_library.dart';
 import '../cubit/detail_cubit.dart';
 import '../cubit/detail_state.dart';
 
@@ -12,10 +13,8 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('详情页'),
-      ),
+    return AppScaffold(
+      title: '详情页',
       body: BlocBuilder<DetailCubit, DetailState>(
         builder: (context, state) {
           return switch (state) {
