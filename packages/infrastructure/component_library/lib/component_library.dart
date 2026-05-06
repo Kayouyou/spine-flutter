@@ -11,3 +11,4 @@ export 'src/constants/cache_constants.dart';
 
 // Widgets
 export 'src/widgets/custom_app_bar.dart';
+export 'src/widgets/app_scaffold.dart';
