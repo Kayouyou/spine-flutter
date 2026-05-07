@@ -9,18 +9,18 @@ import 'detail_state.dart';
 class DetailCubit extends Cubit<DetailState> {
   final DetailRepository _repository;
 
-  DetailCubit(this._repository) : super(DetailInitial());
+  DetailCubit(this._repository) : super(const DetailState.initial());
 
   /// 加载详情数据
   ///
   /// 根据ID获取详情内容
   Future<void> loadData(String id) async {
-    emit(DetailLoading());
+    emit(const DetailState.loading());
     try {
       final data = await _repository.getDetailData(id);
-      emit(DetailLoaded(data));
+      emit(DetailState.loaded(data: data));
     } on DomainException catch (e) {
-      emit(DetailError(e.message));
+      emit(DetailState.error(errorCode: e.message));
     }
   }
 

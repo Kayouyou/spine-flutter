@@ -1,37 +1,19 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// 网络状态
-enum NetworkStatus { connected, disconnected }
+part 'network_state.freezed.dart';
 
-/// 网络UI提示样式
-enum NetworkUIStyle { banner, toast, snackbar, dialog, none }
+@freezed
+class NetworkState with _$NetworkState {
+  const factory NetworkState({
+    required NetworkStatus status,
+    DateTime? lastDisconnectedAt,
+    @Default(NetworkUIStyle.banner) NetworkUIStyle uiStyle,
+  }) = _NetworkState;
 
-/// 网络状态数据类
-class NetworkState extends Equatable {
-  final NetworkStatus status;
-  final DateTime? lastDisconnectedAt;
-  final NetworkUIStyle uiStyle;
-
-  const NetworkState({
-    required this.status,
-    this.lastDisconnectedAt,
-    this.uiStyle = NetworkUIStyle.banner,
-  });
+  const NetworkState._();
 
   bool get isConnected => status == NetworkStatus.connected;
-
-  NetworkState copyWith({
-    NetworkStatus? status,
-    DateTime? lastDisconnectedAt,
-    NetworkUIStyle? uiStyle,
-  }) {
-    return NetworkState(
-      status: status ?? this.status,
-      lastDisconnectedAt: lastDisconnectedAt ?? this.lastDisconnectedAt,
-      uiStyle: uiStyle ?? this.uiStyle,
-    );
-  }
-
-  @override
-  List<Object?> get props => [status, lastDisconnectedAt, uiStyle];
 }
+
+enum NetworkStatus { connected, disconnected }
+enum NetworkUIStyle { banner, toast, snackbar, dialog, none }

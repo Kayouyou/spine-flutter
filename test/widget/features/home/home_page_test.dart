@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// HomeCubit 的 fake 实现，用于 widget 测试
 class FakeHomeCubit extends Fake implements HomeCubit {
   @override
-  HomeState get state => HomeLoaded(<String, dynamic>{});
+  HomeState get state => HomeState.loaded(data: <String, dynamic>{});
 
   @override
   Future<void> loadData() async {}

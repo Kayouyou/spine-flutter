@@ -15,7 +15,7 @@ class HomeCubit extends Cubit<HomeState> {
   /// 数据仓库
   final HomeRepository _repository;
 
-  HomeCubit(this._repository) : super(HomeInitial());
+  HomeCubit(this._repository) : super(const HomeState.initial());
 
   /// 加载首页数据
   ///
@@ -23,16 +23,16 @@ class HomeCubit extends Cubit<HomeState> {
   /// 状态流转：Initial/Error → Loading → Loaded/Error
   Future<void> loadData() async {
     // 开始加载
-    emit(HomeLoading());
+    emit(const HomeState.loading());
 
     try {
       // 获取数据
       final data = await _repository.getHomeData();
       // 加载成功
-      emit(HomeLoaded(data));
+      emit(HomeState.loaded(data: data));
     } on DomainException catch (e) {
       // 加载失败，传递ErrorCode用于国际化
-      emit(HomeError(e.message));
+      emit(HomeState.error(errorCode: e.message));
     }
   }
 
@@ -40,12 +40,12 @@ class HomeCubit extends Cubit<HomeState> {
   ///
   /// 强制从服务器获取最新数据
   Future<void> refreshData() async {
-    emit(HomeLoading());
+    emit(const HomeState.loading());
     try {
       final data = await _repository.refreshHomeData();
-      emit(HomeLoaded(data));
+      emit(HomeState.loaded(data: data));
     } on DomainException catch (e) {
-      emit(HomeError(e.message));
+      emit(HomeState.error(errorCode: e.message));
     }
   }
 

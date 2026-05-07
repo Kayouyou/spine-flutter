@@ -1,30 +1,14 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-enum AuthStatus { initial, loading, loggedIn, error }
+part 'auth_state.freezed.dart';
 
-class AuthState extends Equatable {
-  final AuthStatus status;
-  final String? userId;
-  final String? errorMessage;
-
-  const AuthState({
-    this.status = AuthStatus.initial,
-    this.userId,
-    this.errorMessage,
-  });
-
-  AuthState copyWith({
-    AuthStatus? status,
+@freezed
+class AuthState with _$AuthState {
+  const factory AuthState({
+    @Default(AuthStatus.initial) AuthStatus status,
     String? userId,
     String? errorMessage,
-  }) {
-    return AuthState(
-      status: status ?? this.status,
-      userId: userId ?? this.userId,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
-
-  @override
-  List<Object?> get props => [status, userId, errorMessage];
+  }) = _AuthState;
 }
+
+enum AuthStatus { initial, loading, loggedIn, error }

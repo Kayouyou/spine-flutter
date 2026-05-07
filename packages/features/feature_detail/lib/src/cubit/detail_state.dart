@@ -1,31 +1,11 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// 详情页状态基类
-sealed class DetailState extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+part 'detail_state.freezed.dart';
 
-/// 初始状态
-class DetailInitial extends DetailState {}
-
-/// 加载中状态
-class DetailLoading extends DetailState {}
-
-/// 加载成功状态
-class DetailLoaded extends DetailState {
-  final Map<String, dynamic> data;
-  DetailLoaded(this.data);
-
-  @override
-  List<Object?> get props => [data];
-}
-
-/// 加载失败状态
-class DetailError extends DetailState {
-  final String errorCode;
-  DetailError(this.errorCode);
-
-  @override
-  List<Object?> get props => [errorCode];
+@freezed
+sealed class DetailState with _$DetailState {
+  const factory DetailState.initial() = DetailInitial;
+  const factory DetailState.loading() = DetailLoading;
+  const factory DetailState.loaded({required Map<String, dynamic> data}) = DetailLoaded;
+  const factory DetailState.error({required String errorCode}) = DetailError;
 }
