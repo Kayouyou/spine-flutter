@@ -34,7 +34,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: actions,
-      leading: leading ?? (showBackButton ? const BackButton() : null),
+      leading: leading ?? (showBackButton && Navigator.of(context).canPop() ? const BackButton() : null),
       elevation: elevation,
       backgroundColor: backgroundColor ?? theme.colorScheme.surface,
       centerTitle: true,

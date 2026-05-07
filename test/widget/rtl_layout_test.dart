@@ -21,11 +21,19 @@ void main() {
       expect(find.text('محتوى'), findsOneWidget);
     });
 
-    testWidgets('CustomAppBar back button shows in RTL', (tester) async {
+    testWidgets('CustomAppBar back button shows in RTL when canPop', (tester) async {
       await tester.pumpWidget(wrapRTL(
-        const Scaffold(
-          appBar: CustomAppBar(title: 'عنوان', showBackButton: true),
-          body: SizedBox(),
+        Navigator(
+          onPopPage: (route, result) => route.didPop(result),
+          pages: const [
+            MaterialPage(child: SizedBox()),
+            MaterialPage(
+              child: Scaffold(
+                appBar: CustomAppBar(title: 'عنوان', showBackButton: true),
+                body: SizedBox(),
+              ),
+            ),
+          ],
         ),
       ));
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
