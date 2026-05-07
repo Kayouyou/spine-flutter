@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
 import 'package:feature_detail/feature_detail.dart';
@@ -41,13 +42,19 @@ class AppRouter {
         ),
         GoRoute(
           path: '/detail',
-          builder: (context, state) => const DetailPage(),
+          builder: (context, state) => BlocProvider(
+            create: (_) => ctx.detailCubitFactory!(),
+            child: const DetailPage(),
+          ),
         ),
         GoRoute(
           path: '/detail/:id',
           builder: (context, state) {
             final id = state.pathParameters['id'] ?? '0';
-            return DetailPage(id: id);
+            return BlocProvider(
+              create: (_) => ctx.detailCubitFactory!(),
+              child: DetailPage(id: id),
+            );
           },
         ),
       ],

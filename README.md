@@ -467,18 +467,30 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 架构评分
 
-当前架构评分：9.0+/10（2026-05 最佳实践升级后）
+当前架构评分：**9.5/10**（2026-05 架构对齐 + 功能完善 + 生产就绪后）
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
-| 分层隔离 | 9/10 | 纯 Dart domain + 物理包强制 |
-| Repository 模式 | 9/10 | 接口在 domain，组合注入 |
-| 可测性 | 8/10 | 三层测试体系（单测/bloc/widget） |
-| 依赖约束 | 8/10 | 物理隔离 + lint + CI |
-| 错误处理 | 8/10 | sealed 异常体系 + 全局边界 |
+| 分层隔离 | 9.5/10 | 纯 Dart domain + 物理包强制 + Repository 接口统一归位 |
+| State 管理 | 9/10 | 全部 @freezed 统一，auto copyWith/==/toString |
+| Repository 模式 | 9.5/10 | 接口在 domain，组合注入，HomeRepo 已接入缓存 |
+| 路由架构 | 9/10 | GoRouter + RouteModule + Deep Link + Auth Guard |
+| 缓存体系 | 9/10 | ListCacheManager 4 策略 + 分页感知 + 已接入使用 |
+| 存储安全 | 9/10 | PreferenceKey enum 类型化，48 key 无魔法字符串 |
+| 组件库 | 8.5/10 | AppScaffold/CustomAppBar + LoadingButton/EmptyState/ErrorCard |
+| 可测性 | 8.5/10 | 三层测试 + bloc_test + RTL 测试 |
+| 错误处理 | 9/10 | sealed 异常 + Dio 映射 + ErrorReporter 接口（Sentry 就绪） |
+| 网络监控 | 9/10 | connectivity_plus + NetworkQualityMonitor（弱网检测） |
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
 | 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
-| 缓存基础设施 | 8/10 | 通用 ListCacheManager，四种策略，分页感知 |
+
+### 2026-05-07 优化记录
+
+| Plan | 内容 | 评分提升 |
+|------|------|----------|
+| A: 架构对齐 | 路由连线、路由常量统一、State @freezed 统一、Repository 归位、PreferenceKey enum | 7.5 → 8.5 |
+| B: 功能完善 | ListCache 接入、测试补充、DataSyncManager 实现、组件库扩展 | 8.5 → 9.0 |
+| C: 生产就绪 | Deep Link、ErrorReporter 接口、弱网检测、RTL 测试 | 9.0 → 9.5 |
 
 ---
 

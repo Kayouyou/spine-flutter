@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:feature_home/feature_home.dart';
 
@@ -15,8 +16,10 @@ class ModuleARouteModule extends RouteModule {
       GoRoute(
         path: '/home',
         pageBuilder: (context, state) {
-          // 构建页面内容，并用 routeWrapper 包裹以支持 RequestScope 等功能
-          Widget page = const HomePage();
+          Widget page = BlocProvider(
+            create: (_) => ctx.homeCubitFactory!(),
+            child: const HomePage(),
+          );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);
           }

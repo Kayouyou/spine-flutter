@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:auth/auth.dart';
+import 'package:feature_detail/feature_detail.dart';
+import 'package:feature_home/feature_home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -45,6 +47,8 @@ class _MyAppState extends State<MyApp> {
       enableAuthGuard: EnvironmentConfig.enableAuthGuard,
       // routeWrapper：在每个路由页面外层包裹 RequestScope，实现页面退出时自动取消请求
       routeWrapper: (child) => RequestScope(child: child),
+      homeCubitFactory: () => sl<HomeCubit>(),
+      detailCubitFactory: () => sl<DetailCubit>(),
     );
     _router = AppRouter.getRouter(ctx: ctx);
   }

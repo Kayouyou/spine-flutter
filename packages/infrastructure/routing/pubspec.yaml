@@ -8,6 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_bloc: ^9.1.0
   go_router: ^14.2.7
   auth:
     path: ../../services/auth

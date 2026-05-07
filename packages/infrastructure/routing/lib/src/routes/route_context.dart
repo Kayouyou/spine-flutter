@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auth/auth.dart';
+import 'package:feature_home/feature_home.dart';
+import 'package:feature_detail/feature_detail.dart';
 
 /// 路由上下文 — 封装每个页面构建时需要的依赖
 ///
@@ -15,10 +17,16 @@ class RouteContext {
   /// 典型用途：包装 RequestScope 实现页面级请求自动取消
   final Widget Function(Widget child)? routeWrapper;
 
+  /// Cubit 工厂函数 — 由 app 层从 DI 容器中获取
+  final HomeCubit Function()? homeCubitFactory;
+  final DetailCubit Function()? detailCubitFactory;
+
   const RouteContext({
     required this.navigatorKey,
     this.authManager,
     this.enableAuthGuard = true,
     this.routeWrapper,
+    this.homeCubitFactory,
+    this.detailCubitFactory,
   });
 }
