@@ -21,6 +21,8 @@ dependencies:
     path: ../../infrastructure/component_library
   domain:
     path: ../../domain
+  list_cache:
+    path: ../../infrastructure/list_cache
   auth:
     path: ../../services/auth
 
