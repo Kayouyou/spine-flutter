@@ -9,10 +9,18 @@ import '../cubit/detail_state.dart';
 ///
 /// 职责：展示详情内容，响应加载状态
 class DetailPage extends StatelessWidget {
-  const DetailPage({super.key});
+  final String? id;
+
+  const DetailPage({super.key, this.id});
 
   @override
   Widget build(BuildContext context) {
+    if (id != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<DetailCubit>().loadData(id!);
+      });
+    }
+
     return AppScaffold(
       title: '详情页',
       body: BlocBuilder<DetailCubit, DetailState>(

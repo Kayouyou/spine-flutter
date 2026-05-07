@@ -8,6 +8,7 @@ class NetworkState with _$NetworkState {
     required NetworkStatus status,
     DateTime? lastDisconnectedAt,
     @Default(NetworkUIStyle.banner) NetworkUIStyle uiStyle,
+    @Default(NetworkQuality.good) NetworkQuality quality,
   }) = _NetworkState;
 
   const NetworkState._();
@@ -17,3 +18,4 @@ class NetworkState with _$NetworkState {
 
 enum NetworkStatus { connected, disconnected }
 enum NetworkUIStyle { banner, toast, snackbar, dialog, none }
+enum NetworkQuality { good, slow, poor, disconnected }

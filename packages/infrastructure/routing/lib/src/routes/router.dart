@@ -43,6 +43,13 @@ class AppRouter {
           path: '/detail',
           builder: (context, state) => const DetailPage(),
         ),
+        GoRoute(
+          path: '/detail/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id'] ?? '0';
+            return DetailPage(id: id);
+          },
+        ),
       ],
       errorBuilder: (context, state) => Scaffold(
         body: Center(child: Text('Page not found')),

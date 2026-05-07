@@ -19,6 +19,7 @@ mixin _$NetworkState {
   NetworkStatus get status => throw _privateConstructorUsedError;
   DateTime? get lastDisconnectedAt => throw _privateConstructorUsedError;
   NetworkUIStyle get uiStyle => throw _privateConstructorUsedError;
+  NetworkQuality get quality => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NetworkStateCopyWith<NetworkState> get copyWith =>
@@ -34,7 +35,8 @@ abstract class $NetworkStateCopyWith<$Res> {
   $Res call(
       {NetworkStatus status,
       DateTime? lastDisconnectedAt,
-      NetworkUIStyle uiStyle});
+      NetworkUIStyle uiStyle,
+      NetworkQuality quality});
 }
 
 /// @nodoc
@@ -53,6 +55,7 @@ class _$NetworkStateCopyWithImpl<$Res, $Val extends NetworkState>
     Object? status = null,
     Object? lastDisconnectedAt = freezed,
     Object? uiStyle = null,
+    Object? quality = null,
   }) {
     return _then(_value.copyWith(
       status: null == status
@@ -67,6 +70,10 @@ class _$NetworkStateCopyWithImpl<$Res, $Val extends NetworkState>
           ? _value.uiStyle
           : uiStyle // ignore: cast_nullable_to_non_nullable
               as NetworkUIStyle,
+      quality: null == quality
+          ? _value.quality
+          : quality // ignore: cast_nullable_to_non_nullable
+              as NetworkQuality,
     ) as $Val);
   }
 }
@@ -82,7 +89,8 @@ abstract class _$$NetworkStateImplCopyWith<$Res>
   $Res call(
       {NetworkStatus status,
       DateTime? lastDisconnectedAt,
-      NetworkUIStyle uiStyle});
+      NetworkUIStyle uiStyle,
+      NetworkQuality quality});
 }
 
 /// @nodoc
@@ -99,6 +107,7 @@ class __$$NetworkStateImplCopyWithImpl<$Res>
     Object? status = null,
     Object? lastDisconnectedAt = freezed,
     Object? uiStyle = null,
+    Object? quality = null,
   }) {
     return _then(_$NetworkStateImpl(
       status: null == status
@@ -113,6 +122,10 @@ class __$$NetworkStateImplCopyWithImpl<$Res>
           ? _value.uiStyle
           : uiStyle // ignore: cast_nullable_to_non_nullable
               as NetworkUIStyle,
+      quality: null == quality
+          ? _value.quality
+          : quality // ignore: cast_nullable_to_non_nullable
+              as NetworkQuality,
     ));
   }
 }
@@ -123,7 +136,8 @@ class _$NetworkStateImpl extends _NetworkState {
   const _$NetworkStateImpl(
       {required this.status,
       this.lastDisconnectedAt,
-      this.uiStyle = NetworkUIStyle.banner})
+      this.uiStyle = NetworkUIStyle.banner,
+      this.quality = NetworkQuality.good})
       : super._();
 
   @override
@@ -133,10 +147,13 @@ class _$NetworkStateImpl extends _NetworkState {
   @override
   @JsonKey()
   final NetworkUIStyle uiStyle;
+  @override
+  @JsonKey()
+  final NetworkQuality quality;
 
   @override
   String toString() {
-    return 'NetworkState(status: $status, lastDisconnectedAt: $lastDisconnectedAt, uiStyle: $uiStyle)';
+    return 'NetworkState(status: $status, lastDisconnectedAt: $lastDisconnectedAt, uiStyle: $uiStyle, quality: $quality)';
   }
 
   @override
@@ -147,12 +164,13 @@ class _$NetworkStateImpl extends _NetworkState {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.lastDisconnectedAt, lastDisconnectedAt) ||
                 other.lastDisconnectedAt == lastDisconnectedAt) &&
-            (identical(other.uiStyle, uiStyle) || other.uiStyle == uiStyle));
+            (identical(other.uiStyle, uiStyle) || other.uiStyle == uiStyle) &&
+            (identical(other.quality, quality) || other.quality == quality));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, status, lastDisconnectedAt, uiStyle);
+      Object.hash(runtimeType, status, lastDisconnectedAt, uiStyle, quality);
 
   @JsonKey(ignore: true)
   @override
@@ -165,7 +183,8 @@ abstract class _NetworkState extends NetworkState {
   const factory _NetworkState(
       {required final NetworkStatus status,
       final DateTime? lastDisconnectedAt,
-      final NetworkUIStyle uiStyle}) = _$NetworkStateImpl;
+      final NetworkUIStyle uiStyle,
+      final NetworkQuality quality}) = _$NetworkStateImpl;
   const _NetworkState._() : super._();
 
   @override
@@ -174,6 +193,8 @@ abstract class _NetworkState extends NetworkState {
   DateTime? get lastDisconnectedAt;
   @override
   NetworkUIStyle get uiStyle;
+  @override
+  NetworkQuality get quality;
   @override
   @JsonKey(ignore: true)
   _$$NetworkStateImplCopyWith<_$NetworkStateImpl> get copyWith =>

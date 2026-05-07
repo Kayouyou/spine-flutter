@@ -1,6 +1,6 @@
 // packages/services/error/lib/src/error_handler.dart
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
+import 'error_reporter.dart';
 
 /// 全局错误边界处理器
 ///
@@ -16,6 +16,13 @@ import 'package:flutter/foundation.dart';
 /// );
 /// ```
 class AppErrorHandler {
+  ErrorReporter? _reporter;
+
+  // ignore: use_setters_to_change_properties
+  void setReporter(ErrorReporter reporter) {
+    _reporter = reporter;
+  }
+
   /// 安装全局错误处理器
   ///
   /// 应在 [runApp] 之前调用。
@@ -24,6 +31,11 @@ class AppErrorHandler {
     FlutterError.onError = (FlutterErrorDetails details) {
       // 记录到统一日志
       onError(details.exception, details.stack);
+      _reporter?.reportError(
+        details.exception,
+        details.stack,
+        isFatal: details.silent != true,
+      );
       // 调试模式下保留控制台输出
       if (kDebugMode) {
         FlutterError.presentError(details);
@@ -32,6 +44,7 @@ class AppErrorHandler {
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
       onError(error, stack);
+      _reporter?.reportError(error, stack, isFatal: true);
       return true; // 错误已被处理，不崩溃
     };
   }
