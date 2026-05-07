@@ -1,21 +1,43 @@
 import 'package:flutter/foundation.dart';
+import 'data_syncable.dart';
 
-/// 数据同步管理器
-///
-/// 职责：用户登录后同步本地数据和远程数据
-/// 使用：登录成功后调用sync()触发同步
-/// 注意：同步操作可能耗时，建议后台执行
 class DataSyncManager {
-  /// 执行数据同步
-  void sync() {
-    if (kDebugMode) {
-      debugPrint('🚀 [DataSyncManager] sync: 开始同步...');
-    }
-    // TODO: 同步用户信息
-    // TODO: 同步配置数据
-    // TODO: 处理离线数据
-    if (kDebugMode) {
-      debugPrint('✅ [DataSyncManager] sync: 同步完成');
-    }
+  final List<DataSyncable> _syncables = [];
+
+  void register(DataSyncable syncable) {
+    _syncables.add(syncable);
+    _syncables.sort((a, b) => a.priority.compareTo(b.priority));
   }
+
+  Future<({int success, int failed})> sync() async {
+    if (kDebugMode) {
+      debugPrint('DataSyncManager: starting sync (${_syncables.length} tasks)');
+    }
+
+    int success = 0;
+    int failed = 0;
+
+    for (final syncable in _syncables) {
+      try {
+        final ok = await syncable.sync();
+        if (ok) {
+          success++;
+        } else {
+          failed++;
+        }
+      } catch (e) {
+        failed++;
+        if (kDebugMode) {
+          debugPrint('DataSyncManager: sync error: $e');
+        }
+      }
+    }
+
+    if (kDebugMode) {
+      debugPrint('DataSyncManager: done (success: $success, failed: $failed)');
+    }
+    return (success: success, failed: failed);
+  }
+
+  void clear() => _syncables.clear();
 }
