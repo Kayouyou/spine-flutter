@@ -16,10 +16,10 @@ jobs:
         with:
           flutter-version: '3.22.3'
           channel: 'stable'
-      - name: Install dependencies
-        run: flutter pub get
+      - run: dart pub global activate melos
+      - run: melos bs
       - name: Run tests with coverage
-        run: flutter test --coverage
+        run: melos test:coverage
       - name: Upload to codecov
         uses: codecov/codecov-action@v4
         with:

@@ -1,0 +1,27 @@
+name: my_app
+packages:
+  - packages/domain
+  - packages/infrastructure/*
+  - packages/services/*
+  - packages/features/*
+
+scripts:
+  analyze:
+    run: |
+      melos exec -- flutter analyze
+    description: 全量代码分析
+
+  test:
+    run: |
+      melos exec -- flutter test
+    description: 所有包测试
+
+  test:affected:
+    run: |
+      melos exec --since=origin/main --diff=origin/main -- flutter test
+    description: 只测变更相关包
+
+  test:coverage:
+    run: |
+      melos exec -- flutter test --coverage
+    description: 全量测试+覆盖率

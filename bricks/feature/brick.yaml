@@ -1,0 +1,8 @@
+name: feature
+description: 一键创建完整的 Flutter Feature 包（含 cubit、repository、UI、DI）
+version: 1.0.0
+vars:
+  name:
+    type: string
+    description: Feature 名称（蛇形命名，如 'settings'）
+    prompt: Feature 名称是什么？

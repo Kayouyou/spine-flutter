@@ -11,7 +11,7 @@ echo "▸ 运行 flutter analyze..."
 # 本地只拦截 error，info/warning 交 CI 处理（避免 163 个预存 info 阻塞提交）
 flutter analyze lib/ packages/ --no-fatal-infos --no-fatal-warnings
 
-echo "▸ 运行单元测试和 Bloc 测试..."
-flutter test test/unit/ test/bloc/
+echo "▸ 运行变更相关包的测试..."
+dart run melos test:affected
 
 echo "✓ pre-commit 检查通过"

@@ -19,10 +19,11 @@ jobs:
         with:
           flutter-version: '3.22.3'
           channel: 'stable'
-      - run: flutter pub get
+      - run: dart pub global activate melos
+      - run: melos bs
       - name: 检查 ARB 翻译一致性
         run: ./scripts/check_l10n.sh
-      - run: flutter analyze --fatal-infos
+      - run: melos analyze
 
   test:
     name: 单元测试与 Bloc 测试
@@ -33,8 +34,9 @@ jobs:
         with:
           flutter-version: '3.22.3'
           channel: 'stable'
-      - run: flutter pub get
-      - run: flutter test --coverage
+      - run: dart pub global activate melos
+      - run: melos bs
+      - run: melos test
 
   build:
     name: 调试构建

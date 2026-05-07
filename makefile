@@ -1,21 +1,7 @@
 .PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod
 
 get:
-	cd packages/infrastructure/api && fvm flutter pub get
-	cd packages/infrastructure/key_value_storage && fvm flutter pub get
-	cd packages/infrastructure/list_cache && fvm flutter pub get
-	cd packages/infrastructure/component_library && fvm flutter pub get
-	cd packages/infrastructure/routing && fvm flutter pub get
-	cd packages/domain && fvm flutter pub get
-	cd packages/services/auth && fvm flutter pub get
-	cd packages/services/data_sync && fvm flutter pub get
-	cd packages/services/network && fvm flutter pub get
-	cd packages/services/locale && fvm flutter pub get
-	cd packages/services/error && fvm flutter pub get
-	cd packages/features/feature_home && fvm flutter pub get
-	cd packages/features/feature_detail && fvm flutter pub get
-	cd packages/features/feature_auth && fvm flutter pub get
-	fvm flutter pub get
+	dart run melos bs
 
 clean:
 	fvm flutter clean
@@ -30,10 +16,10 @@ release: get
 	fvm flutter build ios --release --no-codesign
 
 lint:
-	fvm flutter analyze
+	dart run melos analyze
 
 test:
-	fvm flutter test
+	dart run melos test
 
 coverage-local:
 	@chmod +x scripts/coverage_local.sh
