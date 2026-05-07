@@ -534,7 +534,84 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## Login/Register 示例
 
-脚手架示例页面，无真实 API。位于 `packages/features/feature_auth/`。
+脚手架示例页面，位于 `packages/features/feature_auth/`。
+
+### 认证流程
+
+```mermaid
+%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#4fc3f7','primaryTextColor':'#fff','primaryBorderColor':'#4fc3f7','lineColor':'#ffa726','sectionBkgColor':'#1e1e1e','altSectionBkgColor':'#2d2d2d','gridColor':'#404040','secondaryColor':'#ff6b6b','tertiaryColor':'#81c784'}}}%%
+sequenceDiagram
+    participant App as App启动
+    participant AM as AuthManager
+    participant TS as TokenStorage
+    participant KVS as KeyValueStorage(Hive)
+    participant Dio as Dio拦截器
+    participant API as 后端API
+    participant RI as TokenRenewalInterceptor
+
+    App->>AM: handleLogin()
+    AM->>TS: getToken()
+    TS->>KVS: getString(auth_token)
+    KVS-->>TS: token (可能为null)
+    TS-->>AM: token
+
+    alt token存在
+        AM->>API: getCurrentUser() 验证
+        API-->>AM: user对象
+        AM->>TS: setUserId(user.id)
+        TS->>KVS: putString(auth_user_id, user.id)
+        AM->>AM: AuthCubit.loggedIn(userId)
+    else token不存在
+        AM-->>App: 返回，等待用户主动登录
+    end
+
+    User->>Dio: 发起API请求
+    Dio->>TS: getToken()
+    TS->>KVS: getString(auth_token)
+    KVS-->>TS: token
+    TS-->>Dio: token
+    alt token存在
+        Dio->>API: 请求带上token
+    else token不存在
+        Dio->>API: 请求不带token
+    end
+
+    alt API返回code=1000102需要续期
+        RI->>TS: setToken(newToken)
+        TS->>KVS: putString(auth_token, newToken)
+        KVS-->>TS: 写入成功
+        RI->>TS: getToken()
+        TS->>KVS: getString(auth_token)
+        KVS-->>TS: newToken
+        TS-->>RI: newToken
+        RI->>User: 用新Token重试请求
+    end
+```
+
+### 核心组件
+
+| 组件 | 文件 | 职责 |
+|------|------|------|
+| `AuthManager` | `packages/services/auth/lib/src/manager.dart` | 认证逻辑：自动登录、Token持久化、登出 |
+| `TokenStorage` | `packages/infrastructure/key_value_storage/lib/src/token_storage.dart` | Token读写，封装KeyValueStorage |
+| `KeyValueStorage` | `packages/infrastructure/key_value_storage/` | Hive底层存储 |
+| `TokenRenewalInterceptor` | `packages/infrastructure/api/lib/src/dio/renewal_token_intercaptor.dart` | 401自动续期，成功后写入Hive |
+
+### 使用方式
+
+```dart
+// App启动时调用，自动检查Token
+await sl<AuthManager>().handleLogin();
+
+// 登录成功后保存Token
+await sl<AuthManager>().saveToken(token, userId);
+
+// 登出
+await sl<AuthManager>().logout();
+
+// 检查登录状态
+sl<AuthManager>().isLoggedIn;
+```
 
 ---
 

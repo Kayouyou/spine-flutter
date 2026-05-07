@@ -526,6 +526,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  list_cache:
+    dependency: transitive
+    description:
+      path: "../../infrastructure/list_cache"
+      relative: true
+    source: path
+    version: "0.0.1"
   logging:
     dependency: transitive
     description:

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 import 'cancel/auto_cancel_interceptor.dart';
 import 'dio/renewal_token_intercaptor.dart';
 import 'http/app_logger.dart';
@@ -8,9 +9,9 @@ import 'http/app_logger.dart';
 ///
 /// 拦截器链顺序（请求方向）:
 ///   [0] AutoCancelInterceptor    → 读 tag，生成 CancelToken
-///   [1] TokenRenewalInterceptor  → 检测 401，排队续期
-///   [2] InterceptorsWrapper      → 注入 Authorization header
-///   [3] LogInterceptor           → 记录日志
+///   [1] TokenRenewalInterceptor  → 检测 code=1000102，排队续期
+///   [2] InterceptorsWrapper    → 注入 Authorization header
+///   [3] LogInterceptor          → 记录日志
 ///
 /// 使用方式：
 /// ```dart
@@ -19,6 +20,7 @@ import 'http/app_logger.dart';
 ///   onNetworkDisconnected: () => logger.warning('网络断开'),
 ///   logger: appLogger,                        // 注入主应用 AppLogger
 ///   autoCancelInterceptor: myInterceptor,      // 从外部注入 AutoCancelInterceptor
+///   tokenStorage: sl<TokenStorage>(),          // 用于 Token 续期成功后写入 Hive
 /// );
 /// ```
 Dio createDio({
@@ -26,6 +28,7 @@ Dio createDio({
   required void Function() onNetworkDisconnected,
   AppLoggerInterface? logger,
   AutoCancelInterceptor? autoCancelInterceptor,
+  TokenStorage? tokenStorage,
 }) {
   final dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
@@ -38,8 +41,8 @@ Dio createDio({
     dio.interceptors.add(autoCancelInterceptor);
   }
 
-  // [1] Token 续期 — 处理 401，日志走注入的 AppLogger
-  final renewalInterceptor = TokenRenewalInterceptor(dio);
+  // [1] Token 续期 — 处理 code=1000102，日志走注入的 AppLogger
+  final renewalInterceptor = TokenRenewalInterceptor(dio, tokenStorage);
   if (logger != null) {
     renewalInterceptor.logger = logger;
   }

@@ -271,7 +271,7 @@ packages:
     source: hosted
     version: "2.1.2"
   domain:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../domain"
       relative: true
@@ -526,6 +526,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  list_cache:
+    dependency: transitive
+    description:
+      path: "../../infrastructure/list_cache"
+      relative: true
+    source: path
+    version: "0.0.1"
   logging:
     dependency: transitive
     description:

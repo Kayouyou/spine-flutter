@@ -28,4 +28,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   bool get isLoggedIn => state.status == AuthStatus.loggedIn;
+
+  void loggedIn(String userId) {
+    emit(state.copyWith(status: AuthStatus.loggedIn, userId: userId));
+  }
 }

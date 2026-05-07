@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
-import 'package:api/src/http/token_supplier.dart';
 import 'package:api/src/http/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 
 import 'package:uuid/uuid.dart';
 import '../../api.dart';
@@ -114,16 +114,13 @@ class _PendingRequest {
 /// 3. 续期成功后重试所有缓存的请求，并清空缓存
 /// 4. 多个并发请求都只触发一次token续期操作
 class TokenRenewalInterceptor extends Interceptor {
-  TokenRenewalInterceptor(
-    this._dio,
-    [TokenSupplier? tokenSupplier]
-  ) {
-    _tokenSupplier = tokenSupplier;
+  TokenRenewalInterceptor(this._dio, [TokenStorage? tokenStorage]) {
+    _tokenStorage = tokenStorage;
     _renewalLock = Lock();
   }
 
   final Dio _dio;
-  TokenSupplier? _tokenSupplier;
+  TokenStorage? _tokenStorage;
   late final Lock _renewalLock;
 
   /// 日志输出实例
@@ -138,9 +135,9 @@ class TokenRenewalInterceptor extends Interceptor {
   /// 主应用的AppLogger需实现AppLoggerInterface接口
   set logger(AppLoggerInterface logger) => _logger = logger;
 
-  /// 设置TokenSupplier（支持延迟注入）
-  set tokenSupplier(TokenSupplier supplier) {
-    _tokenSupplier = supplier;
+  /// 设置TokenStorage（支持延迟注入）
+  set tokenStorage(TokenStorage storage) {
+    _tokenStorage = storage;
   }
 
   // 使用Set存储待处理请求，自动去重
@@ -179,7 +176,8 @@ class TokenRenewalInterceptor extends Interceptor {
       );
 
       _pendingRequests.add(request);
-      _logger.debug('添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}');
+      _logger.debug(
+          '添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}');
     } catch (e) {
       _logger.error('添加请求到队列时出错: $e');
     }
@@ -323,8 +321,8 @@ class TokenRenewalInterceptor extends Interceptor {
 
         if (success) {
           // 获取最新token
-          if (_tokenSupplier != null) {
-            final token = await _tokenSupplier!.getToken();
+          if (_tokenStorage != null) {
+            final token = await _tokenStorage!.getToken();
             if (token != null && token.isNotEmpty) {
               // 构建成功响应
               final successResponse = Response(
@@ -412,7 +410,8 @@ class TokenRenewalInterceptor extends Interceptor {
       }
 
       // 创建续期请求参数
-      final username = _tokenSupplier != null ? await _tokenSupplier!.getUsername() : null;
+      final username =
+          _tokenStorage != null ? await _tokenStorage!.getUserId() : null;
       final params = <String, dynamic>{
         'Client': 10,
         'UserFlag': username ?? '',
@@ -427,13 +426,15 @@ class TokenRenewalInterceptor extends Interceptor {
         'token': '',
         'sign': '',
       };
-      final token = _tokenSupplier != null ? await _tokenSupplier!.getToken() : null;
+      final token =
+          _tokenStorage != null ? await _tokenStorage!.getToken() : null;
       if (token != null && token.isNotEmpty) {
         headers['token'] = token;
       }
       final url = (HttpConstant.IsRelease
-          ? Uri.https(HttpConstant.Http_Host, ApiBase.tokenRenewal)
-          : Uri.http(HttpConstant.Http_Host, ApiBase.tokenRenewal)).toString();
+              ? Uri.https(HttpConstant.Http_Host, ApiBase.tokenRenewal)
+              : Uri.http(HttpConstant.Http_Host, ApiBase.tokenRenewal))
+          .toString();
 
       // 执行续期请求
       final response = await _executeRenewalRequest(
@@ -477,8 +478,8 @@ class TokenRenewalInterceptor extends Interceptor {
             newToken.length > 10 ? newToken.substring(0, 10) + '...' : newToken;
 
         _logger.info('获取到新token: $tokenPreview');
-        if (_tokenSupplier != null) {
-          await _tokenSupplier!.setToken(newToken);
+        if (_tokenStorage != null) {
+          await _tokenStorage!.setToken(newToken);
         }
         return true;
       }
@@ -584,7 +585,8 @@ class TokenRenewalInterceptor extends Interceptor {
             // 使用原始响应完成Completer
             request.completer.complete(request.originalResponse);
           } catch (e) {
-            _logger.warning('完成等待的请求失败: ${request.requestOptions.path}, 错误: $e');
+            _logger
+                .warning('完成等待的请求失败: ${request.requestOptions.path}, 错误: $e');
           }
         }),
       );
@@ -621,7 +623,8 @@ class TokenRenewalInterceptor extends Interceptor {
   /// 重试单个请求
   Future<Response> _retryRequest(RequestOptions requestOptions) async {
     // 获取最新token
-    final token = _tokenSupplier != null ? await _tokenSupplier!.getToken() : null;
+    final token =
+        _tokenStorage != null ? await _tokenStorage!.getToken() : null;
     final _headers = requestOptions.headers;
     final _token = _headers['token'];
     if (_token != null && _token is String && _token.isNotEmpty) {
@@ -669,7 +672,11 @@ class TokenRenewalInterceptor extends Interceptor {
   }
 
   /// 执行续期请求
-  Future<Response> _executeRenewalRequest({required String url, required Map<String, dynamic> params, required Map<String, dynamic> headers, required CancelToken cancelToken}) async {
+  Future<Response> _executeRenewalRequest(
+      {required String url,
+      required Map<String, dynamic> params,
+      required Map<String, dynamic> headers,
+      required CancelToken cancelToken}) async {
     // 创建专用的Dio实例用于续期请求
     final tokenDio = Dio()..interceptors.add(HeaderInterceptor());
     _configureProxy(tokenDio);

@@ -16,10 +16,14 @@ class NetworkCubit extends Cubit<NetworkState> {
   void startListening() {
     _subscription = _connectivity.onConnectivityChanged.listen((results) {
       final isConnected = !results.contains(ConnectivityResult.none);
-      emit(NetworkState(
-        status: isConnected ? NetworkStatus.connected : NetworkStatus.disconnected,
-        lastDisconnectedAt: isConnected ? null : DateTime.now(),
-      ));
+      emit(
+        NetworkState(
+          status: isConnected
+              ? NetworkStatus.connected
+              : NetworkStatus.disconnected,
+          lastDisconnectedAt: isConnected ? null : DateTime.now(),
+        ),
+      );
     });
   }
 
@@ -34,7 +38,8 @@ class NetworkCubit extends Cubit<NetworkState> {
       final results = await _connectivity.checkConnectivity();
       final isConnected = !results.contains(ConnectivityResult.none);
       emit(NetworkState(
-        status: isConnected ? NetworkStatus.connected : NetworkStatus.disconnected,
+        status:
+            isConnected ? NetworkStatus.connected : NetworkStatus.disconnected,
       ));
     } catch (e) {
       emit(NetworkState(

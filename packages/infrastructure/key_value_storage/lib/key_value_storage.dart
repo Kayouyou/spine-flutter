@@ -2,6 +2,7 @@ export 'package:hive/hive.dart';
 export 'src/key_value_storage.dart';
 export 'src/shared_preference_storage.dart';
 export 'src/preference_key.dart';
+export 'src/token_storage.dart';
 // Phase 3b新增
 export 'src/box_manager.dart';
 export 'src/box_service.dart';

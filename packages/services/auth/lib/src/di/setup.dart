@@ -9,22 +9,18 @@ import '../manager.dart';
 
 /// 注册 auth 服务的所有依赖
 void setupAuth(GetIt sl) {
-  // Repository — 组合注入 Dio
   sl.registerLazySingleton<UserRepository>(
     () => AuthRepositoryImpl(sl<Dio>()),
   );
 
-  // MockAuthRepository — 用于 AuthCubit 的 mock 仓库
   sl.registerFactory<MockAuthRepository>(() => MockAuthRepository());
 
-  // AuthCubit — 认证状态管理
   sl.registerSingleton<AuthCubit>(AuthCubit(sl<MockAuthRepository>()));
 
-  // AuthManager — 注入 Repository、存储 和 AuthCubit
   sl.registerLazySingleton<AuthManager>(
     () => AuthManager(
       userRepository: sl<UserRepository>(),
-      keyValueStorage: sl<KeyValueStorage>(),
+      tokenStorage: sl<TokenStorage>(),
       authCubit: sl<AuthCubit>(),
     ),
   );

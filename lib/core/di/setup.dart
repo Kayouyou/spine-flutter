@@ -27,31 +27,11 @@ void setupDependencies() {
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
-  // 构造 AutoCancelInterceptor（注入 RequestContext + CancelTokenManager）
-  final autoCancelInterceptor = AutoCancelInterceptor(
-    tagProvider: () => RequestContext.currentTag,
-    registerFn: (tag, token) => CancelTokenManager.instance.register(tag, token),
-  );
-
-  final dio = createDio(
-    userTokenSupplier: () async => null, // TODO: 接入真实的 token 提供者
-    onNetworkDisconnected: () {
-      sl<AppLogger>().warning('网络连接已断开');
-    },
-    logger: sl<AppLogger>(),
-    autoCancelInterceptor: autoCancelInterceptor,
-  );
-  dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
-  sl.registerSingleton<Dio>(dio);
-
   sl.registerSingleton<KeyValueStorage>(KeyValueStorage());
 
-  // ===== Step 2: 数据定义层 =====
-  // domain 当前仅导出类型定义，无需注册
-
-  // ===== Step 3: 应用状态 =====
-  sl.registerSingleton<LocaleCubit>(LocaleCubit());
-  sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
+  sl.registerSingleton<TokenStorage>(
+    TokenStorage(sl<KeyValueStorage>()),
+  );
 
   // 链路图解
   // lib/core/di/setup.dart
@@ -71,9 +51,32 @@ void setupDependencies() {
   // 三步骤
   // 每个模块负责组装自己的依赖，主应用只需调用一次 setupXxx(sl)
 
-  // ===== Step 4: 业务服务层 =====
+  // ===== Step 2: Dio（依赖 TokenStorage） =====
+  final autoCancelInterceptor = AutoCancelInterceptor(
+    tagProvider: () => RequestContext.currentTag,
+    registerFn: (tag, token) =>
+        CancelTokenManager.instance.register(tag, token),
+  );
+
+  final dio = createDio(
+    userTokenSupplier: () => sl<TokenStorage>().getToken(),
+    onNetworkDisconnected: () {
+      sl<AppLogger>().warning('网络连接已断开');
+    },
+    logger: sl<AppLogger>(),
+    autoCancelInterceptor: autoCancelInterceptor,
+    tokenStorage: sl<TokenStorage>(),
+  );
+  dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
+  sl.registerSingleton<Dio>(dio);
+
+  // ===== Step 3: 业务服务层（依赖 Dio 和 TokenStorage） =====
   setupAuth(sl);
   setupDataSync(sl);
+
+  // ===== Step 4: 应用状态 =====
+  sl.registerSingleton<LocaleCubit>(LocaleCubit());
+  sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
   // ===== Step 5: 业务功能层 =====
   setupFeatureHome(sl);

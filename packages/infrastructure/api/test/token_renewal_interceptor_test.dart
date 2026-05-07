@@ -5,13 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:api/api.dart';
 import 'package:api/src/dio/renewal_token_intercaptor.dart';
-import 'package:api/src/http/token_supplier.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 
 /// Token续期拦截器单元测试
 ///
 /// 测试覆盖：
 /// 1. Logger注入（默认DefaultLogger + 自定义注入）
-/// 2. TokenSupplier注入
+/// 2. TokenStorage注入
 /// 3. 续期检测逻辑
 /// 4. 续期状态枚举完整性
 /// 5. CancelTokenManager
@@ -52,30 +52,30 @@ void main() {
     });
   });
 
-  group('TokenSupplier注入', () {
-    test('构造函数可接收TokenSupplier', () {
+  group('TokenStorage注入', () {
+    test('构造函数可接收TokenStorage', () {
       final dio = Dio(BaseOptions(baseUrl: 'https://test.com'));
-      final supplier = _TestTokenSupplier();
-      final interceptor = TokenRenewalInterceptor(dio, supplier);
+      final storage = _TestTokenStorage();
+      final interceptor = TokenRenewalInterceptor(dio, storage);
       expect(interceptor, isNotNull);
     });
 
-    test('TokenSupplier可延迟注入', () async {
+    test('TokenStorage可延迟注入', () async {
       final dio = Dio(BaseOptions(baseUrl: 'https://test.com'));
       final interceptor = TokenRenewalInterceptor(dio);
-      final supplier = _TestTokenSupplier();
-      interceptor.tokenSupplier = supplier;
+      final storage = _TestTokenStorage();
+      interceptor.tokenStorage = storage;
 
-      final token = await supplier.getToken();
+      final token = await storage.getToken();
       expect(token, equals('test-token-123'));
       expect(token, isNotEmpty);
     });
 
-    test('TokenSupplier可获取和设置Token', () async {
-      final supplier = _TestTokenSupplier();
-      expect(await supplier.getToken(), equals('test-token-123'));
-      await supplier.setToken('new-token');
-      expect(await supplier.getToken(), equals('new-token'));
+    test('TokenStorage可获取和设置Token', () async {
+      final storage = _TestTokenStorage();
+      expect(await storage.getToken(), equals('test-token-123'));
+      await storage.setToken('new-token');
+      expect(await storage.getToken(), equals('new-token'));
     });
   });
 
@@ -130,7 +130,6 @@ void main() {
       expect(manager.getTokenCount('non_existent_page'), 0);
     });
   });
-
 }
 
 /// 测试用Logger实现
@@ -152,8 +151,8 @@ class _TestLogger implements AppLoggerInterface {
       _messages.add('ERROR: $message');
 }
 
-/// 测试用TokenSupplier
-class _TestTokenSupplier implements TokenSupplier {
+/// 测试用TokenStorage
+class _TestTokenStorage implements TokenStorage {
   String _token = 'test-token-123';
 
   @override
@@ -165,10 +164,13 @@ class _TestTokenSupplier implements TokenSupplier {
   }
 
   @override
-  Future<String?> getUsername() async => 'test-user';
+  Future<String?> getUserId() async => 'test-user';
 
   @override
-  Future<void> clearToken() async {
+  Future<void> setUserId(String userId) async {}
+
+  @override
+  Future<void> clear() async {
     _token = '';
   }
 }

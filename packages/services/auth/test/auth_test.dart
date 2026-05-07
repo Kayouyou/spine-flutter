@@ -7,18 +7,18 @@ import 'package:auth/src/manager.dart';
 
 class _MockUserRepository extends Mock implements UserRepository {}
 
-class _MockKeyValueStorage extends Mock implements KeyValueStorage {}
+class _MockTokenStorage extends Mock implements TokenStorage {}
 
 class _MockAuthCubit extends Mock implements AuthCubit {}
 
 void main() {
   late _MockUserRepository mockUserRepository;
-  late _MockKeyValueStorage mockKeyValueStorage;
+  late _MockTokenStorage mockTokenStorage;
   late _MockAuthCubit mockAuthCubit;
 
   setUp(() {
     mockUserRepository = _MockUserRepository();
-    mockKeyValueStorage = _MockKeyValueStorage();
+    mockTokenStorage = _MockTokenStorage();
     mockAuthCubit = _MockAuthCubit();
   });
 
@@ -27,7 +27,7 @@ void main() {
       when(() => mockAuthCubit.isLoggedIn).thenReturn(false);
       final manager = AuthManager(
         userRepository: mockUserRepository,
-        keyValueStorage: mockKeyValueStorage,
+        tokenStorage: mockTokenStorage,
         authCubit: mockAuthCubit,
       );
       expect(manager.isLoggedIn, false);
@@ -36,7 +36,7 @@ void main() {
     test('handleLogin completes without error', () async {
       final manager = AuthManager(
         userRepository: mockUserRepository,
-        keyValueStorage: mockKeyValueStorage,
+        tokenStorage: mockTokenStorage,
         authCubit: mockAuthCubit,
       );
       await expectLater(manager.handleLogin(), completes);
@@ -45,7 +45,7 @@ void main() {
     test('dispose completes without error', () {
       final manager = AuthManager(
         userRepository: mockUserRepository,
-        keyValueStorage: mockKeyValueStorage,
+        tokenStorage: mockTokenStorage,
         authCubit: mockAuthCubit,
       );
       expect(() => manager.dispose(), returnsNormally);

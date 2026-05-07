@@ -48,6 +48,9 @@ enum PreferenceKey {
   reminderSelectedDate('reminder_date'),
   reminderSelectedStatus('reminder_status'),
   carListDataMode('car_list_data_mode'),
+
+  authToken('auth_token'),
+  authUserId('auth_user_id'),
   ;
 
   final String rawKey;
