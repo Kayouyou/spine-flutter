@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'正在检查网络...'**
   String get checkingNetwork;
+
+  /// 立即检查网络连接按钮
+  ///
+  /// In zh, this message translates to:
+  /// **'立即检查'**
+  String get checkNow;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

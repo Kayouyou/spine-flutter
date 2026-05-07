@@ -54,4 +54,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get checkingNetwork => '正在检查网络...';
+
+  @override
+  String get checkNow => '立即检查';
 }

@@ -54,4 +54,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkingNetwork => 'Checking network...';
+
+  @override
+  String get checkNow => 'Check Now';
 }
