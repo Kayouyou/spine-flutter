@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
+import 'package:feature_detail/feature_detail.dart';
 
 import 'route_context.dart';
 import 'module_a.dart';
@@ -40,10 +41,7 @@ class AppRouter {
         ),
         GoRoute(
           path: '/detail',
-          builder: (context, state) => Scaffold(
-            appBar: AppBar(title: Text('Detail')),
-            body: Center(child: Text('This is a detail page')),
-          ),
+          builder: (context, state) => const DetailPage(),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

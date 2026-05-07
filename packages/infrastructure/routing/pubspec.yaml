@@ -13,6 +13,10 @@ dependencies:
     path: ../../services/auth
   feature_auth:
     path: ../../features/feature_auth
+  feature_home:
+    path: ../../features/feature_home
+  feature_detail:
+    path: ../../features/feature_detail
 
 dev_dependencies:
   flutter_test:

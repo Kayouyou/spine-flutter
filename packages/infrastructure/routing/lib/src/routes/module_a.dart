@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:feature_home/feature_home.dart';
 
 import 'route_context.dart';
 import 'route_module.dart';
@@ -15,9 +16,7 @@ class ModuleARouteModule extends RouteModule {
         path: '/home',
         pageBuilder: (context, state) {
           // 构建页面内容，并用 routeWrapper 包裹以支持 RequestScope 等功能
-          Widget page = const Scaffold(
-            body: Center(child: Text('Home Tab')),
-          );
+          Widget page = const HomePage();
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);
           }
