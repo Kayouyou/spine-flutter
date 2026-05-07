@@ -4,3 +4,4 @@
 /// 将所有未处理错误统一记录到日志。
 export 'src/error_handler.dart';
 export 'src/error_reporter.dart';
+export 'src/sentry_reporter.dart';

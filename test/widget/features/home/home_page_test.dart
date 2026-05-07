@@ -32,6 +32,9 @@ void main() {
       ),
     );
 
+    // 等待异步操作完成
+    await tester.pump(const Duration(seconds: 3));
+
     expect(find.byType(AppBar), findsOneWidget);
     expect(find.text('首页'), findsOneWidget);
   });
@@ -45,6 +48,9 @@ void main() {
         ),
       ),
     );
+
+    // 等待 UpgradeAlert 的异步初始化
+    await tester.pump(const Duration(seconds: 3));
 
     // 验证页面至少能渲染出来不报错
     expect(find.byType(HomePage), findsOneWidget);

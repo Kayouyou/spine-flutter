@@ -54,7 +54,7 @@ class AppLauncher {
     StartupProfiler.mark('BlocObserver 注册');
 
     // 全局错误边界 — 在任何可能出错的代码之前安装
-    AppErrorHandler().setup(
+    AppErrorHandler.instance.setup(
       onError: (error, stack) {
         sl<AppLogger>().error('未处理错误', error);
       },

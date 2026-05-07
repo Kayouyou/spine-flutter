@@ -25,6 +25,11 @@ dependencies:
     path: ../../infrastructure/list_cache
   auth:
     path: ../../services/auth
+  my_app:
+    path: ../../../
+  
+  # 强制更新检查
+  upgrader: ^10.3.0
 
 dev_dependencies:
   flutter_test:

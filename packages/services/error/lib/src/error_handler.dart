@@ -9,14 +9,25 @@ import 'error_reporter.dart';
 ///
 /// 使用方式：
 /// ```dart
-/// AppErrorHandler().setup(
+/// AppErrorHandler.instance.setup(
 ///   onError: (error, stack) {
 ///     logger.error('未处理错误', error, stack);
 ///   },
 /// );
+///
+/// // 注册 SentryReporter（DSN 不为空时）
+/// if (EnvironmentConfig.sentryDsn.isNotEmpty) {
+///   AppErrorHandler.instance.setReporter(SentryReporter());
+/// }
 /// ```
 class AppErrorHandler {
+  /// 单例实例
+  static final instance = AppErrorHandler._();
+
   ErrorReporter? _reporter;
+
+  /// 私有构造函数（单例模式）
+  AppErrorHandler._();
 
   // ignore: use_setters_to_change_properties
   void setReporter(ErrorReporter reporter) {

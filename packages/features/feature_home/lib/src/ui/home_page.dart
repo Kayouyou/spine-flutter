@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
 import 'package:routing/routing.dart';
+import 'package:upgrader/upgrader.dart';
+import 'package:my_app/config.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -15,25 +17,30 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: '首页',
-      actions: [
-        // 刷新按钮
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: () => context.read<HomeCubit>().refreshData(),
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        debugLogging: EnvironmentConfig.isDev,
+      ),
+      child: AppScaffold(
+        title: '首页',
+        actions: [
+          // 刷新按钮
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<HomeCubit>().refreshData(),
+          ),
+        ],
+        body: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
+            // 根据状态渲染不同UI
+            return switch (state) {
+              HomeInitial() => _buildInitial(context),
+              HomeLoading() => _buildLoading(context),
+              HomeLoaded(data: final data) => _buildLoaded(context, data),
+              HomeError(errorCode: final errorCode) => _buildError(context, errorCode),
+            };
+          },
         ),
-      ],
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          // 根据状态渲染不同UI
-          return switch (state) {
-            HomeInitial() => _buildInitial(context),
-            HomeLoading() => _buildLoading(context),
-            HomeLoaded(data: final data) => _buildLoaded(context, data),
-            HomeError(errorCode: final errorCode) => _buildError(context, errorCode),
-          };
-        },
       ),
     );
   }
