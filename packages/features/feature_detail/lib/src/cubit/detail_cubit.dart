@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:domain/domain.dart';
-import '../repository/detail_repository.dart';
 import 'detail_state.dart';
 
 /// 详情页状态管理Cubit

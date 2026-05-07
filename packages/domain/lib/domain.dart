@@ -7,5 +7,8 @@ export 'src/enums/enum.dart';
 export 'src/exceptions/domain_exception.dart';
 export 'src/models/user.dart';
 export 'src/repositories/user_repository.dart';
+export 'src/repositories/home_repository.dart';
+export 'src/repositories/detail_repository.dart';
+export 'src/repositories/auth_repository.dart';
 export 'src/demo/demo_user.dart';
 export 'src/demo/demo_response.dart';

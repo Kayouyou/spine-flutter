@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:api/api.dart';
-import 'detail_repository.dart';
+import 'package:domain/domain.dart';
 
 /// 详情数据仓库实现
 ///

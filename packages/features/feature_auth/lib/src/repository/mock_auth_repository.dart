@@ -1,4 +1,4 @@
-import 'auth_repository.dart';
+import 'package:domain/domain.dart';
 
 class MockAuthRepository implements AuthRepository {
   @override
