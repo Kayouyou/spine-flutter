@@ -4,8 +4,11 @@
 
 set -euo pipefail
 
+echo "▸ 检查 ARB 翻译一致性..."
+./scripts/check_l10n.sh
+
 echo "▸ 运行 flutter analyze..."
-# --no-fatal-infos --no-fatal-warnings: info/warning 不阻止提交，仅 error 阻止
+# 本地只拦截 error，info/warning 交 CI 处理（避免 163 个预存 info 阻塞提交）
 flutter analyze lib/ packages/ --no-fatal-infos --no-fatal-warnings
 
 echo "▸ 运行单元测试和 Bloc 测试..."
