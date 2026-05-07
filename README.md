@@ -13,6 +13,7 @@
 - [分层决策树](#分层决策树)
 - [测试命令](#测试命令)
 - [Make 命令参考](#make-命令参考)
+- [开发工具](#开发工具)
 - [环境配置](#环境配置)
 - [列表缓存](#列表缓存)
 - [架构评分](#架构评分)
@@ -365,6 +366,27 @@ fvm flutter test --coverage
 | `make staging` | Flavor 预发布环境运行 |
 | `make prod` | Flavor 生产环境运行 |
 | `make build-prod` | 生产环境构建 APK |
+
+---
+
+## 开发工具
+
+项目内置自动化检查，pre-commit 本地把关 + CI 远端兜底。
+
+| 工具 | 触发时机 | 检查内容 | 跳过方式 |
+|------|----------|----------|----------|
+| **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 单元测试 | `git commit --no-verify` |
+| **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
+| **CI (Gitee Actions)** | push 到 main | analyze(info 也拦截) → test → build | — |
+
+**手动运行**：
+```bash
+./scripts/check_l10n.sh        # 检查翻译一致性
+.githooks/pre-commit            # 执行完整 hook（模拟提交前检查）
+```
+
+**修改 hook**：编辑 `.githooks/pre-commit`，下次 commit 自动生效。  
+**修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 Gitee 自动加载。
 
 ---
 
