@@ -1,7 +1,7 @@
 .PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod
 
 get:
-	dart run melos bs
+	melos bs
 
 clean:
 	fvm flutter clean
@@ -16,10 +16,10 @@ release: get
 	fvm flutter build ios --release --no-codesign
 
 lint:
-	dart run melos analyze
+	melos analyze
 
 test:
-	dart run melos test
+	melos test
 
 coverage-local:
 	@chmod +x scripts/coverage_local.sh

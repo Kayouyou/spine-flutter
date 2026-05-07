@@ -17,6 +17,9 @@
 - [环境配置](#环境配置)
 - [列表缓存](#列表缓存)
 - [架构评分](#架构评分)
+- [Melos 多包管理](#melos-多包管理)
+- [Mason 代码模板](#mason-代码模板)
+- [监控与更新](#监控与更新)
 - [路由守卫](#路由守卫)
 - [Domain 测试](#domain-测试)
 - [Login/Register 示例](#loginregister-示例)
@@ -64,6 +67,7 @@ my_app/
 │   │   ├── api/                  # Dio HTTP 封装
 │   │   ├── routing/              # GoRouter 路由模块
 │   │   ├── key_value_storage/    # Hive 本地存储
+│   │   ├── list_cache/           # 列表缓存策略
 │   │   └── component_library/    # 共享 UI 组件
 │   │
 │   ├── services/                 # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
@@ -86,8 +90,26 @@ my_app/
 │       └── feature_detail/      # 示例功能：详情页
 │
 ├── makefile                     # 开发命令
+├── melos.yaml                   # Melos 多包管理配置
+├── mason.yaml                   # Mason 代码模板配置
 ├── pubspec.yaml                 # 主应用依赖
-└── l10n.yaml                    # 国际化配置
+├── l10n.yaml                    # 国际化配置
+│
+├── env/                         # 环境变量文件
+│   ├── .env.dev                 # 开发环境
+│   ├── .env.staging             # 预发布环境
+│   └── .env.prod                # 生产环境
+│
+├── assets/                      # 静态资源
+│   ├── icon.png                 # 应用图标
+│   ├── splash.png               # 启动页图片
+│   ├── images/                  # 图片资源
+│   └── fonts/                   # 字体资源
+│
+├── bricks/                      # Mason 代码模板
+│   └── feature/                 # Feature 模板
+│
+└── docs/                        # 文档
 ```
 
 ### 各层职责速查
@@ -105,7 +127,10 @@ my_app/
 ## 快速开始
 
 ```bash
-# 1. 安装依赖
+# 0. 安装 Melos（首次）
+dart pub global activate melos
+
+# 1. 安装依赖（Melos 自动扫描所有包）
 make get
 
 # 2. 运行调试（自动选择设备）
@@ -126,6 +151,20 @@ make test
 ## 我要加一个页面
 
 完整示例：假设我们要添加「设置页面」。
+
+### 快速方式：使用 Mason 模板
+
+项目已配置 Mason feature brick，一行命令生成完整 Feature 包：
+
+```bash
+mason make feature --name settings --output-dir packages/features/feature_settings
+```
+
+生成后运行 `make get` 安装依赖，即可在 routing 中添加路由。
+
+> 详细用法见 [Mason 代码模板](#mason-代码模板) 章节。
+
+### 手动方式（传统步骤）
 
 ### 步骤 1：创建 Feature 包
 
@@ -333,17 +372,17 @@ make debug-simulator
 ## 测试命令
 
 ```bash
-# 运行所有测试
+# 运行所有包测试（Melos）
 make test
 
-# 或直接使用 flutter
-fvm flutter test
+# 只跑变更相关包的测试（快）
+melos test:affected
 
-# 运行特定文件
-fvm flutter test packages/domain/test/
+# 运行特定包测试
+cd packages/domain && flutter test
 
 # 生成覆盖率报告
-fvm flutter test --coverage
+melos test:coverage
 ```
 
 ---
@@ -352,20 +391,21 @@ fvm flutter test --coverage
 
 | 命令 | 说明 |
 |------|------|
-| `make get` | 安装所有包依赖（主应用 + 所有本地包） |
+| `make get` | 安装所有包依赖（通过 Melos 自动扫描） |
 | `make clean` | 清理构建缓存 |
 | `make debug` | 运行调试版本 |
 | `make debug-simulator` | 运行到 iOS 模拟器（推荐） |
 | `make release` | 构建 iOS 发布版本 |
-| `make lint` | 代码分析（flutter analyze） |
-| `make test` | 运行测试 |
+| `make lint` | 代码分析（Melos 全量） |
+| `make test` | 运行所有包测试（Melos） |
 | `make create-repo` | 查看创建 Repository 步骤 |
 | `make create-feature` | 查看创建 Feature 步骤 |
 | `make add-api` | 查看添加 API 端点步骤 |
-| `make dev` | Flavor 开发环境运行 |
-| `make staging` | Flavor 预发布环境运行 |
-| `make prod` | Flavor 生产环境运行 |
-| `make build-prod` | 生产环境构建 APK |
+| `make dev` | 开发环境运行（env/.env.dev） |
+| `make staging` | 预发布环境运行（env/.env.staging） |
+| `make prod` | 生产环境运行（env/.env.prod） |
+| `make build-prod` | 生产环境构建 APK（env/.env.prod） |
+| `make bs` | 仅安装依赖（= melos bs） |
 
 ---
 
@@ -375,9 +415,11 @@ fvm flutter test --coverage
 
 | 工具 | 触发时机 | 检查内容 | 跳过方式 |
 |------|----------|----------|----------|
-| **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 单元测试 | `git commit --no-verify` |
+| **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 增量测试(melos test:affected) | `git commit --no-verify` |
 | **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
 | **CI (Gitee Actions)** | push 到 main | analyze(info 也拦截) → test → build | — |
+| **Melos** | 日常开发 | 多包管理：统一依赖安装、测试、分析 | — |
+| **Mason** | 新建 Feature | 代码模板：mason make feature --name xxx | — |
 
 **手动运行**：
 ```bash
@@ -392,28 +434,24 @@ fvm flutter test --coverage
 
 ## 环境配置
 
-项目支持 dev / staging / prod 三套环境，通过 `--dart-define` 切换。
+通过 `--dart-define-from-file` 读取 `env/` 目录下的环境文件。
 
 ```bash
-make dev           # 开发环境（默认）
-make staging       # 预发布环境
-make prod          # 生产环境
-make build-prod    # 生产环境构建 APK
+make dev           # 开发环境（env/.env.dev）
+make staging       # 预发布环境（env/.env.staging）
+make prod          # 生产环境（env/.env.prod）
 ```
 
-每个环境的 API 地址、日志开关、网络超时自动切换：
+环境变量定义在 `env/.env.*`：
 
-```dart
-import 'package:my_app/config.dart';
+| 变量 | 说明 |
+|------|------|
+| ENV | 环境名称 |
+| API_BASE_URL | API 地址 |
+| SENTRY_DSN | Sentry DSN（空=不启用） |
+| APP_STORE_ID | App Store ID（空=不启用更新检查） |
 
-// 当前环境
-if (EnvironmentConfig.isDev) { ... }
-
-// API 地址（自动根据环境切换）
-final url = EnvironmentConfig.apiBaseUrl;
-```
-
-默认 API 地址在 `lib/config.dart` 的 `EnvironmentConfig` 中配置，接入真实项目时替换为实际地址。
+> `.env.prod` 和 `.env.staging` 已加入 .gitignore。
 
 ---
 
@@ -505,6 +543,10 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | 网络监控 | 9/10 | connectivity_plus + NetworkQualityMonitor（弱网检测） |
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
 | 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
+| 开发工具链 | 9.5/10 | Melos 多包管理 + Mason 代码模板 |
+| 资源管理 | 9/10 | 一键图标/启动页 |
+| 监控体系 | 9/10 | Sentry 崩溃监控（DSN 空时自动禁用） |
+| 版本管理 | 9/10 | upgrader 强制更新检查 |
 
 ### 2026-05-07 优化记录
 
@@ -513,6 +555,75 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | A: 架构对齐 | 路由连线、路由常量统一、State @freezed 统一、Repository 归位、PreferenceKey enum | 7.5 → 8.5 |
 | B: 功能完善 | ListCache 接入、测试补充、DataSyncManager 实现、组件库扩展 | 8.5 → 9.0 |
 | C: 生产就绪 | Deep Link、ErrorReporter 接口、弱网检测、RTL 测试 | 9.0 → 9.5 |
+| D: 开发工具 | Melos、Mason、.env、Sentry、Upgrader、图标/启动页 | 9.5 → 9.8 |
+
+---
+
+## Melos 多包管理
+
+项目使用 Melos 管理 Monorepo 多包依赖。
+
+### 核心命令
+
+```bash
+melos bootstrap   # 安装所有包依赖（= make get）
+melos analyze     # 全量代码分析（= make lint）
+melos test        # 运行所有包测试（= make test）
+melos test:affected  # 仅变更包测试（CI 增量）
+melos clean       # 清理所有包构建缓存
+```
+
+### 配置文件
+
+`melos.yaml` 定义包路径、脚本命令和 bootstrapping 行为。
+
+---
+
+## Mason 代码模板
+
+Mason 提供标准化 Feature 包生成模板，减少重复工作。
+
+### 使用方式
+
+```bash
+# 生成新 Feature 包
+mason make feature --name xxx --output-dir packages/features/feature_xxx
+
+# 安装依赖
+make get
+```
+
+### 模板内容
+
+生成的 Feature 包包含完整结构：`lib/`（di/cubit/repository/ui/models）、`pubspec.yaml`、`test/`。
+
+### 自定义模板
+
+模板位于 `bricks/feature/`，可根据团队规范修改。
+
+---
+
+## 监控与更新
+
+### Sentry 崩溃监控
+
+- 通过 `SENTRY_DSN` 环境变量启用
+- DSN 为空时自动禁用，不影响开发
+- `SentryReporter` 实现 `ErrorReporter` 接口
+
+### Upgrader 强制更新
+
+- 通过 `APP_STORE_ID` 环境变量启用
+- 首页集成 `UpgradeAlert` widget
+- 检测 App Store 版本，弹窗提示更新
+
+### 环境控制
+
+| 环境 | SENTRY_DSN | APP_STORE_ID |
+|------|------------|--------------|
+| dev | 空（禁用） | 空（禁用） |
+| staging | 可配置 | 可配置 |
+| prod | 必填 | 必填 |
 
 ---
 

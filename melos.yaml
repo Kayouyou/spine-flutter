@@ -18,7 +18,7 @@ scripts:
 
   test:affected:
     run: |
-      melos exec --since=origin/main --diff=origin/main -- flutter test
+      melos exec --since=origin/main -- flutter test
     description: 只测变更相关包
 
   test:coverage:

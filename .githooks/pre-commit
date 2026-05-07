@@ -12,6 +12,6 @@ echo "▸ 运行 flutter analyze..."
 flutter analyze lib/ packages/ --no-fatal-infos --no-fatal-warnings
 
 echo "▸ 运行变更相关包的测试..."
-dart run melos test:affected
+melos test:affected
 
 echo "✓ pre-commit 检查通过"

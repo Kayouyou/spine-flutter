@@ -4,6 +4,8 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  exclude:
+    - bricks/**
   errors:
     always_declare_return_types: error
     avoid_dynamic_calls: warning

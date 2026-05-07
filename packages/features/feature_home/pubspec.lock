@@ -265,7 +265,7 @@ packages:
   data_sync:
     dependency: transitive
     description:
-      path: "../../services/data_sync"
+      path: "../../../../../packages/services/data_sync"
       relative: true
     source: path
     version: "0.0.0"
@@ -335,7 +335,7 @@ packages:
   error:
     dependency: transitive
     description:
-      path: "../../services/error"
+      path: "../../../../../packages/services/error"
       relative: true
     source: path
     version: "0.0.1"
@@ -348,14 +348,14 @@ packages:
     source: hosted
     version: "1.3.1"
   feature_auth:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_auth"
       relative: true
     source: path
     version: "0.0.1"
   feature_detail:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_detail"
       relative: true
@@ -590,7 +590,7 @@ packages:
     source: hosted
     version: "4.9.0"
   key_value_storage:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../infrastructure/key_value_storage"
       relative: true
@@ -638,7 +638,7 @@ packages:
   locale:
     dependency: transitive
     description:
-      path: "../../services/locale"
+      path: "../../../../../packages/services/locale"
       relative: true
     source: path
     version: "0.0.1"
@@ -693,8 +693,8 @@ packages:
   my_app:
     dependency: "direct main"
     description:
-      path: "../../.."
-      relative: true
+      path: "/Users/yeyangyang/Desktop/my_app"
+      relative: false
     source: path
     version: "1.0.0+1"
   nested:
@@ -708,7 +708,7 @@ packages:
   network:
     dependency: transitive
     description:
-      path: "../../services/network"
+      path: "../../../../../packages/services/network"
       relative: true
     source: path
     version: "0.0.1"
