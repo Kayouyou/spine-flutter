@@ -85,5 +85,10 @@
   "checkingNetwork": "正在检查网络...",
   "@checkingNetwork": {
     "description": "网络检查中提示"
+  },
+
+  "checkNow": "立即检查",
+  "@checkNow": {
+    "description": "立即检查网络连接按钮"
   }
 }

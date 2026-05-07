@@ -1,52 +1,71 @@
-# 国际化模块
+# 国际化模块 (l10n)
 
-## 职责
-管理应用多语言支持，提供统一的本地化文本。
+管理应用多语言支持。主语言中文 (zh)，英文 (en) 为第二语言。
 
-## 使用方式
+## 快速操作
 
-### 方式1：flutter_intl插件（推荐）
+### 新增字符串
 
-1. VS Code/Android Studio安装flutter_intl插件
-2. 打开ARB文件编辑，插件自动生成代码
-3. 生成文件位于 `.dart_tool/flutter_gen/gen_l10n/`
+1. 在 `app_zh.arb` 添加 key：
+```json
+"authLoginButton": "登录",
+"@authLoginButton": { "description": "登录按钮文本" }
+```
+2. 在 `app_en.arb` 添加对应翻译：
+```json
+"authLoginButton": "Login"
+```
+3. 生成代码：`flutter gen-l10n`
+4. 使用：`Text(context.l10n.authLoginButton)`
 
-### 方式2：命令行生成
+### 修改字符串
+
+直接改 `.arb` 中的值，然后 `flutter gen-l10n`。
+
+### 删除字符串
+
+在 `app_zh.arb` 和 `app_en.arb` 中同时删除 key 及其 `@key` 元数据。`flutter gen-l10n`。
+
+### 检查翻译完整性
 
 ```bash
-flutter gen-l10n
+./scripts/check_l10n.sh
 ```
+输出 `✅ 所有 ARB 文件 key 与模板一致` 即通过。
 
-### 方式3：手动配置（本项目）
+## Widget 中使用
 
-在 `l10n.yaml` 中配置：
-- arb-dir: ARB文件目录
-- template-arb-file: 主模板（中文）
-- output-localization-file: 输出文件名
-- output-class-name: 输出类名
+### 推荐：context.l10n 扩展
 
-## 使用示例
 ```dart
-// 获取本地化文本
-final text = AppLocalizations.of(context).networkError;
+import 'package:my_app/core/l10n/l10n_ext.dart';
 
-// 在Widget中使用
-Text(AppLocalizations.of(context).appName)
+Text(context.l10n.retry)
+Text(context.l10n.homeTitle)
 ```
 
-## ARB文件结构
-- app_zh.arb: 中文模板（主语言）
-- app_en.arb: 英文翻译
-- 其他语言添加对应ARB文件
+对比 `AppLocalizations.of(context)!.retry`（41 字符）→ `context.l10n.retry`（24 字符），短 40%。
 
-## ErrorCode国际化
-每个ErrorCode.name对应ARB中的一个key：
-- ErrorCode.networkError → "networkError": "网络连接失败"
-- ErrorCode.tokenExpired → "tokenExpired": "登录已过期"
+## 命名规范
 
-## 依赖关系
-- intl: ^0.19.0
-- flutter_localizations: sdk
+格式：`模块_元素`，如 `networkError`、`authLoginButton`。
 
-## 性能警告
-无
+## 文件结构
+```
+lib/core/l10n/
+├── app_zh.arb           # 主模板（中文）
+├── app_en.arb           # 英文
+├── l10n_ext.dart        # context.l10n 扩展
+├── generated/           # 自动生成，勿手动编辑
+└── README.md
+```
+
+## 添加新语言
+
+1. 创建 `app_ja.arb`，复制 `app_en.arb` 全部 key
+2. 逐条翻译，`flutter gen-l10n`
+3. `app.dart` 的 `supportedLocales` 加 `Locale('ja')`
+
+## CI 集成
+
+pre-commit hook 或 CI 中加入 `./scripts/check_l10n.sh`。
