@@ -58,19 +58,19 @@ add-api:
 
 # 开发环境运行
 dev: get
-	fvm flutter run --dart-define=ENV=dev --debug
+	fvm flutter run --dart-define-from-file=env/.env.dev --debug
 
 # 预发布环境运行
 staging: get
-	fvm flutter run --dart-define=ENV=staging --debug
+	fvm flutter run --dart-define-from-file=env/.env.staging --debug
 
 # 生产环境运行
 prod: get
-	fvm flutter run --dart-define=ENV=prod --debug
+	fvm flutter run --dart-define-from-file=env/.env.prod --debug
 
 # 生产环境构建
 build-prod: get
-	fvm flutter build apk --dart-define=ENV=prod --release
+	fvm flutter build apk --dart-define-from-file=env/.env.prod --release
 
 coverage-local:
 	@chmod +x scripts/coverage_local.sh
