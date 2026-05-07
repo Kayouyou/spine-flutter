@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
+import 'package:routing/routing.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -90,7 +91,7 @@ class HomePage extends StatelessWidget {
           const Text('Bloc状态管理已集成'),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () => context.push('/detail'),
+            onPressed: () => context.push(AppRoutes.detail),
             icon: const Icon(Icons.open_in_new),
             label: const Text('打开详情页'),
           ),

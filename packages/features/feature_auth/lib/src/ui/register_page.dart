@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:routing/routing.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
 import '../repository/mock_auth_repository.dart';
@@ -31,7 +32,7 @@ class RegisterPageView extends StatelessWidget {
       body: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state.status == LoginStatus.success) {
-            final target = redirect ?? '/home';
+            final target = redirect ?? AppRoutes.home;
             context.go(target);
           }
         },
@@ -66,7 +67,7 @@ class RegisterPageView extends StatelessWidget {
                   child: const Text('注册'),
                 ),
                 TextButton(
-                  onPressed: () => context.go('/login?redirect=$redirect',),
+                  onPressed: () => context.go('${AppRoutes.login}?redirect=$redirect',),
                   child: const Text('已有账号？登录'),
                 ),
               ],
