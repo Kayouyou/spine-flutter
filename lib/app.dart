@@ -49,6 +49,7 @@ class _MyAppState extends State<MyApp> {
       routeWrapper: (child) => RequestScope(child: child),
       homeCubitFactory: () => sl<HomeCubit>(),
       detailCubitFactory: () => sl<DetailCubit>(),
+      debugMode:  EnvironmentConfig.isDev,
     );
     _router = AppRouter.getRouter(ctx: ctx);
   }

@@ -21,6 +21,9 @@ class RouteContext {
   final HomeCubit Function()? homeCubitFactory;
   final DetailCubit Function()? detailCubitFactory;
 
+  /// 调试模式标志 — 由 app 层注入，避免 feature 包反向依赖 my_app
+  final bool debugMode;
+
   const RouteContext({
     required this.navigatorKey,
     this.authManager,
@@ -28,5 +31,6 @@ class RouteContext {
     this.routeWrapper,
     this.homeCubitFactory,
     this.detailCubitFactory,
+    this.debugMode = false,
   });
 }

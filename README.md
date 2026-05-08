@@ -416,14 +416,22 @@ melos test:coverage
 
 | 工具 | 触发时机 | 检查内容 | 跳过方式 |
 |------|----------|----------|----------|
-| **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 增量测试(melos test:affected) | `git commit --no-verify` |
+| **check_deps.sh** | hook / CI / 手动 | Feature 包不得反向依赖 my_app | — |
+| **pre-commit hook** | `git commit` 时 | check_deps → l10n → analyze(仅 error) → 增量测试 | `git commit --no-verify` |
 | **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
-| **CI (GitHub Actions)** | push 到 main | analyze(仅 error) → test → build | — |
+| **CI (GitHub Actions)** | push 到 main | check_deps → l10n → analyze(仅 error) → test → build | — |
+| **Melos validate** | 手动一键验收 | deps → l10n → analyze → test 全跑 | — |
 | **Melos** | 日常开发 | 多包管理：统一依赖安装、测试、分析 | — |
 | **Mason** | 新建 Feature | 代码模板：mason make feature --name xxx | — |
 
+**一键验收**（新同学跑这条就知道是否健康）：
+```bash
+melos run validate
+```
+
 **手动运行**：
 ```bash
+./scripts/check_deps.sh        # 检查依赖方向
 ./scripts/check_l10n.sh        # 检查翻译一致性
 .githooks/pre-commit            # 执行完整 hook（模拟提交前检查）
 ```
@@ -569,7 +577,7 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 架构评分
 
-当前架构评分：**7.5/10**（2026-05 工程收口中 — P0/P1 修复进行中）
+当前架构评分：**9.0/10**（2026-05 工程收口完成）
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
@@ -585,20 +593,28 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | 网络监控 | 9/10 | connectivity_plus + NetworkQualityMonitor（弱网检测） |
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
 | 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
-| 开发工具链 | 9.5/10 | Melos 多包管理 + Mason 代码模板 |
+| 开发工具链 | 9.5/10 | Melos 多包管理 + Mason 代码模板 + validate 一键验收 |
 | 资源管理 | 9/10 | 一键图标/启动页 |
 | 监控体系 | 9/10 | Sentry 崩溃监控（DSN 空时自动禁用） |
 | 版本管理 | 9/10 | upgrader 强制更新检查 |
 
-### 2026-05-07 优化记录
+## 标准脚手架通过条件
 
-| Plan | 内容 | 评分提升 |
-|------|------|----------|
-| A: 架构对齐 | 路由连线、路由常量统一、State @freezed 统一、Repository 归位、PreferenceKey enum | 7.5 → 8.5 |
-| B: 功能完善 | ListCache 接入、测试补充、DataSyncManager 实现、组件库扩展 | 8.5 → 9.0 |
-| C: 生产就绪 | Deep Link、ErrorReporter 接口、弱网检测、RTL 测试 | 9.0 → 9.5 |
-| D: 开发工具 | Melos、Mason、.env、Sentry、Upgrader、图标/启动页 | 9.5 → 9.8 |
-| E: 工程收口 | 门禁统一(green)、测试补全(kv_storage/backbutton)、反向依赖清理 | 9.2 → 9.5 |
+本项目定位为**团队中型项目起步骨架**。以下检查全部通过即视为"健康"：
+
+```bash
+melos run validate
+```
+
+包含 4 项检查：
+| # | 检查 | 说明 |
+|---|------|------|
+| 1 | `check_deps.sh` | Feature 包不得反向依赖 my_app |
+| 2 | `check_l10n.sh` | ARB 翻译 key 数量一致 |
+| 3 | `melos analyze` | 静态分析（--no-fatal-infos --no-fatal-warnings） |
+| 4 | `melos test` | 全量测试通过 |
+
+**文档一致性**：melos.yaml / pre-commit / CI 四处 analyze 标准已统一为 `--no-fatal-infos --no-fatal-warnings`。
 
 ---
 
@@ -610,9 +626,11 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ```bash
 melos bootstrap   # 安装所有包依赖（= make get）
+melos validate    # ✅ 一键验收：deps → l10n → analyze → test
 melos analyze     # 全量代码分析（= make lint）
 melos test        # 运行所有包测试（= make test）
 melos test:affected  # 仅变更包测试（CI 增量）
+melos check:deps  # 检查依赖方向
 melos clean       # 清理所有包构建缓存
 ```
 

@@ -4,22 +4,20 @@ import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
 import 'package:routing/routing.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:my_app/config.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
 /// 首页
-///
-/// 职责：展示首页内容，响应加载状态
-/// 使用：BlocProvider包装，BlocBuilder响应状态
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final bool debugLogging;
+
+  const HomePage({super.key, this.debugLogging = false});
 
   @override
   Widget build(BuildContext context) {
     return UpgradeAlert(
       upgrader: Upgrader(
-        debugLogging: EnvironmentConfig.isDev,
+        debugLogging: debugLogging,
       ),
       child: AppScaffold(
         title: '首页',

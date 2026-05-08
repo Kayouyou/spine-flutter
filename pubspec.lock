@@ -408,6 +408,13 @@ packages:
       relative: true
     source: path
     version: "0.0.0"
+  feature_settings:
+    dependency: "direct main"
+    description:
+      path: "packages/features/feature_settings"
+      relative: true
+    source: path
+    version: "0.0.0"
   ffi:
     dependency: transitive
     description:

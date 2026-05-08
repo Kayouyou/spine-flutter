@@ -31,6 +31,19 @@ scripts:
       ./scripts/check_deps.sh
     description: 检查依赖方向 - feature 包不得引用 my_app
 
+  validate:
+    run: |
+      echo "▸ Step 1: 依赖方向检查..."
+      ./scripts/check_deps.sh
+      echo "▸ Step 2: 翻译一致性..."
+      ./scripts/check_l10n.sh
+      echo "▸ Step 3: 静态分析 (仅拦 error)..."
+      melos exec -- flutter analyze --no-fatal-infos --no-fatal-warnings
+      echo "▸ Step 4: 全量测试..."
+      melos exec -- flutter test
+      echo "✅ 全部通过 — 项目健康"
+    description: 标准验收命令 — deps+l10n+analyze+test 一条跑完
+
   check:coverage:
     run: |
       melos exec -- flutter test --coverage
