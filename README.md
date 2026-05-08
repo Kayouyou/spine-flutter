@@ -153,15 +153,15 @@ make test
 
 完整示例：假设我们要添加「设置页面」。
 
-### 快速方式：使用 Mason 模板
-
-项目已配置 Mason feature brick，一行命令生成完整 Feature 包：
+### 快速方式：一行命令
 
 ```bash
-mason make feature --name settings --output-dir packages/features/feature_settings
+make create-feature name=settings
 ```
 
-生成后运行 `make get` 安装依赖，即可在 routing 中添加路由。
+自动执行三步：生成文件 → `melos bs` 安装依赖 → `build_runner` 生成 freezed 代码。
+
+完成后在 routing 中添加路由、在 `setup.dart` 注册 DI 即可。
 
 > 详细用法见 [Mason 代码模板](#mason-代码模板) 章节。
 
@@ -400,7 +400,7 @@ melos test:coverage
 | `make lint` | 代码分析（Melos 全量） |
 | `make test` | 运行所有包测试（Melos） |
 | `make create-repo` | 查看创建 Repository 步骤 |
-| `make create-feature` | 查看创建 Feature 步骤 |
+| `make create-feature name=xxx` | 创建新 Feature 包（生成 + 装依赖 + 生成 freezed） |
 | `make add-api` | 查看添加 API 端点步骤 |
 | `make dev` | 开发环境运行（env/.env.dev） |
 | `make staging` | 预发布环境运行（env/.env.staging） |
@@ -647,11 +647,17 @@ Mason 提供标准化 Feature 包生成模板，减少重复工作。
 ### 使用方式
 
 ```bash
-# 生成新 Feature 包
-mason make feature --name xxx --output-dir packages/features/feature_xxx
+# 一行命令：生成 + 装依赖 + 生成 freezed 代码
+make create-feature name=settings
+```
 
-# 安装依赖
+单步生成（如需手动控制）：
+```bash
+# 仅生成模板文件
+mason make feature --name settings --output-dir packages/features/feature_settings
+# 然后手动安装依赖 + 生成代码
 make get
+cd packages/features/feature_settings && dart run build_runner build --delete-conflicting-outputs
 ```
 
 ### 模板内容

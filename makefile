@@ -35,14 +35,20 @@ create-repo:
 	@echo "6. 运行 make get"
 
 create-feature:
-	@echo "📱 创建新 Feature 的步骤："
-	@echo "1. 在 packages/features/ 下创建目录: packages/features/feature_<name>/"
-	@echo "2. 创建 pubspec.yaml + lib/feature_<name>.dart"
-	@echo "3. 内部结构: cubit/ repository/ ui/ di/ models/"
-	@echo "4. 参考 packages/features/feature_home/ 的结构"
-	@echo "5. 在 routing 包中添加路由"
-	@echo "6. 在 lib/core/di/setup.dart 中调用 setupFeature<Name>(sl)"
-	@echo "7. 运行 make get"
+	@if [ -z "$(name)" ]; then \
+		echo "用法: make create-feature name=test_mason"; \
+		exit 1; \
+	fi
+	@echo "=== 1/3 生成 Feature 包 ==="
+	mason make feature --name $(name) --output-dir packages/features/feature_$(name)
+	@echo "=== 2/3 安装依赖 ==="
+	melos bs
+	@echo "=== 3/3 生成 freezed 代码 ==="
+	cd packages/features/feature_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo ""
+	@echo "=== ✅ 完成！后续手动步骤 ==="
+	@echo "1. 在 routing 包中添加路由"
+	@echo "2. 在 lib/core/di/setup.dart 注册 setupFeatureXxx(sl)"
 
 add-api:
 	@echo "🔌 添加 API 端点的步骤："

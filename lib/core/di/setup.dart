@@ -66,6 +66,8 @@ void setupDependencies() {
     logger: sl<AppLogger>(),
     autoCancelInterceptor: autoCancelInterceptor,
     tokenStorage: sl<TokenStorage>(),
+    connectTimeout: Duration(seconds: EnvironmentConfig.networkTimeout),
+    receiveTimeout: Duration(seconds: EnvironmentConfig.networkTimeout),
   );
   dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);

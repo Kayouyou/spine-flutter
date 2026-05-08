@@ -1,4 +1,4 @@
-import 'dart:ui' show AppExitResponse;
+import 'dart:ui' show AppExitResponse, ViewFocusEvent;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PredictiveBackEvent;
@@ -70,6 +70,8 @@ mixin AppLifecycleMixin<T extends StatefulWidget> on State<T> implements Widgets
   void handleCommitBackGesture() {}
   @override
   void handleCancelBackGesture() {}
+  @override
+  void didChangeViewFocus(ViewFocusEvent event) {}
   @override
   Future<AppExitResponse> didRequestAppExit() async => AppExitResponse.exit;
 }
