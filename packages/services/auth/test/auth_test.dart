@@ -34,6 +34,7 @@ void main() {
     });
 
     test('handleLogin completes without error', () async {
+      when(() => mockTokenStorage.getToken()).thenAnswer((_) async => null);
       final manager = AuthManager(
         userRepository: mockUserRepository,
         tokenStorage: mockTokenStorage,
