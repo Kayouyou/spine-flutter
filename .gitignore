@@ -44,3 +44,6 @@ app.*.map.json
 .superpowers/
 packages/services/auth/build/
 .worktrees/
+
+# FVM Version Cache
+.fvm/

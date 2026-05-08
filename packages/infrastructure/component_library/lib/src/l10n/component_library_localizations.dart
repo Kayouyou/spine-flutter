@@ -7,6 +7,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'component_library_localizations_zh.dart';
 
+// ignore_for_file: type=lint
+
 /// Callers can lookup localized strings with an instance of ComponentLibraryLocalizations
 /// returned by `ComponentLibraryLocalizations.of(context)`.
 ///

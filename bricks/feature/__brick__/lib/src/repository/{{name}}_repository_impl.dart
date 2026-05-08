@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:domain/domain.dart';
 import '{{name}}_repository.dart';
 
 /// {{name.pascalCase()}} 数据仓库实现

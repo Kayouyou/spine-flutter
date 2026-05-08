@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:feature_{{name}}/src/cubit/{{name}}_cubit.dart';
-import 'package:domain/domain.dart';
+import 'package:feature_{{name}}/src/repository/{{name}}_repository.dart';
 import 'package:feature_{{name}}/src/repository/{{name}}_repository_impl.dart';
 
 /// 注册 {{name.pascalCase()}} 功能模块的依赖注入
