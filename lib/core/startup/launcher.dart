@@ -10,6 +10,7 @@ import 'package:data_sync/data_sync.dart';
 import 'package:error/error.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 // Project imports:
 import '../di/locator.dart';
@@ -64,6 +65,19 @@ class AppLauncher {
     // 依赖注入配置
     setupDependencies();
     StartupProfiler.mark('依赖注入完成');
+
+    // ===== Sentry 初始化（依赖 IAppConfig 配置）=====
+    final config = sl<IAppConfig>();
+    if (config.sentryDsn.isNotEmpty) {
+      await SentryFlutter.init(
+        (options) {
+          options.dsn = config.sentryDsn;
+          options.tracesSampleRate = 0.1;
+        },
+      );
+      AppErrorHandler.instance.setReporter(SentryReporter());
+    }
+    StartupProfiler.mark('Sentry 初始化完成');
 
     // 屏幕方向
     await SystemChrome.setPreferredOrientations([

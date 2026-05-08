@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:auth/auth.dart';
+import 'package:domain/domain.dart';
 import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +15,6 @@ import 'package:network/network.dart';
 import 'package:routing/routing.dart';
 
 // Project imports:
-import 'config.dart';
 import 'core/di/locator.dart';
 import 'core/widgets/network/network_banner.dart';
 import 'core/widgets/request_scope.dart';
@@ -37,19 +37,19 @@ class _MyAppState extends State<MyApp> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 
-@override
+  @override
   void initState() {
     super.initState();
     // 构建路由
+    final config = sl<IAppConfig>();
     final ctx = RouteContext(
       navigatorKey: _navigatorKey,
       authManager: sl<AuthManager>(),
-      enableAuthGuard: EnvironmentConfig.enableAuthGuard,
+      enableAuthGuard: config.enableAuthGuard,
       // routeWrapper：在每个路由页面外层包裹 RequestScope，实现页面退出时自动取消请求
       routeWrapper: (child) => RequestScope(child: child),
       homeCubitFactory: () => sl<HomeCubit>(),
       detailCubitFactory: () => sl<DetailCubit>(),
-      debugMode:  EnvironmentConfig.isDev,
     );
     _router = AppRouter.getRouter(ctx: ctx);
   }

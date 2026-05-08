@@ -18,7 +18,7 @@ class ModuleARouteModule extends RouteModule {
         pageBuilder: (context, state) {
           Widget page = BlocProvider(
             create: (_) => ctx.homeCubitFactory!(),
-            child: HomePage(debugLogging: ctx.debugMode),
+            child: const HomePage(),
           );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);

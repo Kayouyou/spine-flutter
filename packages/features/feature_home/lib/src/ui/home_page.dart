@@ -4,20 +4,20 @@ import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
 import 'package:routing/routing.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
 /// 首页
 class HomePage extends StatelessWidget {
-  final bool debugLogging;
-
-  const HomePage({super.key, this.debugLogging = false});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return UpgradeAlert(
       upgrader: Upgrader(
-        debugLogging: debugLogging,
+        debugLogging: GetIt.instance<IAppConfig>().enableDebugLog,
       ),
       child: AppScaffold(
         title: '首页',

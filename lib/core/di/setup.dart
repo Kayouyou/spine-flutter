@@ -15,7 +15,7 @@ import 'package:locale/locale.dart';
 import 'package:network/network.dart';
 
 // Project imports:
-import '../../config.dart';
+import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
 import 'locator.dart';
@@ -24,6 +24,9 @@ import 'locator.dart';
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies() {
+  // ===== Step 0: 应用配置（必须在其他依赖之前注册）=====
+  sl.registerSingleton<IAppConfig>(EnvAppConfig());
+
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
 
@@ -58,6 +61,7 @@ void setupDependencies() {
         CancelTokenManager.instance.register(tag, token),
   );
 
+  final config = sl<IAppConfig>();
   final dio = createDio(
     userTokenSupplier: () => sl<TokenStorage>().getToken(),
     onNetworkDisconnected: () {
@@ -66,10 +70,10 @@ void setupDependencies() {
     logger: sl<AppLogger>(),
     autoCancelInterceptor: autoCancelInterceptor,
     tokenStorage: sl<TokenStorage>(),
-    connectTimeout: Duration(seconds: EnvironmentConfig.networkTimeout),
-    receiveTimeout: Duration(seconds: EnvironmentConfig.networkTimeout),
+    connectTimeout: Duration(seconds: config.networkTimeout),
+    receiveTimeout: Duration(seconds: config.networkTimeout),
   );
-  dio.options.baseUrl = EnvironmentConfig.apiBaseUrl;
+  dio.options.baseUrl = config.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);
 
   // ===== Step 3: 业务服务层（依赖 Dio 和 TokenStorage） =====
