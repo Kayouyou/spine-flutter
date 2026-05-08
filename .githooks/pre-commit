@@ -4,6 +4,9 @@
 
 set -euo pipefail
 
+echo "▸ 检查依赖方向..."
+./scripts/check_deps.sh
+
 echo "▸ 检查 ARB 翻译一致性..."
 ./scripts/check_l10n.sh
 
