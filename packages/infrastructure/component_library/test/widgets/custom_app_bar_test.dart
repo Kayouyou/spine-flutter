@@ -16,14 +16,32 @@ void main() {
       expect(find.text('测试标题'), findsOneWidget);
     });
 
-    testWidgets('shows back button when showBackButton is true', (tester) async {
+    testWidgets('shows back button when canPop and showBackButton is true',
+        (tester) async {
+      // Push a second route so Navigator.canPop() returns true
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            appBar: CustomAppBar(title: '标题', showBackButton: true),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const Scaffold(
+                        appBar: CustomAppBar(title: '标题', showBackButton: true),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Push'),
+              ),
+            ),
           ),
         ),
       );
+
+      await tester.tap(find.text('Push'));
+      await tester.pumpAndSettle();
 
       expect(find.byType(BackButton), findsOneWidget);
     });

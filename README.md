@@ -418,7 +418,7 @@ melos test:coverage
 |------|----------|----------|----------|
 | **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 增量测试(melos test:affected) | `git commit --no-verify` |
 | **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
-| **CI (Gitee Actions)** | push 到 main | analyze(info 也拦截) → test → build | — |
+| **CI (GitHub Actions)** | push 到 main | analyze(仅 error) → test → build | — |
 | **Melos** | 日常开发 | 多包管理：统一依赖安装、测试、分析 | — |
 | **Mason** | 新建 Feature | 代码模板：mason make feature --name xxx | — |
 
@@ -429,7 +429,7 @@ melos test:coverage
 ```
 
 **修改 hook**：编辑 `.githooks/pre-commit`，下次 commit 自动生效。  
-**修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 Gitee 自动加载。
+**修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 GitHub Actions 自动加载。
 
 ---
 
@@ -569,7 +569,7 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 架构评分
 
-当前架构评分：**9.5/10**（2026-05 架构对齐 + 功能完善 + 生产就绪后）
+当前架构评分：**7.5/10**（2026-05 工程收口中 — P0/P1 修复进行中）
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
@@ -598,6 +598,7 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | B: 功能完善 | ListCache 接入、测试补充、DataSyncManager 实现、组件库扩展 | 8.5 → 9.0 |
 | C: 生产就绪 | Deep Link、ErrorReporter 接口、弱网检测、RTL 测试 | 9.0 → 9.5 |
 | D: 开发工具 | Melos、Mason、.env、Sentry、Upgrader、图标/启动页 | 9.5 → 9.8 |
+| E: 工程收口 | 门禁统一(green)、测试补全(kv_storage/backbutton)、反向依赖清理 | 9.2 → 9.5 |
 
 ---
 

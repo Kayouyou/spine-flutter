@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:domain/domain.dart';
 import 'package:auth/src/cubit/auth_cubit.dart';
 import 'package:auth/src/cubit/auth_state.dart';
-import 'package:auth/src/repository/mock_auth_repository.dart';
 
 class MockAuthRepo extends Mock implements AuthRepository {}
 

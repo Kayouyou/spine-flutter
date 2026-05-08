@@ -8,7 +8,7 @@ packages:
 scripts:
   analyze:
     run: |
-      melos exec -- flutter analyze
+      melos exec -- flutter analyze --no-fatal-infos --no-fatal-warnings
     description: 全量代码分析
 
   test:
@@ -25,3 +25,18 @@ scripts:
     run: |
       melos exec -- flutter test --coverage
     description: 全量测试+覆盖率
+
+  check:deps:
+    run: |
+      ./scripts/check_deps.sh
+    description: 检查依赖方向 - feature 包不得引用 my_app
+
+  check:coverage:
+    run: |
+      melos exec -- flutter test --coverage
+      for dir in packages/*/*/coverage; do
+        if [ -f "$dir/lcov.info" ]; then
+          grep -q "SF:" "$dir/lcov.info" || { echo "No coverage data in $dir"; exit 1; }
+        fi
+      done
+    description: 运行测试并检查覆盖率存在

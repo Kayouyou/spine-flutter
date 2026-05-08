@@ -1,0 +1,30 @@
+# Flutter/Dart/Pub related
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/generated_plugin_registrant.dart
+.packages
+.pub-cache
+.pub-preload-cache
+build/
+
+# Coverage
+coverage/
+*.lcov
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+*.xcworkspace/
+*.xcuserdata/
+
+# Windows
+*.exe
+
+# Test failures
+test/.test_coverage.dart
