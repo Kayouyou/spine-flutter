@@ -43,6 +43,9 @@ app.*.map.json
 /android/app/release
 .superpowers/
 packages/services/auth/build/
+
+# Build artifacts in all packages
+**/build/
 .worktrees/
 
 # FVM Version Cache

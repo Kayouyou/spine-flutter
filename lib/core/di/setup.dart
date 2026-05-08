@@ -15,6 +15,7 @@ import 'package:locale/locale.dart';
 import 'package:network/network.dart';
 
 // Project imports:
+import 'package:domain/domain.dart';
 import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）

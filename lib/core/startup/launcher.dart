@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 // Project imports:
+import 'package:domain/domain.dart';
 import '../di/locator.dart';
 import '../di/setup.dart';
 import '../utils/logger.dart';
