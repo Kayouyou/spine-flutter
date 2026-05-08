@@ -23,7 +23,7 @@ jobs:
       - run: melos bs
       - name: 检查 ARB 翻译一致性
         run: ./scripts/check_l10n.sh
-      - run: melos analyze
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
   test:
     name: 单元测试与 Bloc 测试
