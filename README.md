@@ -569,7 +569,7 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 架构评分
 
-当前架构评分：**9.5/10**（2026-05 架构对齐 + 功能完善 + 生产就绪后）
+当前架构评分：**7.5/10**（2026-05 工程收口中 — P0/P1 修复进行中）
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
@@ -598,6 +598,7 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | B: 功能完善 | ListCache 接入、测试补充、DataSyncManager 实现、组件库扩展 | 8.5 → 9.0 |
 | C: 生产就绪 | Deep Link、ErrorReporter 接口、弱网检测、RTL 测试 | 9.0 → 9.5 |
 | D: 开发工具 | Melos、Mason、.env、Sentry、Upgrader、图标/启动页 | 9.5 → 9.8 |
+| E: 工程收口 | 门禁统一(green)、测试补全(kv_storage/backbutton)、反向依赖清理 | 9.2 → 9.5 |
 
 ---
 
