@@ -13,9 +13,9 @@ void setupAuth(GetIt sl) {
     () => AuthRepositoryImpl(sl<Dio>()),
   );
 
-  sl.registerFactory<MockAuthRepository>(() => MockAuthRepository());
+  sl.registerFactory<AuthRepository>(() => MockAuthRepository());
 
-  sl.registerSingleton<AuthCubit>(AuthCubit(sl<MockAuthRepository>()));
+  sl.registerSingleton<AuthCubit>(AuthCubit(sl<AuthRepository>()));
 
   sl.registerLazySingleton<AuthManager>(
     () => AuthManager(
