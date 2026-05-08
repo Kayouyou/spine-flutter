@@ -15,6 +15,7 @@
 - [Make 命令参考](#make-命令参考)
 - [开发工具](#开发工具)
 - [环境配置](#环境配置)
+- [资源管理（flutter_gen）](#资源管理flutter_gen)
 - [列表缓存](#列表缓存)
 - [架构评分](#架构评分)
 - [Melos 多包管理](#melos-多包管理)
@@ -452,6 +453,47 @@ make prod          # 生产环境（env/.env.prod）
 | APP_STORE_ID | App Store ID（空=不启用更新检查） |
 
 > `.env.prod` 和 `.env.staging` 已加入 .gitignore。
+
+---
+
+## 资源管理（flutter_gen）
+
+项目使用 flutter_gen 提供强类型的资源访问，避免手写字符串路径。
+
+### 添加新资源
+
+将图片放入 `assets/images/` 目录，然后运行：
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### 使用方式
+
+```dart
+// 之前（手写字符串，容易出错）
+Image.asset('assets/images/logo.png')
+
+// 之后（强类型，有代码补全）
+Image.asset(Assets.images.logo.path)
+```
+
+生成的代码在 `lib/gen/assets.gen.dart`，无需手动编辑。
+
+### 配置
+
+`pubspec.yaml` 中 `flutter_gen` 节点控制生成行为：
+
+```yaml
+flutter_gen:
+  output: lib/gen/
+  assets:
+    enabled: true
+    outputs:
+      class_name: Assets
+```
+
+> 注意：添加或删除资源后需要重新运行 `build_runner`，生成的 `assets.gen.dart` 已纳入版本控制。
 
 ---
 
