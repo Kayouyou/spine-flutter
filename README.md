@@ -418,7 +418,7 @@ melos test:coverage
 |------|----------|----------|----------|
 | **pre-commit hook** | `git commit` 时 | l10n 翻译一致性 → analyze(仅 error) → 增量测试(melos test:affected) | `git commit --no-verify` |
 | **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
-| **CI (Gitee Actions)** | push 到 main | analyze(info 也拦截) → test → build | — |
+| **CI (GitHub Actions)** | push 到 main | analyze(仅 error) → test → build | — |
 | **Melos** | 日常开发 | 多包管理：统一依赖安装、测试、分析 | — |
 | **Mason** | 新建 Feature | 代码模板：mason make feature --name xxx | — |
 
@@ -429,7 +429,7 @@ melos test:coverage
 ```
 
 **修改 hook**：编辑 `.githooks/pre-commit`，下次 commit 自动生效。  
-**修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 Gitee 自动加载。
+**修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 GitHub Actions 自动加载。
 
 ---
 
