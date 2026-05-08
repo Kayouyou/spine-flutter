@@ -512,7 +512,7 @@ make prod          # 生产环境（env/.env.prod）
 ### 原则
 
 1. **`EnvironmentConfig` 只被 `EnvAppConfig` 引用**，其他地方不得 import `config.dart`
-2. **`IAppConfig` 只放 feature 层需要的配置**（`sentryDsn`、`appStoreId` 只在 app 层用，不放接口）
+2. **`IAppConfig` 包含所有配置**，不分 app/feature。统一入口比"区分边界"更重要——避免出现"这个配置走 DI，那个配置直接读"的混乱
 3. **单个 UI 行为配置继续传参**（如某个按钮的颜色），不要为了"统一"硬塞进 IAppConfig
 4. **新增配置时先问**：这个配置 feature 层需要读吗？→ 是则加接口，否则留在 `EnvAppConfig` 私有
 
