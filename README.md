@@ -117,11 +117,11 @@ my_app/
 
 | 目录 | 职责 | 依赖 Flutter？ |
 |------|------|--------------|
-| `packages/domain/` | 纯业务：模型、仓储接口、用例、枚举、异常 | ❌ 否 |
+| `packages/domain/` | 纯业务：模型、仓储接口、用例、枚举、异常、**IAppConfig** | ❌ 否 |
 | `packages/infrastructure/` | 技术：API、路由、存储 | ⚠️ 仅技术栈 |
 | `packages/services/` | 共享状态：AuthCubit、NetworkCubit、LocaleCubit | ✅ 是 |
 | `packages/features/` | 功能模块：一个功能一个包 | ✅ 是 |
-| `lib/` | 组装：main.dart、DI 编排、路由绑定 | ✅ 是 |
+| `lib/` | 组装：main.dart、DI 编排、路由绑定、**EnvAppConfig** | ✅ 是 |
 
 ---
 
@@ -443,6 +443,8 @@ melos run validate
 
 ## 环境配置
 
+### 快速使用
+
 通过 `--dart-define-from-file` 读取 `env/` 目录下的环境文件。
 
 ```bash
@@ -451,7 +453,9 @@ make staging       # 预发布环境（env/.env.staging）
 make prod          # 生产环境（env/.env.prod）
 ```
 
-环境变量定义在 `env/.env.*`：
+### 环境变量
+
+定义在 `env/.env.*`：
 
 | 变量 | 说明 |
 |------|------|
@@ -461,6 +465,84 @@ make prod          # 生产环境（env/.env.prod）
 | APP_STORE_ID | App Store ID（空=不启用更新检查） |
 
 > `.env.prod` 和 `.env.staging` 已加入 .gitignore。
+
+### 配置架构（三层设计）
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    环境变量（.env.* 文件）                       │
+│   --dart-define-from-file=env/.env.dev                       │
+└──────────────────────┬──────────────────────────────────────┘
+                       ↓ 编译时注入
+┌──────────────────────┴──────────────────────────────────────┐
+│  EnvironmentConfig（lib/config.dart）                         │
+│  职责：读取原始环境变量，提供静态属性                              │
+│  警告：这是 ONLY 被 EnvAppConfig 引用的文件，其他任何地方不要直接 import │
+└──────────────────────┬──────────────────────────────────────┘
+                       ↓ 包装为接口
+┌──────────────────────┴──────────────────────────────────────┐
+│  EnvAppConfig（lib/core/config/app_config.dart）              │
+│  职责：实现 IAppConfig 接口，唯一读取 EnvironmentConfig 的地方      │
+└──────────────────────┬──────────────────────────────────────┘
+                       ↓ 注册为 DI Singleton
+┌──────────────────────┴──────────────────────────────────────┐
+│  IAppConfig（packages/domain/lib/src/config/app_config.dart）  │
+│  职责：纯 Dart 接口契约，定义 feature 层需要的所有配置              │
+│  使用：通过 sl<IAppConfig>() 全局获取                           │
+└──────────────────────┬──────────────────────────────────────┘
+                       ↓ 注入到各层
+┌──────────────────────┬──────────────────────┬───────────────┐
+│  app 层               │  feature 层            │  infra 层     │
+│  sl<IAppConfig>()     │  GetIt.instance       │  参数传参      │
+│  .enableAuthGuard     │  .<IAppConfig>()      │  (已解耦)      │
+│  .sentryDsn          │  .enableDebugLog      │               │
+│                      │  .apiBaseUrl          │               │
+└──────────────────────┴──────────────────────┴───────────────┘
+```
+
+### 为什么这么设计
+
+| 问题 | 方案 |
+|------|------|
+| feature 不能反向依赖 app | `IAppConfig` 放在 domain（纯 Dart，无 Flutter 依赖） |
+| 各处直接读静态变量，改实现要改 N 处 | DI 注入，换实现只需改 `EnvAppConfig` |
+| 传参层层透传，新增配置改所有中间层 | 需要处直接 `GetIt.instance<IAppConfig>()` |
+| 区分"app 专用配置"和"feature 共享配置" | `IAppConfig` 只放 feature 真正需要的 |
+
+### 原则
+
+1. **`EnvironmentConfig` 只被 `EnvAppConfig` 引用**，其他地方不得 import `config.dart`
+2. **`IAppConfig` 只放 feature 层需要的配置**（`sentryDsn`、`appStoreId` 只在 app 层用，不放接口）
+3. **单个 UI 行为配置继续传参**（如某个按钮的颜色），不要为了"统一"硬塞进 IAppConfig
+4. **新增配置时先问**：这个配置 feature 层需要读吗？→ 是则加接口，否则留在 `EnvAppConfig` 私有
+
+### 使用示例
+
+```dart
+// ===== app 层（setup.dart）=====
+final config = sl<IAppConfig>();
+dio.options.baseUrl = config.apiBaseUrl;
+
+// ===== feature 层（widget 中）=====
+import 'package:get_it/get_it.dart';
+import 'package:domain/domain.dart';
+
+final debugLogging = GetIt.instance<IAppConfig>().enableDebugLog;
+
+// ===== feature 层（Cubit 中）=====
+class HomeCubit extends Cubit<HomeState> {
+  final IAppConfig _config;
+  HomeCubit(this._config, ...);
+}
+```
+
+### 新增配置的流程
+
+1. 在 `env/.env.dev` 加变量（如 `NEW_FEATURE_FLAG=true`）
+2. 在 `lib/config.dart` 加 `EnvironmentConfig` 静态属性
+3. 在 `packages/domain/lib/src/config/app_config.dart` 加 `IAppConfig` 接口
+4. 在 `lib/core/config/app_config.dart` 加 `EnvAppConfig` 实现
+5. 业务代码通过 `sl<IAppConfig>()` 读取
 
 ---
 
