@@ -3,6 +3,7 @@
 /// 本包不依赖 Flutter，不依赖 infrastructure，可独立编译和测试。
 /// 提供：数据模型、仓储接口、用例、枚举、异常定义。
 export 'src/config/app_config.dart';
+export 'src/result.dart';
 export 'src/usecases/get_user_usecase.dart';
 export 'src/enums/enum.dart';
 export 'src/exceptions/domain_exception.dart';
