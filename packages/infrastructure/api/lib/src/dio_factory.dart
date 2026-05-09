@@ -1,4 +1,5 @@
 import 'package:alice/alice.dart';
+import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:key_value_storage/key_value_storage.dart';
@@ -83,7 +84,9 @@ Dio createDio({
 
   // [4] Alice — HTTP Inspector（仅 Debug 模式，可选）
   if (kDebugMode && alice != null) {
-    dio.interceptors.add(alice.getDioInterceptor());
+    final aliceDioAdapter = AliceDioAdapter();
+    alice.addAdapter(aliceDioAdapter);
+    dio.interceptors.add(aliceDioAdapter);
   }
 
   return dio;

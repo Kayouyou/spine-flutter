@@ -54,6 +54,11 @@ class _MyAppState extends State<MyApp> {
       detailCubitFactory: () => sl<DetailCubit>(),
     );
     _router = AppRouter.getRouter(ctx: ctx);
+
+    // Alice HTTP Inspector 设置 navigator key（仅 Debug 模式）
+    if (kDebugMode && sl.isRegistered<Alice>()) {
+      sl<Alice>().setNavigatorKey(_navigatorKey);
+    }
   }
 
   @override
@@ -85,9 +90,8 @@ class _MyAppState extends State<MyApp> {
             ],
             routerConfig: _router,
             builder: (context, child) {
-              // EasyLoading builder
               final easyLoadingBuilder = EasyLoading.init();
-              Widget result = easyLoadingBuilder(
+              return easyLoadingBuilder(
                 context,
                 NetworkBanner(
                   child: MediaQuery(
@@ -98,13 +102,6 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
               );
-
-              // Alice HTTP Inspector（仅 Debug 模式）
-              if (kDebugMode && sl.isRegistered<Alice>()) {
-                result = sl<Alice>().builder(context, result);
-              }
-
-              return result;
             },
           );
         },

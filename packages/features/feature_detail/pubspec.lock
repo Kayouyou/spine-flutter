@@ -812,6 +812,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.4.0"
+  retrofit:
+    dependency: transitive
+    description:
+      name: retrofit
+      sha256: f56124c1bda4eec3a68548957aa1a0d3f6cd728511e81d4215a4167de7197fdd
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.5.0"
   routing:
     dependency: "direct main"
     description:

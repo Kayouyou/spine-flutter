@@ -323,28 +323,28 @@ packages:
     source: hosted
     version: "1.3.1"
   feature_auth:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_auth"
       relative: true
     source: path
     version: "0.0.1"
   feature_detail:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_detail"
       relative: true
     source: path
     version: "0.0.0"
   feature_home:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_home"
       relative: true
     source: path
     version: "0.0.0"
   feature_settings:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../feature_settings"
       relative: true
@@ -547,7 +547,7 @@ packages:
     source: hosted
     version: "4.9.0"
   key_value_storage:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../infrastructure/key_value_storage"
       relative: true
@@ -832,6 +832,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.4.0"
+  retrofit:
+    dependency: transitive
+    description:
+      name: retrofit
+      sha256: f56124c1bda4eec3a68548957aa1a0d3f6cd728511e81d4215a4167de7197fdd
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.5.0"
   routing:
     dependency: "direct main"
     description:
