@@ -26,3 +26,27 @@ services, features
 - **不依赖 Flutter** — 可独立编译和测试
 - **Repository 接口** — domain 定义接口，services/features 实现
 - **Sealed 异常** — `DomainException` 是 sealed class，保证穷尽性匹配
+
+## Result<T, E> 模式
+
+域层提供统一的 `Result<T, E>` 类型用于显式错误处理。
+
+### 使用方式
+
+```dart
+// 仓储返回 Result
+Future<Result<User, DomainException>> getCurrentUser();
+
+// 调用方通过 when 穷尽匹配
+final result = await repository.getCurrentUser();
+result.when(
+  success: (user) => print(user.name),
+  failure: (error) => showError(error),
+);
+```
+
+### 核心类型
+- `Result<T, E>` — 密封基类
+- `Success<T, E>` — 成功结果，包含数据 `data`
+- `Failure<T, E>` — 失败结果，包含异常 `error`
+- `Future.toResult()` — 自动将 Future 转换为 Result（api 包提供）

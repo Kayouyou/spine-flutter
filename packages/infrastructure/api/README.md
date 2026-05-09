@@ -36,6 +36,48 @@ api/
 - **请求头签名** — `HeaderInterceptor` SHA1 签名注入
 - **取消管理** — `CancelTokenManager` 页面销毁时取消未完成请求
 - **错误映射** — `DioExceptionMapper` 单一路径：DioException → DomainException
+- **Retrofit 代码生成** — 基于注解的 HTTP 客户端自动生成
+
+### Retrofit API 接口
+
+api 包支持两种调用方式：传统 Dio 和 Retrofit 代码生成。
+
+```
+api/
+├── lib/
+│   ├── api.dart
+│   └── src/
+│       ├── api/
+│       │   ├── home_api.dart        # 首页 API
+│       │   ├── detail_api.dart      # 详情 API
+│       │   ├── auth_api.dart        # 认证 API
+│       │   ├── session_api.dart     # Session API
+│       │   └── vehicle_api.dart     # 车辆 API
+│       └── error/
+│           ├── dio_mapper.dart      # DioException → DomainException
+│           └── future_result.dart   # Future.toResult() 扩展
+```
+
+**Retrofit 使用：**
+```dart
+// 1. 创建接口实例（共享 Dio 和拦截器）
+final homeApi = HomeApi(dio);
+
+// 2. 调用方法
+final response = await homeApi.getHomeData();
+
+// 3. 转换为 Result（推荐）
+final result = await dio.get('/api').toResult();
+```
+
+**Dio 调用转换为 Result（推荐）：**
+```dart
+final result = await dio.get('/api/users').toResult();
+result.when(
+  success: (data) => print(data),
+  failure: (error) => print(error),
+);
+```
 
 ## 使用
 

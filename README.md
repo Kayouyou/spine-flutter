@@ -657,6 +657,33 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ---
 
+## 最近架构演进
+
+### Result<T, E> 模式（2026-05-09）
+- domain 层引入 `Result<T, E>` 密封类替代 try-catch 错误处理
+- 所有仓储接口/实现返回 `Result<T, DomainException>`
+- Cubit 通过 `result.when()` 穷尽匹配成功/失败
+- 创建 `Future.toResult()` 扩展自动转换 DioException
+- Mason 模板已更新包含 Result 模式
+
+### Retrofit API 集成（2026-05-09）
+- api 包添加 Retrofit 代码生成（5个业务域接口）
+- 仓库实现改用 Retrofit API 替代直接 Dio 调用
+- `ApiEndpoints` 标记为 @Deprecated
+
+### Hive 迁移框架（2026-05-09）
+- key_value_storage 包支持 schema 版本管理和数据迁移
+- 支持链式迁移（保留数据）和版本不匹配清除策略
+- 创建 `register.yaml` 集中管理 Hive TypeId
+
+### Mason 砖块扩展（2026-05-09）
+- 新增 `api` 砖：一键创建 Retrofit API 模块
+- 新增 `model` 砖：一键创建 @freezed 数据模型
+- 新增 `hive_model` 砖：一键创建 @HiveType 本地存储模型
+- 新增 `create-api` / `create-model` / `create-hive-model` make 命令
+
+---
+
 ## 架构评分
 
 当前架构评分：**9.0/10**（2026-05 工程收口完成）
