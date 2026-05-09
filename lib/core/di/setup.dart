@@ -1,7 +1,10 @@
 // Flutter imports:
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
+import 'package:alice/alice.dart';
+import 'package:alice/model/alice_configuration.dart';
 import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
@@ -26,6 +29,18 @@ import 'locator.dart';
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies() {
+  // ===== 0. Alice HTTP Inspector（仅 debug 模式）=====
+  // 必须在 getIt.init() 之前注册，以便其他服务可依赖
+  if (kDebugMode) {
+    final alice = Alice(
+      configuration: AliceConfiguration(
+        showNotification: true,
+        showInspectorOnShake: true,
+      ),
+    );
+    getIt.registerSingleton<Alice>(alice);
+  }
+
   // ===== 1. injectable 初始化（自动注册 @injectable 类）=====
   // 注意：这需要在任何手动注册之前调用
   getIt.init();
@@ -78,6 +93,7 @@ void setupDependencies() {
     tokenStorage: sl<TokenStorage>(),
     connectTimeout: Duration(seconds: config.networkTimeout),
     receiveTimeout: Duration(seconds: config.networkTimeout),
+    alice: kDebugMode ? sl<Alice>() : null, // Alice HTTP Inspector（仅 Debug）
   );
   dio.options.baseUrl = config.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);

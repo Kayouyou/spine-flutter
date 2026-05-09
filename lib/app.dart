@@ -1,7 +1,9 @@
 // Flutter imports:
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
+import 'package:alice/alice.dart';
 import 'package:auth/auth.dart';
 import 'package:domain/domain.dart';
 import 'package:feature_detail/feature_detail.dart';
@@ -83,8 +85,9 @@ class _MyAppState extends State<MyApp> {
             ],
             routerConfig: _router,
             builder: (context, child) {
+              // EasyLoading builder
               final easyLoadingBuilder = EasyLoading.init();
-              return easyLoadingBuilder(
+              Widget result = easyLoadingBuilder(
                 context,
                 NetworkBanner(
                   child: MediaQuery(
@@ -95,6 +98,13 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
               );
+
+              // Alice HTTP Inspector（仅 Debug 模式）
+              if (kDebugMode && sl.isRegistered<Alice>()) {
+                result = sl<Alice>().builder(context, result);
+              }
+
+              return result;
             },
           );
         },

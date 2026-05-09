@@ -1,3 +1,4 @@
+import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:key_value_storage/key_value_storage.dart';
@@ -11,7 +12,8 @@ import 'http/app_logger.dart';
 ///   [0] AutoCancelInterceptor    → 读 tag，生成 CancelToken
 ///   [1] TokenRenewalInterceptor  → 检测 code=1000102，排队续期
 ///   [2] InterceptorsWrapper    → 注入 Authorization header
-///   [3] LogInterceptor          → 记录日志
+///   [3] LogInterceptor          → 记录日志（仅 Debug）
+///   [4] AliceInterceptor        → HTTP Inspector（仅 Debug）
 ///
 /// 使用方式：
 /// ```dart
@@ -21,6 +23,7 @@ import 'http/app_logger.dart';
 ///   logger: appLogger,                        // 注入主应用 AppLogger
 ///   autoCancelInterceptor: myInterceptor,      // 从外部注入 AutoCancelInterceptor
 ///   tokenStorage: sl<TokenStorage>(),          // 用于 Token 续期成功后写入 Hive
+///   alice: sl<Alice>(),                        // Alice HTTP Inspector（可选，仅 Debug）
 /// );
 /// ```
 Dio createDio({
@@ -31,6 +34,7 @@ Dio createDio({
   TokenStorage? tokenStorage,
   Duration? connectTimeout,
   Duration? receiveTimeout,
+  Alice? alice,
 }) {
   final dio = Dio(BaseOptions(
     connectTimeout: connectTimeout ?? const Duration(seconds: 10),
@@ -75,6 +79,11 @@ Dio createDio({
         responseBody: true,
       ),
     );
+  }
+
+  // [4] Alice — HTTP Inspector（仅 Debug 模式，可选）
+  if (kDebugMode && alice != null) {
+    dio.interceptors.add(alice.getDioInterceptor());
   }
 
   return dio;
