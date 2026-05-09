@@ -21,7 +21,6 @@ import 'package:domain/domain.dart';
 import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
-import 'injectable.dart'; // Injectable 初始化配置
 import 'locator.dart';
 
 /// 依赖注入配置
