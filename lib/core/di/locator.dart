@@ -1,6 +1,8 @@
 // Package imports:
 import 'package:get_it/get_it.dart';
 
+export 'injectable.dart' show getIt;
+
 /// 全局 Service Locator
 ///
 /// 使用方式（按推荐程度排序）：
@@ -11,7 +13,4 @@ import 'package:get_it/get_it.dart';
 /// 配合 injectable 使用：
 /// - 用 @injectable 注解的类自动生成注册代码
 /// - 手动注册继续工作（双轨策略）
-final sl = GetIt.instance;
-
-// 导出 injectable.dart 的 getIt
-export 'injectable.dart' show getIt;
+final sl = getIt;
