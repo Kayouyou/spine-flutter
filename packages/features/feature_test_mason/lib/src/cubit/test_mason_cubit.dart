@@ -25,15 +25,13 @@ class TestMasonCubit extends Cubit<TestMasonState> {
     // 开始加载
     emit(const TestMasonState.loading());
 
-    try {
-      // 获取数据
-      final data = await _repository.getTestMasonData();
-      // 加载成功
-      emit(TestMasonState.loaded(data: data));
-    } on DomainException catch (e) {
-      // 加载失败，传递 ErrorCode 用于国际化
-      emit(TestMasonState.error(errorCode: e.message));
-    }
+    // 获取数据（返回Result类型）
+    final result = await _repository.getTestMasonData();
+    // 穷尽匹配处理结果
+    result.when(
+      success: (data) => emit(TestMasonState.loaded(data: data)),
+      failure: (error) => emit(TestMasonState.error(errorCode: error.message)),
+    );
   }
 
   /// 刷新 TestMason 数据
@@ -41,12 +39,14 @@ class TestMasonCubit extends Cubit<TestMasonState> {
   /// 强制从服务器获取最新数据
   Future<void> refreshData() async {
     emit(const TestMasonState.loading());
-    try {
-      final data = await _repository.refreshTestMasonData();
-      emit(TestMasonState.loaded(data: data));
-    } on DomainException catch (e) {
-      emit(TestMasonState.error(errorCode: e.message));
-    }
+    
+    // 获取数据（返回Result类型）
+    final result = await _repository.refreshTestMasonData();
+    // 穷尽匹配处理结果
+    result.when(
+      success: (data) => emit(TestMasonState.loaded(data: data)),
+      failure: (error) => emit(TestMasonState.error(errorCode: error.message)),
+    );
   }
 
   /// 重试加载

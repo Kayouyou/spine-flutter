@@ -24,15 +24,13 @@ class HomeCubit extends Cubit<HomeState> {
     // 开始加载
     emit(const HomeState.loading());
 
-    try {
-      // 获取数据
-      final data = await _repository.getHomeData();
-      // 加载成功
-      emit(HomeState.loaded(data: data));
-    } on DomainException catch (e) {
-      // 加载失败，传递ErrorCode用于国际化
-      emit(HomeState.error(errorCode: e.message));
-    }
+    // 获取数据（返回Result类型）
+    final result = await _repository.getHomeData();
+    // 穷尽匹配处理结果
+    result.when(
+      success: (data) => emit(HomeState.loaded(data: data)),
+      failure: (error) => emit(HomeState.error(errorCode: error.message)),
+    );
   }
 
   /// 刷新首页数据
@@ -40,12 +38,14 @@ class HomeCubit extends Cubit<HomeState> {
   /// 强制从服务器获取最新数据
   Future<void> refreshData() async {
     emit(const HomeState.loading());
-    try {
-      final data = await _repository.refreshHomeData();
-      emit(HomeState.loaded(data: data));
-    } on DomainException catch (e) {
-      emit(HomeState.error(errorCode: e.message));
-    }
+    
+    // 获取数据（返回Result类型）
+    final result = await _repository.refreshHomeData();
+    // 穷尽匹配处理结果
+    result.when(
+      success: (data) => emit(HomeState.loaded(data: data)),
+      failure: (error) => emit(HomeState.error(errorCode: error.message)),
+    );
   }
 
   /// 重试加载

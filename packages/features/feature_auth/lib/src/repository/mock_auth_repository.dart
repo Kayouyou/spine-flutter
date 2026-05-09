@@ -1,20 +1,25 @@
 import 'package:domain/domain.dart';
 
 class MockAuthRepository implements AuthRepository {
+  bool _loggedIn = false;
+
   @override
-  Future<bool> login(String username, String password) async {
+  Future<Result<bool, DomainException>> login(String username, String password) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return username.isNotEmpty && password.length >= 6;
+    _loggedIn = username.isNotEmpty && password.length >= 6;
+    return Result.success(_loggedIn);
   }
 
   @override
-  Future<bool> register(String username, String password) async {
+  Future<Result<bool, DomainException>> register(String username, String password) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return username.isNotEmpty && password.length >= 6;
+    _loggedIn = username.isNotEmpty && password.length >= 6;
+    return Result.success(_loggedIn);
   }
 
   @override
-  Future<void> logout() async {
+  Future<Result<void, DomainException>> logout() async {
     await Future.delayed(const Duration(milliseconds: 100));
+    return Result.success(null);
   }
 }

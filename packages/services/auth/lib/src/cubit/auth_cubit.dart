@@ -9,16 +9,23 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> login(String username, String password) async {
     emit(state.copyWith(status: AuthStatus.loading));
-    try {
-      final success = await _repository.login(username, password);
-      if (success) {
-        emit(state.copyWith(status: AuthStatus.loggedIn, userId: 'mock-user-1'));
-      } else {
-        emit(state.copyWith(status: AuthStatus.error, errorMessage: '登录失败'));
-      }
-    } catch (e) {
-      emit(state.copyWith(status: AuthStatus.error, errorMessage: e.toString()));
-    }
+    
+    // 获取登录结果（返回Result类型）
+    final result = await _repository.login(username, password);
+    // 穷尽匹配处理结果
+    result.when(
+      success: (success) {
+        if (success) {
+          emit(state.copyWith(status: AuthStatus.loggedIn, userId: 'mock-user-1'));
+        } else {
+          emit(state.copyWith(status: AuthStatus.error, errorMessage: '登录失败'));
+        }
+      },
+      failure: (error) => emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: error.message,
+      ),),
+    );
   }
 
   Future<void> logout() async {

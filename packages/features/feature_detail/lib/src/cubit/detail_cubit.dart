@@ -15,12 +15,14 @@ class DetailCubit extends Cubit<DetailState> {
   /// 根据ID获取详情内容
   Future<void> loadData(String id) async {
     emit(const DetailState.loading());
-    try {
-      final data = await _repository.getDetailData(id);
-      emit(DetailState.loaded(data: data));
-    } on DomainException catch (e) {
-      emit(DetailState.error(errorCode: e.message));
-    }
+    
+    // 获取数据（返回Result类型）
+    final result = await _repository.getDetailData(id);
+    // 穷尽匹配处理结果
+    result.when(
+      success: (data) => emit(DetailState.loaded(data: data)),
+      failure: (error) => emit(DetailState.error(errorCode: error.message)),
+    );
   }
 
   /// 重试加载
