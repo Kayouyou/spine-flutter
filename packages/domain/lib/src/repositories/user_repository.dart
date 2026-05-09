@@ -1,5 +1,7 @@
 // packages/domain/lib/src/repositories/user_repository.dart
 import '../models/user.dart';
+import '../result.dart';
+import '../exceptions/domain_exception.dart';
 
 /// 用户数据访问契约
 ///
@@ -8,15 +10,13 @@ import '../models/user.dart';
 abstract class UserRepository {
   /// 获取当前登录用户
   ///
-  /// 抛出 [UnauthorizedException] 若令牌过期。
-  /// 抛出 [NetworkException] 若网络失败。
-  Future<User> getCurrentUser();
+  /// 返回 Result: Success(User) 或 Failure(DomainException)
+  Future<Result<User, DomainException>> getCurrentUser();
 
   /// 更新用户资料
   ///
-  /// 抛出 [ValidationException] 若字段校验失败。
-  /// 抛出 [NetworkException] 若网络失败。
-  Future<void> updateProfile(ProfileData data);
+  /// 返回 Result: Success(void) 或 Failure(DomainException)
+  Future<Result<void, DomainException>> updateProfile(ProfileData data);
 }
 
 /// 资料更新数据传输对象
