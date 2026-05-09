@@ -16,3 +16,10 @@ export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截
 export 'src/http/app_logger.dart';
 export 'src/endpoints/api_endpoints.dart';
 export 'src/constants/api_constants.dart';
+
+// Retrofit API 接口
+export 'src/api/home_api.dart';
+export 'src/api/detail_api.dart';
+export 'src/api/auth_api.dart';
+export 'src/api/session_api.dart';
+export 'src/api/vehicle_api.dart';

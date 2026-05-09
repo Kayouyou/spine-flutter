@@ -18,6 +18,7 @@ abstract final class ApiBase {
       'http${HttpConstant.IsRelease ? 's' : ''}://${HttpConstant.Http_Host}';
 
   /// Token 续期路径（基础设施共享端点，不属于任何业务域）
+  @Deprecated('请使用 ApiConstants.tokenRenewal 替代')
   static const String tokenRenewal = '/User/Token/Renewal';
 }
 
@@ -57,7 +58,18 @@ final class _Vehicle {
 }
 
 // ─── 统一入口 ───
+// ⚠️ 注意：此类已弃用，请使用 Retrofit API 接口（home_api、detail_api 等）替代。
+// 迁移指南：
+//   旧：ApiEndpoints.home.data
+//   新：HomeApi(dio).getHomeData()
+//
+//   旧：ApiEndpoints.auth.login
+//   新：AuthApi(dio).login(request)
+//
+//   旧：ApiEndpoints.detail.item(id)
+//   新：DetailApi(dio).getDetail(id)
 
+@Deprecated('请使用 Retrofit API 接口替代')
 abstract final class ApiEndpoints {
   static const _Home home = _Home();
   static const _Detail detail = _Detail();
