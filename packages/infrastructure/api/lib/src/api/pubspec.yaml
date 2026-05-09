@@ -1,0 +1,25 @@
+name: api_auth
+description: Auth API 调用模块
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  retrofit: ^4.0.0
+  freezed_annotation: ^2.4.0
+  json_annotation: ^4.8.0
+  domain:
+    path: ../../domain
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.0
+  retrofit_generator: ^8.0.0
+  freezed: ^2.4.0
+  json_serializable: ^6.7.0

@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      retrofit_generator:
+        generate_for:
+          include:
+            - lib/src/api/**
+          exclude:
+            - lib/src/models/**
+      json_serializable:
+        generate_for:
+          include:
+            - lib/src/models/**
+          exclude:
+            - lib/src/api/**

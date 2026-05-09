@@ -1,0 +1,35 @@
+{
+  "domain": "vehicle",
+  "basePath": "",
+  "models": {
+    "VehicleData": {
+      "fields": {
+        "id": "String",
+        "name": "String",
+        "plate": "String",
+        "status": "String",
+        "type": "String?"
+      }
+    }
+  },
+  "endpoints": [
+    {
+      "name": "getVehicleList",
+      "method": "GET",
+      "path": "/Vehicle/List",
+      "response": "VehicleData"
+    },
+    {
+      "name": "getVehicleDetail",
+      "method": "GET",
+      "path": "/Vehicle/Detail/Info",
+      "response": "VehicleData"
+    },
+    {
+      "name": "getVehicleRanking",
+      "method": "GET",
+      "path": "/Vehicle/Ranking/Query/Top/Info",
+      "response": "VehicleData"
+    }
+  ]
+}

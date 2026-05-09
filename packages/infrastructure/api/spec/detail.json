@@ -1,0 +1,23 @@
+{
+  "domain": "detail",
+  "basePath": "",
+  "models": {
+    "DetailData": {
+      "fields": {
+        "id": "String",
+        "title": "String",
+        "content": "String",
+        "imageUrl": "String?"
+      }
+    }
+  },
+  "endpoints": [
+    {
+      "name": "getDetailData",
+      "method": "GET",
+      "path": "/detail/{id}",
+      "params": { "id": "String" },
+      "response": "DetailData"
+    }
+  ]
+}

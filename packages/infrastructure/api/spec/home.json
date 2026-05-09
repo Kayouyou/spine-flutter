@@ -1,0 +1,21 @@
+{
+  "domain": "home",
+  "basePath": "",
+  "models": {
+    "HomeData": {
+      "fields": {
+        "title": "String",
+        "sections": "String",
+        "banner": "String?"
+      }
+    }
+  },
+  "endpoints": [
+    {
+      "name": "getHomeData",
+      "method": "GET",
+      "path": "/home/data",
+      "response": "HomeData"
+    }
+  ]
+}

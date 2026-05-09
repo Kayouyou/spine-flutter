@@ -1,0 +1,28 @@
+name: api_gen
+description: 从 JSON spec 生成 Retrofit API 接口 + Freezed DTO + Hive CM 持久化模型
+version: 1.0.0
+vars:
+  domain:
+    type: string
+    description: 业务域名（如 auth）
+  modelName:
+    type: string
+    description: 模型名称（PascalCase）
+  fields:
+    type: string
+    description: 字段定义 JSON 数组字符串
+  hive:
+    type: boolean
+    description: 是否生成 CM 持久化模型
+    default: false
+  hiveTypeId:
+    type: number
+    description: Hive TypeId
+    default: 0
+  endpoints:
+    type: string
+    description: 端点定义 JSON 字符串
+  models:
+    type: string
+    description: 模型引用列表 JSON 字符串
+    default: "[]"
