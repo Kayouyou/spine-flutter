@@ -1,3 +1,9 @@
 bricks:
   feature:
     path: bricks/feature
+  api:
+    path: bricks/api
+  model:
+    path: bricks/model
+  hive_model:
+    path: bricks/hive_model

@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod
+.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api create-model create-hive-model
 
 get:
 	melos bs
@@ -81,6 +81,38 @@ build-prod: get
 coverage-local:
 	@chmod +x scripts/coverage_local.sh
 	@./scripts/coverage_local.sh
+
+create-api:
+	@if [ -z "$(name)" ]; then echo "用法: make create-api name=user baseUrl=/api/v1"; exit 1; fi
+	@if [ -z "$(baseUrl)" ]; then echo "错误: 请提供 baseUrl 参数"; exit 1; fi
+	@echo "=== 1/3 生成 API 模块 ==="
+	mason make api --name $(name) --base-url $(baseUrl) --output-dir packages/apis/api_$(name)
+	@echo "=== 2/3 安装依赖 ==="
+	melos bs
+	@echo "=== 3/3 生成 retrofit 代码 ==="
+	cd packages/apis/api_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 完成 ==="
+
+create-model:
+	@if [ -z "$(name)" ]; then echo "用法: make create-model name=user_profile"; exit 1; fi
+	@echo "=== 1/3 生成 Model ==="
+	mason make model --name $(name) --output-dir packages/models/model_$(name)
+	@echo "=== 2/3 安装依赖 ==="
+	melos bs
+	@echo "=== 3/3 生成 freezed 代码 ==="
+	cd packages/models/model_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 完成 ==="
+
+create-hive-model:
+	@if [ -z "$(name)" ]; then echo "用法: make create-hive-model name=user_settings typeId=50"; exit 1; fi
+	@if [ -z "$(typeId)" ]; then echo "错误: 请提供 typeId 参数"; exit 1; fi
+	@echo "=== 1/3 生成 HiveModel ==="
+	mason make hive_model --name $(name) --type-id $(typeId) --output-dir packages/models/hive_model_$(name)
+	@echo "=== 2/3 安装依赖 ==="
+	melos bs
+	@echo "=== 3/3 生成 Hive Adapter 代码 ==="
+	cd packages/models/hive_model_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 完成 ==="
 
 %:
 	@:

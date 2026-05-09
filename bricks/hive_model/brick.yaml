@@ -1,0 +1,12 @@
+name: hive_model
+description: 一键创建 @HiveType 本地存储模型（含 Adapter、Migration 骨架）
+version: 1.0.0
+vars:
+  name:
+    type: string
+    description: Model 名称（蛇形命名）
+    prompt: Model 名称是什么？
+  typeId:
+    type: string
+    description: Hive Type ID（0-255）
+    prompt: Type ID 是什么？

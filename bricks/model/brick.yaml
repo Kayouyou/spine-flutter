@@ -1,0 +1,8 @@
+name: model
+description: 一键创建 @freezed 数据模型（自动 JSON 序列化）
+version: 1.0.0
+vars:
+  name:
+    type: string
+    description: Model 名称（蛇形命名）
+    prompt: Model 名称是什么？
