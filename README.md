@@ -587,6 +587,42 @@ flutter_gen:
 
 ---
 
+## 主题系统（Theme）
+
+本项目使用 Flutter 内置 **ThemeExtension** 方案管理主题颜色，支持亮色/暗色自动切换。
+
+### 快速使用
+
+```dart
+// 在任意 Widget 中通过 context 访问颜色
+Container(
+  color: context.colors.primary,
+  child: Text('标题', style: TextStyle(color: context.colors.textPrimaryLight)),
+)
+```
+
+### 可用颜色
+
+| 属性 | 亮光模式 | 深色模式 | 用途 |
+|------|---------|---------|------|
+| `primary` | #1976D2 | #42A5F5 | 主色调 |
+| `secondary` | #26A69A | #4DB6AC | 次色调 |
+| `success` / `warning` / `error` / `info` | ✅ | ✅ | 状态色 |
+| `backgroundLight` / `backgroundDark` | ✅ | ✅ | 背景色 |
+| `textPrimaryLight` / `textPrimaryDark` | ✅ | ✅ | 文字色 |
+| `border` / `divider` | ✅ | ✅ | 边框/分割线 |
+
+### 如何新增颜色
+
+1. 在 `lib/src/theme/app_colors.dart` 的 `AppColors` 类中添加属性
+2. 在 `light` 和 `dark` 静态常量添加对应值
+3. 更新 `copyWith()` 和 `lerp()` 方法
+4. 通过 `context.colors.newColor` 使用
+
+详见：[lib/src/theme/README.md](lib/src/theme/README.md)
+
+---
+
 ## 列表缓存
 
 `packages/infrastructure/list_cache/` 提供通用列表缓存策略，任意模块可复用。
