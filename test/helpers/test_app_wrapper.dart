@@ -32,7 +32,7 @@ extension WidgetTesterExtension on WidgetTester {
   /// await tester.pumpApp(MyWidget());
   /// ```
   Future<void> pumpApp(Widget child, {ThemeData? theme}) async {
-    await pumpWidget(TestAppWrapper(child: child, theme: theme));
+    await pumpWidget(TestAppWrapper(theme: theme, child: child));
     await pumpAndSettle();
   }
 }
