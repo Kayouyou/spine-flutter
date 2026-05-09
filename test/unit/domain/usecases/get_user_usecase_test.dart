@@ -16,13 +16,17 @@ void main() {
 
     test('execute returns User from repository', () async {
       final expectedUser = User(id: '1', name: 'Test User', email: 'test@example.com');
-      when(() => mockRepo.getCurrentUser()).thenAnswer((_) async => expectedUser);
+      when(() => mockRepo.getCurrentUser()).thenAnswer((_) async => Result.success(expectedUser));
 
       final result = await usecase.execute();
-
-      expect(result.id, '1');
-      expect(result.name, 'Test User');
-      expect(result.email, 'test@example.com');
+      result.when(
+        success: (user) {
+          expect(user.id, '1');
+          expect(user.name, 'Test User');
+          expect(user.email, 'test@example.com');
+        },
+        failure: (_) => fail('应返回成功结果'),
+      );
       verify(() => mockRepo.getCurrentUser()).called(1);
     });
 

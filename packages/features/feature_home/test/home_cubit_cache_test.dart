@@ -19,7 +19,7 @@ void main() {
       'loadData emits loading then loaded on success',
       build: () {
         when(() => mockRepo.getHomeData())
-            .thenAnswer((_) async => {'cached': true});
+            .thenAnswer((_) async => Result.success<Map<String, dynamic>, DomainException>({'cached': true}));
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData(),
@@ -33,7 +33,7 @@ void main() {
       'refreshData calls refreshHomeData on repository',
       build: () {
         when(() => mockRepo.refreshHomeData())
-            .thenAnswer((_) async => {'refreshed': true});
+            .thenAnswer((_) async => Result.success<Map<String, dynamic>, DomainException>({'refreshed': true}));
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.refreshData(),
@@ -47,7 +47,8 @@ void main() {
       'loadData emits loading then error on failure',
       build: () {
         when(() => mockRepo.getHomeData())
-            .thenThrow(NetworkException('server error', statusCode: 500));
+            .thenAnswer((_) async => Result.failure<Map<String, dynamic>, DomainException>(
+              NetworkException('server error', statusCode: 500)));
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData(),

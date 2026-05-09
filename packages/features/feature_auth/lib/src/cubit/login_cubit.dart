@@ -17,28 +17,34 @@ class LoginCubit extends Cubit<LoginState> {
 
   Future<void> login() async {
     emit(state.copyWith(status: LoginStatus.loading));
-    try {
-      final success = await _repository.login(state.username, state.password);
-      emit(state.copyWith(
+
+    final result = await _repository.login(state.username, state.password);
+    result.when(
+      success: (success) => emit(state.copyWith(
         status: success ? LoginStatus.success : LoginStatus.error,
         errorMessage: success ? null : '用户名或密码错误',
-      ),);
-    } catch (e) {
-      emit(state.copyWith(status: LoginStatus.error, errorMessage: e.toString()));
-    }
+      )),
+      failure: (error) => emit(state.copyWith(
+        status: LoginStatus.error,
+        errorMessage: error.message,
+      )),
+    );
   }
 
   Future<void> register() async {
     emit(state.copyWith(status: LoginStatus.loading));
-    try {
-      final success = await _repository.register(state.username, state.password);
-      emit(state.copyWith(
+
+    final result = await _repository.register(state.username, state.password);
+    result.when(
+      success: (success) => emit(state.copyWith(
         status: success ? LoginStatus.success : LoginStatus.error,
         errorMessage: success ? null : '注册失败',
-      ),);
-    } catch (e) {
-      emit(state.copyWith(status: LoginStatus.error, errorMessage: e.toString()));
-    }
+      )),
+      failure: (error) => emit(state.copyWith(
+        status: LoginStatus.error,
+        errorMessage: error.message,
+      )),
+    );
   }
 
   void reset() {

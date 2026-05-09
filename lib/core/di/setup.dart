@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:alice/alice.dart';
-import 'package:alice/model/alice_configuration.dart';
 import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
@@ -33,17 +32,16 @@ void setupDependencies() {
   // 必须在 getIt.init() 之前注册，以便其他服务可依赖
   if (kDebugMode) {
     final alice = Alice(
-      configuration: AliceConfiguration(
-        showNotification: true,
-        showInspectorOnShake: true,
-      ),
+      showNotification: true,
+      showInspectorOnShake: true,
     );
     getIt.registerSingleton<Alice>(alice);
   }
 
   // ===== 1. injectable 初始化（自动注册 @injectable 类）=====
   // 注意：这需要在任何手动注册之前调用
-  getIt.init();
+  // 需要先运行 build_runner 生成 injectable.config.dart 才能启用
+  // getIt.init();
 
   // ===== 0. 应用配置（必须在其他依赖之前注册）=====
   sl.registerSingleton<IAppConfig>(EnvAppConfig());

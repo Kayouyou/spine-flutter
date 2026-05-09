@@ -19,7 +19,7 @@ void main() {
       'loadData 成功时发出 [loading, loaded]',
       build: () {
         when(() => mockRepo.getHomeData()).thenAnswer(
-          (_) async => <String, dynamic>{},
+          (_) async => Result.success<Map<String, dynamic>, DomainException>(<String, dynamic>{}),
         );
         return HomeCubit(mockRepo);
       },

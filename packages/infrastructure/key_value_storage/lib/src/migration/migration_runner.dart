@@ -82,11 +82,14 @@ class MigrationRunner {
     try {
       await migration.apply(oldBox, newBox);
 
+      // 将迁移后的数据复制回旧 box，保持 box 名称不变
+      for (final key in newBox.keys) {
+        await oldBox.put(key, newBox.get(key));
+      }
+
       await oldBox.close();
       await newBox.close();
-
-      await Hive.deleteBoxFromDisk(migration.boxName);
-      await Hive.box(newBoxName).rename(migration.boxName);
+      await Hive.deleteBoxFromDisk(newBoxName);
     } catch (e) {
       await newBox.close();
       await Hive.deleteBoxFromDisk(newBoxName);

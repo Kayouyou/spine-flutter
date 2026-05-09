@@ -26,9 +26,14 @@ void main() {
       );
       when(() => mockDio.get('/api/user/me')).thenAnswer((_) async => response);
 
-      final user = await repo.getCurrentUser();
-      expect(user.id, '1');
-      expect(user.name, 'Test');
+      final result = await repo.getCurrentUser();
+      result.when(
+        success: (user) {
+          expect(user.id, '1');
+          expect(user.name, 'Test');
+        },
+        failure: (_) => fail('应返回成功结果'),
+      );
     });
 
     test('401 时抛出 UnauthorizedException', () async {

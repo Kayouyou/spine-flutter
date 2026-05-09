@@ -2,30 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:feature_auth/feature_auth.dart';
-import 'package:feature_settings/feature_settings.dart';
 import 'route_context.dart';
 import 'route_module.dart';
 
-/// Module B — Settings tab route
+/// Module B — Auth routes (login/register)
 class ModuleBRouteModule extends RouteModule {
   ModuleBRouteModule(RouteContext ctx) : super(ctx);
 
   @override
   List<RouteBase> build() {
     return [
-      GoRoute(
-        path: '/settings',
-        pageBuilder: (context, state) {
-          Widget page = const SettingsPage();
-          if (ctx.routeWrapper != null) {
-            page = ctx.routeWrapper!(page);
-          }
-          return NoTransitionPage(
-            key: state.pageKey,
-            child: page,
-          );
-        },
-      ),
+      // TODO: 添加 Settings 路由（设置页面开发完成后）
       GoRoute(
         path: '/login',
         pageBuilder: (context, state) {

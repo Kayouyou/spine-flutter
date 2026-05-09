@@ -27,7 +27,7 @@ void main() {
       'loadData emits loading then loaded on success',
       build: () {
         when(() => mockRepo.getDetailData('1'))
-            .thenAnswer((_) async => {'title': 'detail'});
+            .thenAnswer((_) async => Result.success<Map<String, dynamic>, DomainException>({'title': 'detail'}));
         return DetailCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData('1'),
@@ -41,7 +41,7 @@ void main() {
       'loadData emits loading then error on failure',
       build: () {
         when(() => mockRepo.getDetailData('1'))
-            .thenThrow(const NotFoundException());
+            .thenAnswer((_) async => Result.failure<Map<String, dynamic>, DomainException>(const NotFoundException()));
         return DetailCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData('1'),
@@ -55,7 +55,7 @@ void main() {
       'retry calls loadData with same id',
       build: () {
         when(() => mockRepo.getDetailData('42'))
-            .thenAnswer((_) async => {'retry': 'ok'});
+            .thenAnswer((_) async => Result.success<Map<String, dynamic>, DomainException>({'retry': 'ok'}));
         return DetailCubit(mockRepo);
       },
       act: (cubit) => cubit.retry('42'),

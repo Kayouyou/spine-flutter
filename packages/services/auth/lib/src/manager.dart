@@ -39,23 +39,18 @@ class AuthManager {
       return;
     }
 
-    try {
-      final user = await _userRepository.getCurrentUser();
-      await _tokenStorage.setUserId(user.id);
-      _authCubit.loggedIn(user.id);
-      if (kDebugMode) {
-        debugPrint('✅ [AuthManager] handleLogin: Token有效，自动登录成功 - userId=${user.id}');
-      }
-    } on UnauthorizedException catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ [AuthManager] handleLogin: Token过期 - ${e.message}');
-      }
-      await clearAuth();
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('⚠️ [AuthManager] handleLogin: 验证失败 - $e');
-      }
-    }
+    final result = await _userRepository.getCurrentUser();
+    result.when(
+      success: (user) async {
+        await _tokenStorage.setUserId(user.id);
+        _authCubit.loggedIn(user.id);
+        debugPrint('✅ [AuthManager] handleLogin: Token有效，userId=${user.id}');
+      },
+      failure: (error) async {
+        debugPrint('⚠️ [AuthManager] handleLogin: 自动登录失败 - ${error.message}');
+        await _authCubit.logout();
+      },
+    );
   }
 
   /// 保存Token（登录成功时调用）

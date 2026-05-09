@@ -30,7 +30,7 @@ void main() {
       'login success emits [loading, loggedIn]',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(true));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
@@ -43,7 +43,7 @@ void main() {
       'login failure emits [loading, error]',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => false);
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(false));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
@@ -57,12 +57,12 @@ void main() {
       build: () => AuthCubit(mockRepo),
       setUp: () {
         when(() => mockRepo.login('user', 'pass'))
-            .thenThrow(Exception('network error'));
+            .thenAnswer((_) async => Result.failure(NetworkException('network error')));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
         const AuthState(status: AuthStatus.loading),
-        const AuthState(status: AuthStatus.error, errorMessage: 'Exception: network error'),
+        const AuthState(status: AuthStatus.error, errorMessage: 'network error'),
       ],
     );
 
@@ -70,8 +70,8 @@ void main() {
       'logout emits [loading, initial] after login',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
-        when(() => mockRepo.logout()).thenAnswer((_) async {});
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(true));
+        when(() => mockRepo.logout()).thenAnswer((_) async => Result.success(null));
       },
       act: (cubit) async {
         await cubit.login('user', 'pass');
@@ -89,7 +89,7 @@ void main() {
       'isLoggedIn getter returns true when loggedIn',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => true);
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(true));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       verify: (cubit) {

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:domain/domain.dart';
 import 'package:feature_auth/src/cubit/login_cubit.dart';
 import 'package:feature_auth/src/cubit/login_state.dart';
 import 'package:feature_auth/src/repository/mock_auth_repository.dart';
@@ -27,7 +28,7 @@ void main() {
       'login success',
       build: () {
         when(() => mockRepo.login('user', 'password123'))
-            .thenAnswer((_) async => true);
+            .thenAnswer((_) async => Result.success(true));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -49,7 +50,7 @@ void main() {
       'login with short password fails',
       build: () {
         when(() => mockRepo.login('user', 'short'))
-            .thenAnswer((_) async => false);
+            .thenAnswer((_) async => Result.success(false));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -70,7 +71,7 @@ void main() {
       'login with empty username fails',
       build: () {
         when(() => mockRepo.login('', 'password123'))
-            .thenAnswer((_) async => false);
+            .thenAnswer((_) async => Result.success(false));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -91,7 +92,7 @@ void main() {
       'reset returns to initial',
       build: () {
         when(() => mockRepo.login('user', 'password123'))
-            .thenAnswer((_) async => true);
+            .thenAnswer((_) async => Result.success(true));
         return LoginCubit(mockRepo);
       },
       act: (cubit) async {
@@ -112,7 +113,7 @@ void main() {
       'register success',
       build: () {
         when(() => mockRepo.register('user', 'password123'))
-            .thenAnswer((_) async => true);
+            .thenAnswer((_) async => Result.success(true));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -133,7 +134,7 @@ void main() {
       'register with short password fails',
       build: () {
         when(() => mockRepo.register('user', 'short'))
-            .thenAnswer((_) async => false);
+            .thenAnswer((_) async => Result.success(false));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {

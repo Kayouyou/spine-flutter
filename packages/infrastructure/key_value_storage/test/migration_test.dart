@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:key_value_storage/key_value_storage.dart';
+import 'package:key_value_storage/src/migration/schema_version_box.dart';
 import 'package:test/test.dart';
 
 void main() {

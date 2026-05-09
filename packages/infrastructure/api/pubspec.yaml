@@ -29,5 +29,4 @@ dev_dependencies:
   retrofit_generator: ^8.1.0
   build_runner: ^2.4.9
   json_serializable: ^6.7.1
-  alice: ^1.0.0-dev.10
-  alice_dio: ^1.0.4
+  alice: ^0.4.2
