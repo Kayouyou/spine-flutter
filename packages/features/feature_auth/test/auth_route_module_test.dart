@@ -12,7 +12,6 @@ void main() {
     setUp(() {
       ctx = RouteContext(
         navigatorKey: navigatorKey,
-        isLoggedInChecker: () => false,
       );
     });
 
