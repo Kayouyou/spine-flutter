@@ -6,6 +6,12 @@ import 'package:domain/domain.dart';
 ///
 /// 通过 Dio 访问后端 API，将 DioException 映射为 DomainException。
 /// 返回 Result 类型处理成功和异常。
+///
+/// 注意：当前实现暂时保留直接 Dio 调用方式，因为：
+/// - getCurrentUser() 使用 /api/user/me 端点
+/// - updateProfile() 使用 /api/user/profile 端点
+/// - AuthApi 当前端点为 login/register/getProfile/forgotPassword，未包含这些端点
+/// 后续需要与 AuthApi 对齐，或创建专门的 UserApi。
 class AuthRepositoryImpl implements UserRepository {
   final Dio _dio;
 
