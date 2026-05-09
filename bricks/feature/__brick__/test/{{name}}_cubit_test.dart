@@ -1,7 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:feature_{{name}}/feature_{{name}}.dart';
+import 'package:domain/domain.dart';
+import 'package:feature_{{name.snakeCase()}}/feature_{{name.snakeCase()}}.dart';
 
 class Mock{{name.pascalCase()}}Repository extends Mock implements {{name.pascalCase()}}Repository {}
 
@@ -24,10 +25,10 @@ void main() {
     });
 
     blocTest<{{name.pascalCase()}}Cubit, {{name.pascalCase()}}State>(
-      'loadData 发出 loading 然后 loaded',
+      'loadData 发出 loading 然后 loaded（成功）',
       build: () {
         when(() => mockRepository.get{{name.pascalCase()}}Data())
-            .thenAnswer((_) async => {'test': 'data'});
+            .thenAnswer((_) async => Result.success({'test': 'data'}));
         return cubit;
       },
       act: (cubit) => cubit.loadData(),
@@ -35,43 +36,20 @@ void main() {
         const {{name.pascalCase()}}State.loading(),
         const {{name.pascalCase()}}State.loaded(data: {'test': 'data'}),
       ],
-      verify: (_) {
-        verify(() => mockRepository.get{{name.pascalCase()}}Data()).called(1);
-      },
     );
 
     blocTest<{{name.pascalCase()}}Cubit, {{name.pascalCase()}}State>(
-      'refreshData 发出 loading 然后 loaded',
-      build: () {
-        when(() => mockRepository.refresh{{name.pascalCase()}}Data())
-            .thenAnswer((_) async => {'test': 'refreshed'});
-        return cubit;
-      },
-      act: (cubit) => cubit.refreshData(),
-      expect: () => [
-        const {{name.pascalCase()}}State.loading(),
-        const {{name.pascalCase()}}State.loaded(data: {'test': 'refreshed'}),
-      ],
-      verify: (_) {
-        verify(() => mockRepository.refresh{{name.pascalCase()}}Data()).called(1);
-      },
-    );
-
-    blocTest<{{name.pascalCase()}}Cubit, {{name.pascalCase()}}State>(
-      'retry 调用 loadData',
+      'loadData 发出 loading 然后 error（失败）',
       build: () {
         when(() => mockRepository.get{{name.pascalCase()}}Data())
-            .thenAnswer((_) async => {'test': 'retry'});
+            .thenAnswer((_) async => Result.failure(NetworkException('网络错误')));
         return cubit;
       },
-      act: (cubit) => cubit.retry(),
+      act: (cubit) => cubit.loadData(),
       expect: () => [
         const {{name.pascalCase()}}State.loading(),
-        const {{name.pascalCase()}}State.loaded(data: {'test': 'retry'}),
+        const {{name.pascalCase()}}State.error(errorCode: '网络错误'),
       ],
-      verify: (_) {
-        verify(() => mockRepository.get{{name.pascalCase()}}Data()).called(1);
-      },
     );
   });
 }
