@@ -1,0 +1,15 @@
+# Hive TypeId 注册表
+#
+# 添加新的 @HiveType 模型时：
+# 1. 读取当前 nextTypeId 值
+# 2. 使用该 id
+# 3. 递增 nextTypeId 并提交
+
+nextTypeId: 1
+
+# 使用历史（参考用，代码不使用）
+typeIds:
+  - id: 0
+    model: CacheData
+    package: infrastructure/key_value_storage
+    description: 通用缓存包装器

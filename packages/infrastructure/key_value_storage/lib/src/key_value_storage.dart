@@ -1,6 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 class KeyValueStorage {
   static const _defaultBoxKey = 'default';
@@ -13,8 +11,6 @@ class KeyValueStorage {
     if (_hive.isBoxOpen(key)) {
       return _hive.box(key);
     }
-    final appDir = await getApplicationDocumentsDirectory();
-    Hive.init(p.join(appDir.path, 'hive'));
     return _hive.openBox(key);
   }
 

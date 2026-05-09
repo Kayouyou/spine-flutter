@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 // Package imports:
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 
 /// SDK初始化器
@@ -19,7 +20,10 @@ class SDKInitializer {
       debugPrint('🚀 [SDKInitializer] initPlugins: 开始初始化...');
     }
 
-    // 初始化Hive Adapter
+    // 初始化 Hive（统一入口）
+    await Hive.initFlutter();
+    
+    // 注册 Hive Adapter
     await HiveRegistrar.registerAll();
     if (kDebugMode) {
       debugPrint('✅ [SDKInitializer] Hive Adapter注册完成');
