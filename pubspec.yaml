@@ -51,6 +51,7 @@ dependencies:
 
   # Dependency Injection
   get_it: ^7.6.0
+  injectable: ^2.5.0            # DI 代码生成注解
   equatable: ^2.0.5
 
   # State Management
@@ -66,6 +67,9 @@ dependencies:
 
   # Network
   connectivity_plus: ^6.0.0
+  
+  # Local Storage
+  hive_flutter: ^1.1.0
 
   # Internationalization
   intl: ^0.19.0
@@ -94,6 +98,7 @@ dev_dependencies:
   import_sorter: ^4.6.0
 
   # Code Generation
+  injectable_generator: ^2.6.2   # injectable 代码生成器
   build_runner: ^2.4.8
   flutter_gen_runner: ^5.7.0
   freezed: ^2.4.0            # freezed 代码生成器

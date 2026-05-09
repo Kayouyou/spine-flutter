@@ -19,13 +19,18 @@ import 'package:domain/domain.dart';
 import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
+import 'injectable.dart'; // Injectable 初始化配置
 import 'locator.dart';
 
 /// 依赖注入配置
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies() {
-  // ===== Step 0: 应用配置（必须在其他依赖之前注册）=====
+  // ===== 1. injectable 初始化（自动注册 @injectable 类）=====
+  // 注意：这需要在任何手动注册之前调用
+  getIt.init();
+
+  // ===== 0. 应用配置（必须在其他依赖之前注册）=====
   sl.registerSingleton<IAppConfig>(EnvAppConfig());
 
   // ===== Step 1: 基础设施层 =====
