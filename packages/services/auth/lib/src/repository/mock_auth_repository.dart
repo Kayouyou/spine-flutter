@@ -24,7 +24,7 @@ class MockAuthRepository implements AuthRepository {
   Future<Result<void, DomainException>> logout() async {
     await Future.delayed(const Duration(milliseconds: 100));
     _loggedIn = false;
-    return Result<void, DomainException>.success(null);
+    return Result.success(null);
   }
 
   /// 检查是否已登录（非接口方法）
