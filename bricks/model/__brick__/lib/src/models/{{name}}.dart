@@ -10,7 +10,7 @@ class {{name.pascalCase()}} with _${{name.pascalCase()}} {
     required String id,
     required String name,
     @Default('') String description,
-    @Default(DateTime.now()) DateTime createdAt,
+    DateTime? createdAt,
     DateTime? updatedAt,
   }) = __{{name.pascalCase()}};
 

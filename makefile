@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api create-model create-hive-model help
+.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help
 
 # ============================================================================
 # 基础命令
@@ -84,37 +84,68 @@ create-feature:
 
 # 生成 Retrofit API 模块
 create-api:
-	@if [ -z "$(name)" ]; then echo "用法: make create-api name=user baseUrl=/api/v1"; exit 1; fi
+	@if [ -z "$(name)" ]; then echo "用法: make create-api name=user baseUrl=/api/v1 [model=UserModel]"; exit 1; fi
 	@if [ -z "$(baseUrl)" ]; then echo "错误: 请提供 baseUrl 参数"; exit 1; fi
-	@echo "=== 1/3 生成 API 模块 ==="
-	mason make api --name $(name) --base-url $(baseUrl) --output-dir packages/apis/api_$(name)
+	@if [ -n "$(model)" ]; then \
+		echo "=== 1/3 生成 API 模块 (绑定模型: $(model)) ==="; \
+		mason make api --name $(name) --baseUrl $(baseUrl) --hasModel true --modelName $(model) --output-dir packages/infrastructure/api --on-conflict skip; \
+	else \
+		echo "=== 1/3 生成 API 模块 (无模型) ==="; \
+		mason make api --name $(name) --baseUrl $(baseUrl) --hasModel false --output-dir packages/infrastructure/api --on-conflict skip; \
+	fi
 	@echo "=== 2/3 安装依赖 ==="
 	melos bs
-	@echo "=== 3/3 生成 retrofit 代码 ==="
-	cd packages/apis/api_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 3/3 自动导出并生成 retrofit 代码 ==="
+	@if ! grep -q "export 'src/api/$(name)_api.dart';" packages/infrastructure/api/lib/api.dart; then \
+		echo "export 'src/api/$(name)_api.dart';" >> packages/infrastructure/api/lib/api.dart; \
+	fi
+	cd packages/infrastructure/api && dart run build_runner build --delete-conflicting-outputs
 	@echo "=== 完成 ==="
+
+# 一键生成 Model + API 组合包
+scaffold-api:
+	@if [ -z "$(name)" ]; then echo "用法: make scaffold-api name=user baseUrl=/api/v1"; exit 1; fi
+	@if [ -z "$(baseUrl)" ]; then echo "错误: 请提供 baseUrl 参数"; exit 1; fi
+	@echo "🚀 开始一键生成 $(name) 的 Model 和 API..."
+	@make create-model name=$(name)
+	@make create-api name=$(name) baseUrl=$(baseUrl) model=$(name)
+	@echo "🎉 一键生成完毕！"
 
 # 生成 Freezed 数据模型
 create-model:
 	@if [ -z "$(name)" ]; then echo "用法: make create-model name=user_profile"; exit 1; fi
 	@echo "=== 1/3 生成 Model ==="
-	mason make model --name $(name) --output-dir packages/models/model_$(name)
+	mason make model --name $(name) --output-dir packages/domain
 	@echo "=== 2/3 安装依赖 ==="
 	melos bs
-	@echo "=== 3/3 生成 freezed 代码 ==="
-	cd packages/models/model_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 3/3 自动导出模型并生成 freezed 代码 ==="
+	@if ! grep -q "export 'src/models/$(name).dart';" packages/domain/lib/domain.dart; then \
+		echo "export 'src/models/$(name).dart';" >> packages/domain/lib/domain.dart; \
+	fi
+	cd packages/domain && dart run build_runner build --delete-conflicting-outputs
 	@echo "=== 完成 ==="
 
 # 生成 Hive 本地存储模型
 create-hive-model:
 	@if [ -z "$(name)" ]; then echo "用法: make create-hive-model name=user_settings typeId=50"; exit 1; fi
 	@if [ -z "$(typeId)" ]; then echo "错误: 请提供 typeId 参数"; exit 1; fi
-	@echo "=== 1/3 生成 HiveModel ==="
-	mason make hive_model --name $(name) --type-id $(typeId) --output-dir packages/models/hive_model_$(name)
-	@echo "=== 2/3 安装依赖 ==="
+	@echo "=== 1/4 生成 HiveModel ==="
+	mason make hive_model --name $(name) --typeId $(typeId) --output-dir packages/infrastructure/key_value_storage
+	@echo "=== 2/4 安装依赖 ==="
 	melos bs
-	@echo "=== 3/3 生成 Hive Adapter 代码 ==="
-	cd packages/models/hive_model_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 3/4 自动注册并导出 Hive 模型 ==="
+	@if ! grep -q "export 'src/models/$(name).dart';" packages/infrastructure/key_value_storage/lib/key_value_storage.dart; then \
+		echo "export 'src/models/$(name).dart';" >> packages/infrastructure/key_value_storage/lib/key_value_storage.dart; \
+	fi
+	@ADAPTER_NAME=$$(echo $(name) | awk -F_ '{for(i=1;i<=NF;i++) printf toupper(substr($$i,1,1)) substr($$i,2)}')Adapter; \
+	if ! grep -q "Hive.registerAdapter($$ADAPTER_NAME());" packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart; then \
+		awk "/_registered = true;/{print \"    Hive.registerAdapter($$ADAPTER_NAME());\"}1" packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart > tmp_file && mv tmp_file packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart; \
+	fi
+	@if ! grep -q "import 'models/$(name).dart';" packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart; then \
+		awk "NR==1{print \"import 'models/$(name).dart';\"}1" packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart > tmp_file && mv tmp_file packages/infrastructure/key_value_storage/lib/src/hive_registrar.dart; \
+	fi
+	@echo "=== 4/4 生成 Adapter 代码 ==="
+	cd packages/infrastructure/key_value_storage && dart run build_runner build --delete-conflicting-outputs
 	@echo "=== 完成 ==="
 
 # ============================================================================

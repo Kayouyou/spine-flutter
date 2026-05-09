@@ -7,12 +7,32 @@ class {{name.pascalCase()}}RepositoryImpl {
 
   {{name.pascalCase()}}RepositoryImpl(this._api);
 
+{{#hasModel}}
+  Future<Result<List<{{modelName.pascalCase()}}>, DomainException>> getList() async {
+    try {
+      final response = await _api.getList();
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(NetworkException(e.toString()));
+    }
+  }
+
+  Future<Result<{{modelName.pascalCase()}}, DomainException>> getById(String id) async {
+    try {
+      final response = await _api.getById(id);
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(NetworkException(e.toString()));
+    }
+  }
+{{/hasModel}}
+{{^hasModel}}
   Future<Result<List<dynamic>, DomainException>> getList() async {
     try {
       final response = await _api.getList();
       return Result.success(response);
     } catch (e) {
-      return Result.failure(UnknownException(e.toString()));
+      return Result.failure(NetworkException(e.toString()));
     }
   }
 
@@ -21,7 +41,8 @@ class {{name.pascalCase()}}RepositoryImpl {
       final response = await _api.getById(id);
       return Result.success(response);
     } catch (e) {
-      return Result.failure(UnknownException(e.toString()));
+      return Result.failure(NetworkException(e.toString()));
     }
   }
+{{/hasModel}}
 }

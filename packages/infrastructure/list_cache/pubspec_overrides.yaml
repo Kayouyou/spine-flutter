@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: key_value_storage
+dependency_overrides:
+  key_value_storage:
+    path: ../key_value_storage
