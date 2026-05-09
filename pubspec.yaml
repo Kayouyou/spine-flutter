@@ -41,8 +41,6 @@ dependencies:
     path: packages/features/feature_detail
   feature_auth:
     path: packages/features/feature_auth
-  feature_settings:
-    path: packages/features/feature_settings
 
   component_library:
     path: packages/infrastructure/component_library
@@ -86,6 +84,9 @@ dependencies:
   # 错误监控与强制更新
   sentry_flutter: ^8.13.0
   upgrader: ^10.3.0
+
+  # Debug 工具
+  alice: ^1.0.0-dev.10
 
 dev_dependencies:
   flutter_test:

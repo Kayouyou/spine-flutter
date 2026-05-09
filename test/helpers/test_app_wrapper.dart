@@ -8,7 +8,11 @@ class TestAppWrapper extends StatelessWidget {
   final Widget child;
   final ThemeData? theme;
 
-  const TestAppWrapper({super.key, required this.child, this.theme});
+  const TestAppWrapper({
+    required this.child,
+    super.key,
+    this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {

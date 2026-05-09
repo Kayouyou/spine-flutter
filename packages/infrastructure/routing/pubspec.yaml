@@ -18,8 +18,6 @@ dependencies:
     path: ../../features/feature_home
   feature_detail:
     path: ../../features/feature_detail
-  feature_settings:
-    path: ../../features/feature_settings
 
 dev_dependencies:
   flutter_test:

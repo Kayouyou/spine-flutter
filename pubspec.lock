@@ -10,7 +10,7 @@ packages:
     source: hosted
     version: "67.0.0"
   alice:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: alice
       sha256: fd3dea508647491bfe0a8be3f11a23ea4946d275c499436279330725a389e5fe
@@ -421,13 +421,6 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/features/feature_home"
-      relative: true
-    source: path
-    version: "0.0.0"
-  feature_settings:
-    dependency: "direct main"
-    description:
-      path: "packages/features/feature_settings"
       relative: true
     source: path
     version: "0.0.0"
