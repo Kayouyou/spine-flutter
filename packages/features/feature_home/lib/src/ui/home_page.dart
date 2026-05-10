@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
   }
 
   /// 加载成功状态UI
-  Widget _buildLoaded(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildLoaded(BuildContext context, HomeData data) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -101,11 +101,12 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '骨架搭建完成',
+            data.title,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
-          const Text('Bloc状态管理已集成'),
+          if (data.items.isNotEmpty)
+            Text('${data.items.length} 项已加载'),
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () => context.push(AppRoutes.detail),

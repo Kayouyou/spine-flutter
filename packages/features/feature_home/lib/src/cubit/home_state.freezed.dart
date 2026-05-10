@@ -20,7 +20,7 @@ mixin _$HomeState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(HomeData data) loaded,
     required TResult Function(String errorCode) error,
   }) =>
       throw _privateConstructorUsedError;
@@ -28,7 +28,7 @@ mixin _$HomeState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(HomeData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) =>
       throw _privateConstructorUsedError;
@@ -36,7 +36,7 @@ mixin _$HomeState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(HomeData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) =>
@@ -125,7 +125,7 @@ class _$HomeInitialImpl implements HomeInitial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(HomeData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return initial();
@@ -136,7 +136,7 @@ class _$HomeInitialImpl implements HomeInitial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(HomeData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return initial?.call();
@@ -147,7 +147,7 @@ class _$HomeInitialImpl implements HomeInitial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(HomeData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -239,7 +239,7 @@ class _$HomeLoadingImpl implements HomeLoading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(HomeData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return loading();
@@ -250,7 +250,7 @@ class _$HomeLoadingImpl implements HomeLoading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(HomeData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return loading?.call();
@@ -261,7 +261,7 @@ class _$HomeLoadingImpl implements HomeLoading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(HomeData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -319,7 +319,9 @@ abstract class _$$HomeLoadedImplCopyWith<$Res> {
           _$HomeLoadedImpl value, $Res Function(_$HomeLoadedImpl) then) =
       __$$HomeLoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({Map<String, dynamic> data});
+  $Res call({HomeData data});
+
+  $HomeDataCopyWith<$Res> get data;
 }
 
 /// @nodoc
@@ -337,26 +339,28 @@ class __$$HomeLoadedImplCopyWithImpl<$Res>
   }) {
     return _then(_$HomeLoadedImpl(
       data: null == data
-          ? _value._data
+          ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
+              as HomeData,
     ));
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $HomeDataCopyWith<$Res> get data {
+    return $HomeDataCopyWith<$Res>(_value.data, (value) {
+      return _then(_value.copyWith(data: value));
+    });
   }
 }
 
 /// @nodoc
 
 class _$HomeLoadedImpl implements HomeLoaded {
-  const _$HomeLoadedImpl({required final Map<String, dynamic> data})
-      : _data = data;
+  const _$HomeLoadedImpl({required this.data});
 
-  final Map<String, dynamic> _data;
   @override
-  Map<String, dynamic> get data {
-    if (_data is EqualUnmodifiableMapView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_data);
-  }
+  final HomeData data;
 
   @override
   String toString() {
@@ -368,12 +372,11 @@ class _$HomeLoadedImpl implements HomeLoaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$HomeLoadedImpl &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_data));
+  int get hashCode => Object.hash(runtimeType, data);
 
   @JsonKey(ignore: true)
   @override
@@ -386,7 +389,7 @@ class _$HomeLoadedImpl implements HomeLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(HomeData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return loaded(data);
@@ -397,7 +400,7 @@ class _$HomeLoadedImpl implements HomeLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(HomeData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return loaded?.call(data);
@@ -408,7 +411,7 @@ class _$HomeLoadedImpl implements HomeLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(HomeData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -457,10 +460,9 @@ class _$HomeLoadedImpl implements HomeLoaded {
 }
 
 abstract class HomeLoaded implements HomeState {
-  const factory HomeLoaded({required final Map<String, dynamic> data}) =
-      _$HomeLoadedImpl;
+  const factory HomeLoaded({required final HomeData data}) = _$HomeLoadedImpl;
 
-  Map<String, dynamic> get data;
+  HomeData get data;
   @JsonKey(ignore: true)
   _$$HomeLoadedImplCopyWith<_$HomeLoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -533,7 +535,7 @@ class _$HomeErrorImpl implements HomeError {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(HomeData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return error(errorCode);
@@ -544,7 +546,7 @@ class _$HomeErrorImpl implements HomeError {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(HomeData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return error?.call(errorCode);
@@ -555,7 +557,7 @@ class _$HomeErrorImpl implements HomeError {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(HomeData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {

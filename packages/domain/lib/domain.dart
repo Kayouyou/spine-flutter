@@ -8,6 +8,8 @@ export 'src/usecases/get_user_usecase.dart';
 export 'src/enums/enum.dart';
 export 'src/exceptions/domain_exception.dart';
 export 'src/models/user.dart';
+export 'src/models/home_data.dart';
+export 'src/models/detail_data.dart';
 export 'src/repositories/user_repository.dart';
 export 'src/repositories/home_repository.dart';
 export 'src/repositories/detail_repository.dart';

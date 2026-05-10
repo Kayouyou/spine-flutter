@@ -20,7 +20,7 @@ mixin _$DetailState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(DetailData data) loaded,
     required TResult Function(String errorCode) error,
   }) =>
       throw _privateConstructorUsedError;
@@ -28,7 +28,7 @@ mixin _$DetailState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(DetailData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) =>
       throw _privateConstructorUsedError;
@@ -36,7 +36,7 @@ mixin _$DetailState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(DetailData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) =>
@@ -126,7 +126,7 @@ class _$DetailInitialImpl implements DetailInitial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(DetailData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return initial();
@@ -137,7 +137,7 @@ class _$DetailInitialImpl implements DetailInitial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(DetailData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return initial?.call();
@@ -148,7 +148,7 @@ class _$DetailInitialImpl implements DetailInitial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(DetailData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -240,7 +240,7 @@ class _$DetailLoadingImpl implements DetailLoading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(DetailData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return loading();
@@ -251,7 +251,7 @@ class _$DetailLoadingImpl implements DetailLoading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(DetailData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return loading?.call();
@@ -262,7 +262,7 @@ class _$DetailLoadingImpl implements DetailLoading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(DetailData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -320,7 +320,9 @@ abstract class _$$DetailLoadedImplCopyWith<$Res> {
           _$DetailLoadedImpl value, $Res Function(_$DetailLoadedImpl) then) =
       __$$DetailLoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({Map<String, dynamic> data});
+  $Res call({DetailData data});
+
+  $DetailDataCopyWith<$Res> get data;
 }
 
 /// @nodoc
@@ -338,26 +340,28 @@ class __$$DetailLoadedImplCopyWithImpl<$Res>
   }) {
     return _then(_$DetailLoadedImpl(
       data: null == data
-          ? _value._data
+          ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
+              as DetailData,
     ));
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $DetailDataCopyWith<$Res> get data {
+    return $DetailDataCopyWith<$Res>(_value.data, (value) {
+      return _then(_value.copyWith(data: value));
+    });
   }
 }
 
 /// @nodoc
 
 class _$DetailLoadedImpl implements DetailLoaded {
-  const _$DetailLoadedImpl({required final Map<String, dynamic> data})
-      : _data = data;
+  const _$DetailLoadedImpl({required this.data});
 
-  final Map<String, dynamic> _data;
   @override
-  Map<String, dynamic> get data {
-    if (_data is EqualUnmodifiableMapView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_data);
-  }
+  final DetailData data;
 
   @override
   String toString() {
@@ -369,12 +373,11 @@ class _$DetailLoadedImpl implements DetailLoaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$DetailLoadedImpl &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_data));
+  int get hashCode => Object.hash(runtimeType, data);
 
   @JsonKey(ignore: true)
   @override
@@ -387,7 +390,7 @@ class _$DetailLoadedImpl implements DetailLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(DetailData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return loaded(data);
@@ -398,7 +401,7 @@ class _$DetailLoadedImpl implements DetailLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(DetailData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return loaded?.call(data);
@@ -409,7 +412,7 @@ class _$DetailLoadedImpl implements DetailLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(DetailData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {
@@ -458,10 +461,10 @@ class _$DetailLoadedImpl implements DetailLoaded {
 }
 
 abstract class DetailLoaded implements DetailState {
-  const factory DetailLoaded({required final Map<String, dynamic> data}) =
+  const factory DetailLoaded({required final DetailData data}) =
       _$DetailLoadedImpl;
 
-  Map<String, dynamic> get data;
+  DetailData get data;
   @JsonKey(ignore: true)
   _$$DetailLoadedImplCopyWith<_$DetailLoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -534,7 +537,7 @@ class _$DetailErrorImpl implements DetailError {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(Map<String, dynamic> data) loaded,
+    required TResult Function(DetailData data) loaded,
     required TResult Function(String errorCode) error,
   }) {
     return error(errorCode);
@@ -545,7 +548,7 @@ class _$DetailErrorImpl implements DetailError {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(Map<String, dynamic> data)? loaded,
+    TResult? Function(DetailData data)? loaded,
     TResult? Function(String errorCode)? error,
   }) {
     return error?.call(errorCode);
@@ -556,7 +559,7 @@ class _$DetailErrorImpl implements DetailError {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(Map<String, dynamic> data)? loaded,
+    TResult Function(DetailData data)? loaded,
     TResult Function(String errorCode)? error,
     required TResult orElse(),
   }) {

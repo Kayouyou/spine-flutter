@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
+import 'package:domain/domain.dart';
 import 'package:routing/routing.dart';
 import '../cubit/detail_cubit.dart';
 import '../cubit/detail_state.dart';
@@ -67,7 +68,7 @@ class _DetailPageState extends State<DetailPage> with LifecycleMixin<DetailPage>
     );
   }
 
-  Widget _buildLoaded(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildLoaded(BuildContext context, DetailData data) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

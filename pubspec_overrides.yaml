@@ -1,0 +1,31 @@
+# melos_managed_dependency_overrides: api,auth,component_library,data_sync,domain,error,feature_auth,feature_detail,feature_home,key_value_storage,list_cache,locale,network,routing,flutter_spinkit
+dependency_overrides:
+  api:
+    path: packages/infrastructure/api
+  auth:
+    path: packages/services/auth
+  component_library:
+    path: packages/infrastructure/component_library
+  data_sync:
+    path: packages/services/data_sync
+  domain:
+    path: packages/domain
+  error:
+    path: packages/services/error
+  feature_auth:
+    path: packages/features/feature_auth
+  feature_detail:
+    path: packages/features/feature_detail
+  feature_home:
+    path: packages/features/feature_home
+  key_value_storage:
+    path: packages/infrastructure/key_value_storage
+  list_cache:
+    path: packages/infrastructure/list_cache
+  locale:
+    path: packages/services/locale
+  network:
+    path: packages/services/network
+  routing:
+    path: packages/infrastructure/routing
+  flutter_spinkit: 5.1.0
