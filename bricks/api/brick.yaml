@@ -16,5 +16,7 @@ vars:
     default: false
   modelName:
     type: string
-    description: 绑定的数据模型名称（仅在 hasModel 为 true 时有效）
+    description: 绑定的数据模型名称
+    prompt: ""
     default: "dynamic"
+

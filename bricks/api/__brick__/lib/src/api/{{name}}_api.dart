@@ -29,7 +29,7 @@ abstract class {{name.pascalCase()}}Api {
 {{^hasModel}}
   /// 获取列表
   @GET('{{{baseUrl}}}')
-  Future<List<dynamic>> getList();
+  Future<dynamic> getList();
 
   /// 获取单个
   @GET('{{{baseUrl}}}/{id}')

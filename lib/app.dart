@@ -76,6 +76,7 @@ class _MyAppState extends State<MyApp> {
   /// Wave 2: 直接在 app.dart 组装路由，不再依赖 routing 包的 router.dart
   GoRouter _buildRouter(RouteContext ctx) {
     return GoRouter(
+      navigatorKey: _navigatorKey,
       initialLocation: '/home',
       observers: [AppRouteObserver.instance],
       redirect: ctx.enableAuthGuard && ctx.isLoggedInChecker != null

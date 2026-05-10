@@ -398,16 +398,26 @@ melos test:coverage
 | `make debug` | 运行调试版本 |
 | `make debug-simulator` | 运行到 iOS 模拟器（推荐） |
 | `make release` | 构建 iOS 发布版本 |
-| `make lint` | 代码分析（Melos 全量） |
+| `make lint` | 代码分析（Melos 全量，内部调用 `melos run analyze`） |
 | `make test` | 运行所有包测试（Melos） |
 | `make create-repo` | 查看创建 Repository 步骤 |
 | `make create-feature name=xxx` | 创建新 Feature 包（生成 + 装依赖 + 生成 freezed） |
+| `make create-model name=xxx` | 创建 @freezed 数据模型（domain 包） |
+| `make create-api name=xxx baseUrl=/api/v1 [modelName=xxx]` | 创建 Retrofit API 模块（指定 modelName=dynamic 可不传模型） |
+| `make scaffold-api name=xxx baseUrl=/api/v1` | 一键创建 Model + API（create-model + create-api） |
+| `make create-hive-model name=xxx typeId=N` | 创建 @HiveType 本地存储模型 |
 | `make add-api` | 查看添加 API 端点步骤 |
 | `make dev` | 开发环境运行（env/.env.dev） |
 | `make staging` | 预发布环境运行（env/.env.staging） |
 | `make prod` | 生产环境运行（env/.env.prod） |
 | `make build-prod` | 生产环境构建 APK（env/.env.prod） |
 | `make bs` | 仅安装依赖（= melos bs） |
+| `make gen-api-mason spec=xxx` | 从 JSON spec 生成 API 代码（Mason ✨） |
+| `make gen-all-apis-mason` | 批量生成所有 spec 代码（Mason ✨） |
+| `make refresh-api-mason` | 完整刷新：生成 + 依赖 + build_runner + 校验（内部调用 `melos run analyze`） |
+| `make gen-api spec=xxx` | 从 JSON spec 生成 API 代码（Dart 脚本备用） |
+
+> 📌 2026-05-10 修复：domain 包已添加 build_runner/freezed/json_serializable，create-model 现已可用；create-api 支持 `--modelName dynamic` 跳过交互式输入；lint/refresh-api-mason 已改用 `melos run analyze`。
 
 ---
 
@@ -719,6 +729,12 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 - 新增 `hive_model` 砖：一键创建 @HiveType 本地存储模型
 - 新增 `create-api` / `create-model` / `create-hive-model` make 命令
 
+### API 生成 Mason 化（2026-05-10）
+- 新增 `api_gen_spec` 砖：从 JSON spec 自动生成完整 API 代码（替代 `gen_api.dart` 入口）
+- `post_gen.dart` 钩子读取 JSON spec → 生成 Freezed DTO + Retrofit API + Hive CM → 更新 barrel
+- 新增 `make gen-api-mason` / `gen-all-apis-mason` / `refresh-api-mason` 目标
+- 输出与 `gen_api.dart` **完全一致**，Dart 脚本保留为备用
+
 ---
 
 ## 架构评分
@@ -813,6 +829,49 @@ cd packages/features/feature_settings && dart run build_runner build --delete-co
 ### 自定义模板
 
 模板位于 `bricks/feature/`，可根据团队规范修改。
+
+### Mason 砖块一览
+
+项目现有 6 个 Mason 砖块：
+
+| 砖块 | 用途 | 入口命令 |
+|------|------|----------|
+| `feature` | 一键创建完整的 Flutter Feature 包（含 cubit、repository、UI、DI） | `make create-feature name=xxx` |
+| `api` | 一键创建 Retrofit API 模块（含 RepositoryImpl、DI 注册） | `make create-api name=xxx baseUrl=/api/v1` |
+| `model` | 一键创建 @freezed 数据模型 | `make create-model name=xxx` |
+| `hive_model` | 一键创建 @HiveType 本地存储模型 | `make create-hive-model name=xxx typeId=N` |
+| `api_gen` | 从砖块 vars 生成单个 Retrofit API 文件（模板级） | `mason make api_gen --domain xxx ...` |
+| `api_gen_spec` ⭐ | 从 JSON spec 文件自动生成全部 API 代码（推荐） | `make gen-api-mason spec=auth.json` |
+
+### API 代码生成（推荐 Mason 方式）
+
+JSON spec 文件位于 `packages/infrastructure/api/spec/`（如 `auth.json`、`user.json` 等）。
+
+**一键生成（Mason ✨）**：
+```bash
+# 单个 spec
+make gen-api-mason spec=auth.json
+
+# 批量所有 spec
+make gen-all-apis-mason
+
+# 完整刷新（生成 + 依赖 + build_runner + 校验）
+make refresh-api-mason
+```
+
+**备用方式（Dart 脚本）**：
+```bash
+# 单文件
+make gen-api spec=auth.json
+
+# 批量
+make gen-all-apis
+
+# 完整刷新
+make refresh-api
+```
+
+两种方式输出**完全一致**，`scripts/gen_api.dart` 保留为备用。
 
 ---
 

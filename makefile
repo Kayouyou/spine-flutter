@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help
+.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help gen-api-mason gen-all-apis-mason refresh-api-mason
 
 # ============================================================================
 # 基础命令
@@ -14,7 +14,7 @@ clean:
 
 # 代码分析
 lint:
-	melos analyze
+	melos run analyze
 
 # 运行测试
 test:
@@ -91,7 +91,7 @@ create-api:
 		mason make api --name $(name) --baseUrl $(baseUrl) --hasModel true --modelName $(model) --output-dir packages/infrastructure/api --on-conflict skip; \
 	else \
 		echo "=== 1/3 生成 API 模块 (无模型) ==="; \
-		mason make api --name $(name) --baseUrl $(baseUrl) --hasModel false --output-dir packages/infrastructure/api --on-conflict skip; \
+		mason make api --name $(name) --baseUrl $(baseUrl) --hasModel false --modelName dynamic --output-dir packages/infrastructure/api --on-conflict skip; \
 	fi
 	@echo "=== 2/3 安装依赖 ==="
 	melos bs
@@ -183,16 +183,16 @@ add-api:
 	@:
 
 # ============================================================================
-# API 代码生成（从 JSON spec）
+# API 代码生成（从 JSON spec - Dart 脚本方式，保留为备用）
 # ============================================================================
 
-# 单文件生成
+# 单文件生成（Dart 脚本）
 gen-api:
 	@if [ -z "$(spec)" ]; then echo "用法: make gen-api spec=auth.json"; exit 1; fi
 	@echo "🚀 从 spec/$(spec) 生成 API 代码..."
 	@dart run scripts/gen_api.dart --spec=packages/infrastructure/api/spec/$(spec)
 
-# 批量生成所有 spec
+# 批量生成所有 spec（Dart 脚本）
 gen-all-apis:
 	@for f in packages/infrastructure/api/spec/*.json; do \
 		echo "📄 $$(basename $$f)"; \
@@ -200,10 +200,38 @@ gen-all-apis:
 	done
 	@echo "✅ 所有 API spec 生成完成"
 
-# 完整刷新: 生成 + build_runner + 校验
+# 完整刷新: 生成 + build_runner + 校验（Dart 脚本）
 refresh-api:
 	@make gen-all-apis
 	@make get
 	@cd packages/infrastructure/api && dart run build_runner build --delete-conflicting-outputs
 	@cd packages/infrastructure/key_value_storage && dart run build_runner build --delete-conflicting-outputs
-	@melos analyze
+	@melos run analyze
+
+# ============================================================================
+# API 代码生成（从 JSON spec - Dart 脚本方式，备用）
+# ============================================================================
+# API 代码生成（从 JSON spec - Mason 方式，推荐使用 ✨）
+# ============================================================================
+
+# 单文件生成（Mason）
+gen-api-mason:
+	@if [ -z "$(spec)" ]; then echo "用法: make gen-api-mason spec=auth.json"; exit 1; fi
+	@echo "🚀 Mason: 从 spec/$(spec) 生成 API 代码..."
+	@mason make api_gen_spec --spec packages/infrastructure/api/spec/$(spec)
+
+# 批量生成所有 spec（Mason）
+gen-all-apis-mason:
+	@for f in packages/infrastructure/api/spec/*.json; do \
+		echo "📄 $$(basename $$f)"; \
+		mason make api_gen_spec --spec $$f; \
+	done
+	@echo "✅ 所有 API spec 生成完成（Mason）"
+
+# 完整刷新: 生成 + build_runner + 校验（Mason）
+refresh-api-mason:
+	@make gen-all-apis-mason
+	@make get
+	@cd packages/infrastructure/api && dart run build_runner build --delete-conflicting-outputs
+	@cd packages/infrastructure/key_value_storage && dart run build_runner build --delete-conflicting-outputs
+	@melos run analyze
