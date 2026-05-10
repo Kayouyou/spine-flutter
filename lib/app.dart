@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
       routeWrapper: (child) => RequestScope(child: child),
     );
     // Alice HTTP Inspector — 创建时传入 navigatorKey，确保 showInspector 可用
-    if (kDebugMode) {
+    if (kDebugMode && !sl.isRegistered<Alice>()) {
       final alice = Alice(
         showNotification: true,
         showInspectorOnShake: true,

@@ -162,7 +162,7 @@ make create-feature name=settings
 
 自动执行三步：生成文件 → `melos bs` 安装依赖 → `build_runner` 生成 freezed 代码。
 
-完成后在 routing 中添加路由、在 `setup.dart` 注册 DI 即可。
+完成后路由和 DI 已通过 RouteModuleRegistry + FeatureRegistry 自动注册，无需手动操作。
 
 > 详细用法见 [Mason 代码模板](#mason-代码模板) 章节。
 
