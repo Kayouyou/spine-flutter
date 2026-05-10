@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:domain/domain.dart';
-import '{{name}}_repository.dart';
 
 /// {{name.pascalCase()}} 数据仓储实现
+///
+/// 注意：{{name.pascalCase()}}Repository 接口定义在 domain 包中，
+/// 通过 package:domain/domain.dart 导入引用。
 class {{name.pascalCase()}}RepositoryImpl implements {{name.pascalCase()}}Repository {
   final Dio _dio;
 
