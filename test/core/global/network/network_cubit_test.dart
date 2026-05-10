@@ -53,10 +53,10 @@ void main() {
 
   group('NetworkCubit', () {
     blocTest<NetworkCubit, NetworkState>(
-      '初始状态为已连接',
+      '初始状态为未连接',
       build: () => NetworkCubit(connectivity: mockConnectivity),
       verify: (cubit) {
-        expect(cubit.state.isConnected, isTrue);
+        expect(cubit.state.isConnected, isFalse);
       },
     );
 
@@ -110,7 +110,7 @@ void main() {
       build: () => NetworkCubit(connectivity: mockConnectivity),
       act: (cubit) => cubit.setUIStyle(NetworkUIStyle.toast),
       expect: () => [
-        NetworkState(status: NetworkStatus.connected, uiStyle: NetworkUIStyle.toast),
+        NetworkState(status: NetworkStatus.disconnected, uiStyle: NetworkUIStyle.toast),
       ],
     );
 

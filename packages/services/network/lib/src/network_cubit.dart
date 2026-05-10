@@ -10,7 +10,7 @@ class NetworkCubit extends Cubit<NetworkState> {
 
   NetworkCubit({Connectivity? connectivity})
       : _connectivity = connectivity ?? Connectivity(),
-        super(const NetworkState(status: NetworkStatus.connected));
+        super(const NetworkState(status: NetworkStatus.disconnected));
 
   /// 开始监听网络状态变化
   void startListening() {
