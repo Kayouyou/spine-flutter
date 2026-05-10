@@ -4,10 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
 import 'package:routing/routing.dart';
-import 'package:upgrader/upgrader.dart';
 import 'package:domain/domain.dart';
-import 'package:get_it/get_it.dart';
-import 'package:alice/alice.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -17,40 +14,25 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return UpgradeAlert(
-      upgrader: Upgrader(
-        debugLogging: GetIt.instance<IAppConfig>().enableDebugLog,
-      ),
-      child: AppScaffold(
-        title: '首页',
-        actions: [
-          // 刷新按钮
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<HomeCubit>().refreshData(),
-          ),
-          // 调试面板按钮（仅 Debug 模式）
-          if (kDebugMode)
-            IconButton(
-              icon: const Icon(Icons.bug_report),
-              onPressed: () {
-                final alice = GetIt.instance<Alice>();
-                alice.showInspector();
-              },
-              tooltip: '调试面板',
-            ),
-        ],
-        body: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
-            // 根据状态渲染不同UI
-            return switch (state) {
-              HomeInitial() => _buildInitial(context),
-              HomeLoading() => _buildLoading(context),
-              HomeLoaded(data: final data) => _buildLoaded(context, data),
-              HomeError(errorCode: final errorCode) => _buildError(context, errorCode),
-            };
-          },
+    return AppScaffold(
+      title: '首页',
+      actions: [
+        // 刷新按钮
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => context.read<HomeCubit>().refreshData(),
         ),
+        // 调试面板按钮 — 已移至 app 层（T3.2）
+      ],
+      body: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          return switch (state) {
+            HomeInitial() => _buildInitial(context),
+            HomeLoading() => _buildLoading(context),
+            HomeLoaded(data: final data) => _buildLoaded(context, data),
+            HomeError(errorCode: final errorCode) => _buildError(context, errorCode),
+          };
+        },
       ),
     );
   }
