@@ -19,7 +19,7 @@ void main() {
       'initial state is DetailInitial',
       build: () => DetailCubit(mockRepo),
       verify: (cubit) {
-        expect(cubit.state, isA<DetailState>());
+        expect(cubit.state, isA<DetailInitial>());
       },
     );
 
@@ -33,9 +33,14 @@ void main() {
       },
       act: (cubit) => cubit.loadData('1'),
       expect: () => [
-        isA<DetailState>(),
-        isA<DetailState>(),
+        isA<DetailLoading>(),
+        isA<DetailLoaded>(),
       ],
+      verify: (cubit) {
+        final loadedState = cubit.state as DetailLoaded;
+        expect(loadedState.data.id, '1');
+        expect(loadedState.data.title, 'detail');
+      },
     );
 
     blocTest<DetailCubit, DetailState>(
@@ -47,9 +52,12 @@ void main() {
       },
       act: (cubit) => cubit.loadData('1'),
       expect: () => [
-        isA<DetailState>(),
-        isA<DetailState>(),
+        isA<DetailLoading>(),
+        isA<DetailError>(),
       ],
+      verify: (cubit) {
+        expect(cubit.state.runtimeType, DetailError);
+      },
     );
 
     blocTest<DetailCubit, DetailState>(
@@ -62,9 +70,12 @@ void main() {
       },
       act: (cubit) => cubit.retry('42'),
       expect: () => [
-        isA<DetailState>(),
-        isA<DetailState>(),
+        isA<DetailLoading>(),
+        isA<DetailLoaded>(),
       ],
+      verify: (cubit) {
+        expect((cubit.state as DetailLoaded).data.id, '42');
+      },
     );
   });
 }

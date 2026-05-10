@@ -25,13 +25,17 @@ void main() {
       },
       act: (cubit) => cubit.loadData(),
       expect: () => [
-        isA<HomeState>(),
-        isA<HomeState>(),
+        isA<HomeLoading>(),
+        isA<HomeLoaded>(),
       ],
+      verify: (cubit) {
+        final loadedState = cubit.state as HomeLoaded;
+        expect(loadedState.data.title, 'cached');
+      },
     );
 
     blocTest<HomeCubit, HomeState>(
-      'refreshData calls refreshHomeData on repository',
+      'refreshData emits loading then loaded on refresh',
       build: () {
         when(() => mockRepo.refreshHomeData())
             .thenAnswer((_) async => Result.success<HomeData, DomainException>(
@@ -40,9 +44,12 @@ void main() {
       },
       act: (cubit) => cubit.refreshData(),
       expect: () => [
-        isA<HomeState>(),
-        isA<HomeState>(),
+        isA<HomeLoading>(),
+        isA<HomeLoaded>(),
       ],
+      verify: (cubit) {
+        expect((cubit.state as HomeLoaded).data.title, 'refreshed');
+      },
     );
 
     blocTest<HomeCubit, HomeState>(
@@ -55,9 +62,12 @@ void main() {
       },
       act: (cubit) => cubit.loadData(),
       expect: () => [
-        isA<HomeState>(),
-        isA<HomeState>(),
+        isA<HomeLoading>(),
+        isA<HomeError>(),
       ],
+      verify: (cubit) {
+        expect(cubit.state, isA<HomeError>());
+      },
     );
   });
 }
