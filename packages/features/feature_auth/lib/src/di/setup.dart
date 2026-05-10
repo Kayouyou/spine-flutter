@@ -2,14 +2,12 @@ import 'package:domain/domain.dart';
 import 'package:get_it/get_it.dart';
 import 'package:routing/routing.dart';
 import '../cubit/login_cubit.dart';
-import '../repository/mock_auth_repository.dart';
 import '../routes/auth_route_module.dart';
 
 void setupFeatureAuth(GetIt sl) {
-  // DI 注册
-  sl.registerFactory<AuthRepository>(() => MockAuthRepository());
+  // LoginCubit 注：AuthRepository 已在 setupAuth(sl) 中注册
   sl.registerFactory<LoginCubit>(() => LoginCubit(sl<AuthRepository>()));
-  
+
   // 路由注册
   RouteModuleRegistry.instance.register('feature_auth', (ctx) => AuthRouteModule(ctx));
 }
