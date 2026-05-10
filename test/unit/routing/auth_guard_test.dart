@@ -17,24 +17,24 @@ void main() {
     test('whitelist routes return null', () {
       when(() => mockAuth.isLoggedIn).thenReturn(false);
       for (final route in publicRoutes) {
-        expect(AuthGuard.check(route, mockAuth), null);
+        expect(AuthGuard.check(route, () => mockAuth.isLoggedIn), null);
       }
     });
 
     test('logged in user no redirect', () {
       when(() => mockAuth.isLoggedIn).thenReturn(true);
-      expect(AuthGuard.check('/profile', mockAuth), null);
+      expect(AuthGuard.check('/profile', () => mockAuth.isLoggedIn), null);
     });
 
     test('not logged in non-whitelist redirect to login', () {
       when(() => mockAuth.isLoggedIn).thenReturn(false);
-      final result = AuthGuard.check('/profile', mockAuth);
+      final result = AuthGuard.check('/profile', () => mockAuth.isLoggedIn);
       expect(result, '/login?redirect=/profile');
     });
 
     test('redirect preserves original path', () {
       when(() => mockAuth.isLoggedIn).thenReturn(false);
-      final result = AuthGuard.check('/settings/theme', mockAuth);
+      final result = AuthGuard.check('/settings/theme', () => mockAuth.isLoggedIn);
       expect(result, contains('/login?redirect=/settings/theme'));
     });
   });

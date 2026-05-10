@@ -19,7 +19,7 @@ void main() {
       'loadData 成功时发出 [loading, loaded]',
       build: () {
         when(() => mockRepo.getHomeData()).thenAnswer(
-          (_) async => Result.success<Map<String, dynamic>, DomainException>(<String, dynamic>{}),
+          (_) async => Result.success<HomeData, DomainException>(const HomeData(title: 'test')),
         );
         return HomeCubit(mockRepo);
       },
@@ -33,8 +33,10 @@ void main() {
     blocTest<HomeCubit, HomeState>(
       'loadData 失败时发出 [loading, error]',
       build: () {
-        when(() => mockRepo.getHomeData()).thenThrow(
-          NetworkException('连接失败'),
+        when(() => mockRepo.getHomeData()).thenAnswer(
+          (_) async => Result.failure<HomeData, DomainException>(
+            NetworkException('连接失败'),
+          ),
         );
         return HomeCubit(mockRepo);
       },

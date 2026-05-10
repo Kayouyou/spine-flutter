@@ -1,30 +1,29 @@
-// Package imports:
+import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:dio/dio.dart';
 import 'package:domain/domain.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockDio extends Mock implements Dio {}
+class MockUserApi extends Mock implements UserApi {}
 
 void main() {
-  late MockDio mockDio;
+  late MockUserApi mockApi;
   late AuthRepositoryImpl repo;
 
   setUp(() {
-    mockDio = MockDio();
-    repo = AuthRepositoryImpl(mockDio);
-    registerFallbackValue(RequestOptions());
+    mockApi = MockUserApi();
+    repo = AuthRepositoryImpl(mockApi);
   });
 
   group('getCurrentUser', () {
     test('200 时返回 User', () async {
-      final response = Response(
-        requestOptions: RequestOptions(),
-        data: {'id': '1', 'name': 'Test'},
-        statusCode: 200,
-      );
-      when(() => mockDio.get('/api/user/me')).thenAnswer((_) async => response);
+      when(() => mockApi.getCurrentUser()).thenAnswer((_) async => UserProfile(
+        id: '1',
+        name: 'Test',
+        email: 'test@test.com',
+        avatar: null,
+      ));
 
       final result = await repo.getCurrentUser();
       result.when(
@@ -36,40 +35,56 @@ void main() {
       );
     });
 
-    test('401 时抛出 UnauthorizedException', () async {
-      final error = DioException(
-        requestOptions: RequestOptions(),
-        response: Response(requestOptions: RequestOptions(), statusCode: 401),
+    test('401 时返回 UnauthorizedException', () async {
+      when(() => mockApi.getCurrentUser()).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          response: Response(requestOptions: RequestOptions(), statusCode: 401),
+        ),
       );
-      when(() => mockDio.get('/api/user/me')).thenThrow(error);
 
-      expect(
-        () => repo.getCurrentUser(),
-        throwsA(isA<UnauthorizedException>()),
+      final result = await repo.getCurrentUser();
+      result.when(
+        success: (_) => fail('应返回失败结果'),
+        failure: (error) {
+          expect(error, isA<UnauthorizedException>());
+        },
       );
     });
 
-    test('404 时抛出 NotFoundException', () async {
-      final error = DioException(
-        requestOptions: RequestOptions(),
-        response: Response(requestOptions: RequestOptions(), statusCode: 404),
+    test('404 时返回 NotFoundException', () async {
+      when(() => mockApi.getCurrentUser()).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          response: Response(requestOptions: RequestOptions(), statusCode: 404),
+        ),
       );
-      when(() => mockDio.get('/api/user/me')).thenThrow(error);
 
-      expect(() => repo.getCurrentUser(), throwsA(isA<NotFoundException>()));
+      final result = await repo.getCurrentUser();
+      result.when(
+        success: (_) => fail('应返回失败结果'),
+        failure: (error) {
+          expect(error, isA<NotFoundException>());
+        },
+      );
     });
 
-    test('连接错误时抛出 NetworkException', () async {
-      final error = DioException(
-        requestOptions: RequestOptions(),
-        type: DioExceptionType.connectionError,
-        message: '无网络',
+    test('连接错误时返回 NetworkException', () async {
+      when(() => mockApi.getCurrentUser()).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionError,
+          message: '无网络',
+        ),
       );
-      when(() => mockDio.get('/api/user/me')).thenThrow(error);
 
-      expect(
-        () => repo.getCurrentUser(),
-        throwsA(predicate((e) => e is NetworkException && e.statusCode == null)),
+      final result = await repo.getCurrentUser();
+      result.when(
+        success: (_) => fail('应返回失败结果'),
+        failure: (error) {
+          expect(error, isA<NetworkException>());
+          expect((error as NetworkException).statusCode, isNull);
+        },
       );
     });
   });
