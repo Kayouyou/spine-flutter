@@ -10,6 +10,7 @@
 export 'src/routes/routes.dart';
 export 'src/routes/route_module.dart';
 export 'src/routes/route_module_registry.dart';
+export 'src/routes/feature_registry.dart';
 export 'src/routes/route_context.dart';
 export 'src/routes/app_routes.dart';
 export 'src/guards/auth_guard.dart';

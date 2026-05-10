@@ -14,6 +14,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'package:locale/locale.dart';
 import 'package:network/network.dart';
+import 'package:routing/routing.dart' as routing;
 
 // Project imports:
 import 'package:domain/domain.dart';
@@ -91,10 +92,8 @@ void setupDependencies() {
   sl.registerSingleton<LocaleCubit>(LocaleCubit());
   sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
-  // ===== Step 5: 业务功能层 =====
-  setupFeatureHome(sl);
-  setupFeatureDetail(sl);
-  setupFeatureAuth(sl);
+  // ===== Step 5: 业务功能层（通过 FeatureRegistry 自动发现） =====
+  routing.FeatureRegistry.instance.runAll(sl);
 
   configureEasyLoading();
 }

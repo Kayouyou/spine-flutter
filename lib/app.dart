@@ -7,9 +7,6 @@ import 'package:alice/alice.dart';
 import 'package:auth/auth.dart';
 import 'package:dio/dio.dart';
 import 'package:domain/domain.dart';
-import 'package:feature_detail/feature_detail.dart';
-import 'package:feature_auth/feature_auth.dart';
-import 'package:feature_home/feature_home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -95,14 +92,15 @@ class _MyAppState extends State<MyApp> {
           },
           branches: [
             StatefulShellBranch(
-              routes: [...HomeRouteModule(ctx).build()],
+              routes: RouteModuleRegistry.instance.get('feature_home', ctx),
             ),
             StatefulShellBranch(
-              routes: [...AuthRouteModule(ctx).build()],
+              routes: RouteModuleRegistry.instance.get('feature_auth', ctx),
             ),
           ],
         ),
-        ...DetailRouteModule(ctx).build(),
+        // 其他非 tab 路由通过注册中心构建
+        ...RouteModuleRegistry.instance.get('feature_detail', ctx),
       ],
       errorBuilder: (context, state) => Scaffold(
         body: Center(child: Text('Page not found')),

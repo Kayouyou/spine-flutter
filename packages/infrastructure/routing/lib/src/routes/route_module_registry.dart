@@ -25,10 +25,10 @@ abstract class RouteModuleRegistry {
   void register(String featureName, RouteModule Function(RouteContext) factory);
 
   /// 构建所有已注册路由模块的路由列表
-  ///
-  /// ctx: 路由上下文（包含 navigatorKey、AuthGuard、routeWrapper 等）
-  /// 返回: 合并后的路由列表（List<RouteBase>），可直接传给 GoRouter.routes
   List<RouteBase> buildAll(RouteContext ctx);
+
+  /// 获取指定 Feature 的路由列表
+  List<RouteBase> get(String featureName, RouteContext ctx);
 
   /// 清空已注册的路由模块（用于测试或重置）
   void clear();
@@ -54,6 +54,15 @@ class _RouteModuleRegistryImpl implements RouteModuleRegistry {
       routes.addAll(module.build());
     }
     return routes;
+  }
+
+  @override
+  List<RouteBase> get(String featureName, RouteContext ctx) {
+    final factory = _modules[featureName];
+    if (factory == null) {
+      throw StateError('RouteModule "$featureName" not registered');
+    }
+    return factory(ctx).build();
   }
 
   @override
