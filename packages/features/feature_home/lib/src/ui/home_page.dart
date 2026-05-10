@@ -118,7 +118,7 @@ class HomePage extends StatelessWidget {
   }
 
   /// 错误状态UI
-  Widget _buildError(BuildContext context, errorCode) {
+  Widget _buildError(BuildContext context, String errorCode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -130,7 +130,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '加载失败: ${errorCode.name}',
+            '加载失败: $errorCode',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),

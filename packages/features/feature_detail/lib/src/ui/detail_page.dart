@@ -82,14 +82,14 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildError(BuildContext context, errorCode) {
+  Widget _buildError(BuildContext context, String errorCode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 16),
-          Text('加载失败: ${errorCode.name}'),
+          Text('加载失败: $errorCode'),
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () => context.read<DetailCubit>().retry('1'),
