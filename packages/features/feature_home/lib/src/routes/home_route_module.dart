@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
+import '../cubit/home_cubit.dart';
 import '../ui/home_page.dart';
 
 /// 首页路由模块
@@ -15,7 +18,10 @@ class HomeRouteModule extends RouteModule {
       GoRoute(
         path: '/home',
         pageBuilder: (context, state) {
-          Widget page = const HomePage();
+          Widget page = BlocProvider(
+            create: (_) => GetIt.instance<HomeCubit>(),
+            child: const HomePage(),
+          );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);
           }

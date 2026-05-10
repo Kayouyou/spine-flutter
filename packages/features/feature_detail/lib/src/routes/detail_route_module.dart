@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
+import '../cubit/detail_cubit.dart';
 import '../ui/detail_page.dart';
 
 /// 详情页路由模块
@@ -15,7 +18,10 @@ class DetailRouteModule extends RouteModule {
       GoRoute(
         path: '/detail',
         pageBuilder: (context, state) {
-          Widget page = const DetailPage();
+          Widget page = BlocProvider(
+            create: (_) => GetIt.instance<DetailCubit>(),
+            child: const DetailPage(),
+          );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);
           }
@@ -26,7 +32,10 @@ class DetailRouteModule extends RouteModule {
         path: '/detail/:id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'];
-          Widget page = DetailPage(id: id);
+          Widget page = BlocProvider(
+            create: (_) => GetIt.instance<DetailCubit>(),
+            child: DetailPage(id: id),
+          );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);
           }
