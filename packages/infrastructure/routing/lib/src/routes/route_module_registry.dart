@@ -40,9 +40,7 @@ class _RouteModuleRegistryImpl implements RouteModuleRegistry {
 
   @override
   void register(String featureName, RouteModule Function(RouteContext) factory) {
-    if (_modules.containsKey(featureName)) {
-      throw StateError('RouteModule "$featureName" already registered. Call clear() first if needed.');
-    }
+    if (_modules.containsKey(featureName)) return; // hot reload 安全
     _modules[featureName] = factory;
   }
 

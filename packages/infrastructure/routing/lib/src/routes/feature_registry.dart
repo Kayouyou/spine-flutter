@@ -20,9 +20,7 @@ class FeatureRegistry {
 
   /// 注册 Feature 的 DI setup 函数，返回 name 用于顶层赋值
   String register(String name, void Function(GetIt) setup) {
-    if (_names.contains(name)) {
-      throw StateError('Feature "$name" already registered');
-    }
+    if (_names.contains(name)) return name; // hot reload 安全
     _names.add(name);
     _setups.add(setup);
     return name;
