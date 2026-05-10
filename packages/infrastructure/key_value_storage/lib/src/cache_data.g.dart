@@ -17,8 +17,7 @@ class CacheDataAdapter extends TypeAdapter<CacheData> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CacheData(
-      fields[0] as dynamic,
-      ttl: Duration(hours: 24), // 默认值，实际从expireAt计算
+      fields[0] as T,
     );
   }
 

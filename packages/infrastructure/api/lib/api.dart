@@ -31,3 +31,5 @@ export 'src/models/detail_data.dart';
 export 'src/models/sign_in_request.dart';
 export 'src/models/session_result.dart';
 export 'src/models/vehicle_data.dart';
+export 'src/models/update_profile_request.dart';
+export 'src/api/user_api.dart';

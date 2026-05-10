@@ -1,27 +1,27 @@
 // packages/services/auth/lib/src/repository/auth_repository_impl.dart
 import 'package:dio/dio.dart';
+import 'package:api/api.dart';
 import 'package:domain/domain.dart';
 
-/// UserRepository 的远程实现
+/// UserRepository 的 Retrofit 实现
 ///
-/// 通过 Dio 访问后端 API，将 DioException 映射为 DomainException。
+/// 通过 UserApi（Retrofit 代码生成）访问后端，将 DioException 映射为 DomainException。
 /// 返回 Result 类型处理成功和异常。
-///
-/// 注意：当前实现暂时保留直接 Dio 调用方式，因为：
-/// - getCurrentUser() 使用 /api/user/me 端点
-/// - updateProfile() 使用 /api/user/profile 端点
-/// - AuthApi 当前端点为 login/register/getProfile/forgotPassword，未包含这些端点
-/// 后续需要与 AuthApi 对齐，或创建专门的 UserApi。
 class AuthRepositoryImpl implements UserRepository {
-  final Dio _dio;
+  final UserApi _userApi;
 
-  AuthRepositoryImpl(this._dio);
+  AuthRepositoryImpl(this._userApi);
 
   @override
   Future<Result<User, DomainException>> getCurrentUser() async {
     try {
-      final response = await _dio.get('/api/user/me');
-      return Result.success(User.fromJson(response.data as Map<String, dynamic>));
+      final profile = await _userApi.getCurrentUser();
+      return Result.success(User(
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        avatar: profile.avatar,
+      ));
     } on DioException catch (e) {
       return Result.failure(_mapError(e));
     }
@@ -30,12 +30,12 @@ class AuthRepositoryImpl implements UserRepository {
   @override
   Future<Result<void, DomainException>> updateProfile(ProfileData data) async {
     try {
-      await _dio.put('/api/user/profile', data: {
-        if (data.name != null) 'name': data.name,
-        if (data.avatar != null) 'avatar': data.avatar,
-        if (data.email != null) 'email': data.email,
-      },);
-      return Result.success(null,);
+      await _userApi.updateProfile(UpdateProfileRequest(
+        name: data.name,
+        email: data.email,
+        avatar: data.avatar,
+      ));
+      return Result.success(null);
     } on DioException catch (e) {
       return Result.failure(_mapError(e));
     }

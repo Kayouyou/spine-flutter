@@ -11,6 +11,8 @@ dependencies:
   dio: ^5.2.0+1
   domain:
     path: ../../domain
+  api:
+    path: ../../infrastructure/api
   key_value_storage:
     path: ../../infrastructure/key_value_storage
   get_it: ^7.6.0

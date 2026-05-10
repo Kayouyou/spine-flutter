@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:alice/alice.dart';
 import 'package:auth/auth.dart';
+import 'package:dio/dio.dart';
 import 'package:domain/domain.dart';
 import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_auth/feature_auth.dart';
@@ -61,6 +62,10 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: _navigatorKey,
       );
       sl.registerSingleton<Alice>(alice);
+
+      // Add Alice interceptor to existing Dio singleton
+      final dio = sl<Dio>();
+      dio.interceptors.add(alice.getDioInterceptor());
     }
 
     _router = _buildRouter(ctx);

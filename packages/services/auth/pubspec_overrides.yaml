@@ -1,5 +1,7 @@
-# melos_managed_dependency_overrides: domain,key_value_storage
+# melos_managed_dependency_overrides: domain,key_value_storage,api
 dependency_overrides:
+  api:
+    path: ../../infrastructure/api
   domain:
     path: ../../domain
   key_value_storage:

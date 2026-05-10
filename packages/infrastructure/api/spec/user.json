@@ -1,0 +1,36 @@
+{
+  "domain": "user",
+  "basePath": "/User",
+  "models": {
+    "UserProfile": {
+      "fields": {
+        "id": "String",
+        "name": "String",
+        "email": "String",
+        "avatar": "String?"
+      }
+    },
+    "UpdateProfileRequest": {
+      "fields": {
+        "name": "String?",
+        "email": "String?",
+        "avatar": "String?"
+      }
+    }
+  },
+  "endpoints": [
+    {
+      "name": "getCurrentUser",
+      "method": "GET",
+      "path": "/me",
+      "response": "UserProfile"
+    },
+    {
+      "name": "updateProfile",
+      "method": "PUT",
+      "path": "/profile",
+      "body": "UpdateProfileRequest",
+      "response": "UserProfile"
+    }
+  ]
+}
