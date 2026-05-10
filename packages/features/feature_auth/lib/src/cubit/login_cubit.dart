@@ -1,9 +1,9 @@
+import 'package:domain/domain.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'login_state.dart';
-import '../repository/mock_auth_repository.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  final MockAuthRepository _repository;
+  final AuthRepository _repository;
 
   LoginCubit(this._repository) : super(const LoginState());
 
@@ -23,11 +23,11 @@ class LoginCubit extends Cubit<LoginState> {
       success: (success) => emit(state.copyWith(
         status: success ? LoginStatus.success : LoginStatus.error,
         errorMessage: success ? null : '用户名或密码错误',
-      )),
+      ),),
       failure: (error) => emit(state.copyWith(
         status: LoginStatus.error,
         errorMessage: error.message,
-      )),
+      ),),
     );
   }
 
@@ -39,11 +39,11 @@ class LoginCubit extends Cubit<LoginState> {
       success: (success) => emit(state.copyWith(
         status: success ? LoginStatus.success : LoginStatus.error,
         errorMessage: success ? null : '注册失败',
-      )),
+      ),),
       failure: (error) => emit(state.copyWith(
         status: LoginStatus.error,
         errorMessage: error.message,
-      )),
+      ),),
     );
   }
 

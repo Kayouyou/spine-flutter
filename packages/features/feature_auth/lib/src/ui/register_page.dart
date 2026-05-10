@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
-import '../repository/mock_auth_repository.dart';
 
 class RegisterPage extends StatelessWidget {
   final String? redirect;
@@ -13,10 +12,7 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LoginCubit(MockAuthRepository()),
-      child: RegisterPageView(redirect: redirect),
-    );
+    return RegisterPageView(redirect: redirect);
   }
 }
 
