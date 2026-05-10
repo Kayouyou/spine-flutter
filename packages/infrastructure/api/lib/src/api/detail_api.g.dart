@@ -22,12 +22,12 @@ class _DetailApi implements DetailApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<Map<String, dynamic>> getDetailData(String id) async {
+  Future<DetailData> getDetailData(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<DetailData>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -44,7 +44,14 @@ class _DetailApi implements DetailApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late DetailData _value;
+    try {
+      _value = DetailData.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

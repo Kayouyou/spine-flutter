@@ -11,6 +11,7 @@ import 'package:list_cache/list_cache.dart';
 /// 缓存策略：staleWhileRevalidate（先缓存后网络，后台静默刷新）
 /// 
 /// Retrofit 迁移：使用 HomeApi 替代直接 Dio 调用
+///  Typed API 返回 HomeData，这里转换为 Map<String, dynamic> 以保持接口兼容
 class HomeRepositoryImpl implements HomeRepository {
   final Dio _dio;
   final ListCacheManager<Map<String, dynamic>> _cacheManager;
@@ -32,13 +33,14 @@ class HomeRepositoryImpl implements HomeRepository {
         page: 1,
         networkFetcher: () async {
           final response = await _homeApi.getHomeData();
-          return [response];
+          // Convert typed HomeData to Map for domain interface compatibility
+          return [response.toJson()];
         },
       );
       if (result.data.isNotEmpty) {
         return Result.success(result.data.first);
       }
-      return Result.success({});
+      return Result.success(<String, dynamic>{});
     } on DioException catch (e) {
       return Result.failure(e.toDomainException());
     }

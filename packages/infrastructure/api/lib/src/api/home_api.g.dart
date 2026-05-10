@@ -22,12 +22,12 @@ class _HomeApi implements HomeApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<Map<String, dynamic>> getHomeData() async {
+  Future<HomeData> getHomeData() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<HomeData>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -44,7 +44,14 @@ class _HomeApi implements HomeApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late HomeData _value;
+    try {
+      _value = HomeData.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

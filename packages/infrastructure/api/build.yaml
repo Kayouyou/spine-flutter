@@ -1,6 +1,12 @@
 targets:
   $default:
     builders:
+      freezed:
+        generate_for:
+          include:
+            - lib/src/models/**
+          exclude:
+            - lib/src/api/**
       retrofit_generator:
         generate_for:
           include:

@@ -22,12 +22,12 @@ class _VehicleApi implements VehicleApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<Map<String, dynamic>> getVehicleList() async {
+  Future<VehicleData> getVehicleList() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<VehicleData>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -44,16 +44,23 @@ class _VehicleApi implements VehicleApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late VehicleData _value;
+    try {
+      _value = VehicleData.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<Map<String, dynamic>> getVehicleDetail() async {
+  Future<VehicleData> getVehicleDetail() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<VehicleData>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -70,16 +77,23 @@ class _VehicleApi implements VehicleApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late VehicleData _value;
+    try {
+      _value = VehicleData.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<Map<String, dynamic>> getVehicleRanking() async {
+  Future<VehicleData> getVehicleRanking() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<VehicleData>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -96,7 +110,14 @@ class _VehicleApi implements VehicleApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late VehicleData _value;
+    try {
+      _value = VehicleData.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

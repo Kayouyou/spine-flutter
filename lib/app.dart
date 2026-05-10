@@ -7,6 +7,7 @@ import 'package:alice/alice.dart';
 import 'package:auth/auth.dart';
 import 'package:domain/domain.dart';
 import 'package:feature_detail/feature_detail.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -46,14 +47,13 @@ class _MyAppState extends State<MyApp> {
     final config = sl<IAppConfig>();
     final ctx = RouteContext(
       navigatorKey: _navigatorKey,
-      authManager: sl<AuthManager>(),
       enableAuthGuard: config.enableAuthGuard,
+      // 登录状态检查回调 — 从 DI 容器中获取 AuthManager
+      isLoggedInChecker: () => sl<AuthManager>().isLoggedIn,
       // routeWrapper：在每个路由页面外层包裹 RequestScope，实现页面退出时自动取消请求
       routeWrapper: (child) => RequestScope(child: child),
-      homeCubitFactory: () => sl<HomeCubit>(),
-      detailCubitFactory: () => sl<DetailCubit>(),
     );
-    _router = AppRouter.getRouter(ctx: ctx);
+    _router = _buildRouter(ctx);
 
     // Alice HTTP Inspector 设置 navigator key（仅 Debug 模式）
     if (kDebugMode && sl.isRegistered<Alice>()) {
@@ -61,9 +61,46 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  /// 使用 RouteModules 构建 GoRouter
+  ///
+  /// Wave 2: 直接在 app.dart 组装路由，不再依赖 routing 包的 router.dart
+  GoRouter _buildRouter(RouteContext ctx) {
+    return GoRouter(
+      initialLocation: '/home',
+      observers: [AppRouteObserver.instance],
+      redirect: ctx.enableAuthGuard && ctx.isLoggedInChecker != null
+          ? (context, state) {
+              final location = state.matchedLocation;
+              return AuthGuard.check(location, ctx.isLoggedInChecker!);
+            }
+          : null,
+      routes: [
+        StatefulShellRoute.indexedStack(
+          pageBuilder: (context, state, navigationShell) {
+            return NoTransitionPage(
+              key: state.pageKey,
+              child: _MainShell(navigationShell: navigationShell),
+            );
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [...HomeRouteModule(ctx).build()],
+            ),
+            StatefulShellBranch(
+              routes: [...AuthRouteModule(ctx).build()],
+            ),
+          ],
+        ),
+        ...DetailRouteModule(ctx).build(),
+      ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(child: Text('Page not found')),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-// 全局BlocProvider包装，提供LocaleCubit、NetworkCubit和AuthCubit
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<LocaleCubit>()),
@@ -76,13 +113,11 @@ class _MyAppState extends State<MyApp> {
             title: '骨架演示',
             theme: appLightTheme,
             darkTheme: appDarkTheme,
-            // 语言配置
             locale: localeState.locale,
             supportedLocales: const [
-              Locale('zh'), // 中文
-              Locale('en'), // 英文
+              Locale('zh'),
+              Locale('en'),
             ],
-            // 国际化配置
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -105,6 +140,32 @@ class _MyAppState extends State<MyApp> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Main Shell with bottom navigation
+class _MainShell extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
+  const _MainShell({required this.navigationShell});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: (index) {
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'Settings'),
+        ],
       ),
     );
   }

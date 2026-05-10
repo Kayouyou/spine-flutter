@@ -181,3 +181,29 @@ add-api:
 
 %:
 	@:
+
+# ============================================================================
+# API 代码生成（从 JSON spec）
+# ============================================================================
+
+# 单文件生成
+gen-api:
+	@if [ -z "$(spec)" ]; then echo "用法: make gen-api spec=auth.json"; exit 1; fi
+	@echo "🚀 从 spec/$(spec) 生成 API 代码..."
+	@dart run scripts/gen_api.dart --spec=packages/infrastructure/api/spec/$(spec)
+
+# 批量生成所有 spec
+gen-all-apis:
+	@for f in packages/infrastructure/api/spec/*.json; do \
+		echo "📄 $$(basename $$f)"; \
+		dart run scripts/gen_api.dart --spec=$$f; \
+	done
+	@echo "✅ 所有 API spec 生成完成"
+
+# 完整刷新: 生成 + build_runner + 校验
+refresh-api:
+	@make gen-all-apis
+	@make get
+	@cd packages/infrastructure/api && dart run build_runner build --delete-conflicting-outputs
+	@cd packages/infrastructure/key_value_storage && dart run build_runner build --delete-conflicting-outputs
+	@melos analyze

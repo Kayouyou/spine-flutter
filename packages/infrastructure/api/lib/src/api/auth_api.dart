@@ -1,28 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import 'package:api/src/models/login_response.dart';
+import 'package:api/src/models/login_request.dart';
+import 'package:api/src/models/user_profile.dart';
+
 part 'auth_api.g.dart';
 
-/// 认证业务域 API 接口
 @RestApi(baseUrl: '')
 abstract class AuthApi {
   factory AuthApi(Dio dio) = _AuthApi;
 
-  /// 用户登录
   @POST('/User/Login/Password')
-  Future<Map<String, dynamic>> login(@Body() Map<String, dynamic> body);
+  Future<LoginResponse> login(@Body() LoginRequest body);
 
-  /// 用户注册
   @POST('/User/Register')
-  Future<Map<String, dynamic>> register(@Body() Map<String, dynamic> body);
+  Future<LoginResponse> register(@Body() LoginRequest body);
 
-  /// 获取用户资料
-  ///
-  /// [username] 用户名
   @GET('/User/{username}')
-  Future<Map<String, dynamic>> getProfile(@Path('username') String username);
+  Future<UserProfile> getProfile(@Path('username') String username);
 
-  /// 忘记密码
   @POST('/User/forgot_password')
-  Future<Map<String, dynamic>> forgotPassword(@Body() Map<String, dynamic> body);
+  Future<LoginResponse> forgotPassword(@Body() LoginRequest body);
+
 }

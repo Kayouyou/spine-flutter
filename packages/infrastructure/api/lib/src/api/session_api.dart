@@ -1,18 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import 'package:api/src/models/session_result.dart';
+import 'package:api/src/models/sign_in_request.dart';
+
 part 'session_api.g.dart';
 
-/// Session 业务域 API 接口
 @RestApi(baseUrl: '')
 abstract class SessionApi {
   factory SessionApi(Dio dio) = _SessionApi;
 
-  /// 签到（Session 登录）
   @POST('/session')
-  Future<Map<String, dynamic>> signIn(@Body() Map<String, dynamic> body);
+  Future<SessionResult> signIn(@Body() SignInRequest body);
 
-  /// 签退（Session 登出）
   @DELETE('/session')
-  Future<Map<String, dynamic>> signOut();
+  Future<SessionResult> signOut();
+
 }

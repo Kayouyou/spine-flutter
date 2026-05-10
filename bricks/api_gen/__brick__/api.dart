@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 {{#models}}
-import 'package:api/src/models/{{name.snakeCase}}.dart';
+import 'package:api/src/models/{{snake}}.dart';
 {{/models}}
 
 part '{{domain}}_api.g.dart';

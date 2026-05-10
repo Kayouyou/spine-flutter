@@ -6,6 +6,7 @@ import 'package:domain/domain.dart';
 ///
 /// 职责：从API获取详情数据
 /// Retrofit 迁移：使用 DetailApi 替代直接 Dio 调用
+/// Typed API 返回 DetailData，这里转换为 Map<String, dynamic> 以保持接口兼容
 class DetailRepositoryImpl implements DetailRepository {
   final Dio _dio;
   late final DetailApi _detailApi;
@@ -18,7 +19,8 @@ class DetailRepositoryImpl implements DetailRepository {
   Future<Result<Map<String, dynamic>, DomainException>> getDetailData(String id) async {
     try {
       final response = await _detailApi.getDetailData(id);
-      return Result.success(response);
+      // Convert typed DetailData to Map for domain interface compatibility
+      return Result.success(response.toJson());
     } on DioException catch (e) {
       return Result.failure(e.toDomainException());
     }

@@ -22,13 +22,12 @@ class _AuthApi implements AuthApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<Map<String, dynamic>> login(Map<String, dynamic> body) async {
+  Future<LoginResponse> login(LoginRequest body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _data = body;
+    final _options = _setStreamType<LoginResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -45,17 +44,23 @@ class _AuthApi implements AuthApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late LoginResponse _value;
+    try {
+      _value = LoginResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<Map<String, dynamic>> register(Map<String, dynamic> body) async {
+  Future<LoginResponse> register(LoginRequest body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _data = body;
+    final _options = _setStreamType<LoginResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -72,16 +77,23 @@ class _AuthApi implements AuthApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late LoginResponse _value;
+    try {
+      _value = LoginResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<Map<String, dynamic>> getProfile(String username) async {
+  Future<UserProfile> getProfile(String username) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _options = _setStreamType<UserProfile>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -98,17 +110,23 @@ class _AuthApi implements AuthApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late UserProfile _value;
+    try {
+      _value = UserProfile.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<Map<String, dynamic>> forgotPassword(Map<String, dynamic> body) async {
+  Future<LoginResponse> forgotPassword(LoginRequest body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
-    final _options = _setStreamType<Map<String, dynamic>>(Options(
+    final _data = body;
+    final _options = _setStreamType<LoginResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -125,7 +143,14 @@ class _AuthApi implements AuthApi {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    return _result.data!;
+    late LoginResponse _value;
+    try {
+      _value = LoginResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
