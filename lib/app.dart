@@ -53,12 +53,17 @@ class _MyAppState extends State<MyApp> {
       // routeWrapper：在每个路由页面外层包裹 RequestScope，实现页面退出时自动取消请求
       routeWrapper: (child) => RequestScope(child: child),
     );
-    _router = _buildRouter(ctx);
-
-    // Alice HTTP Inspector 设置 navigator key（仅 Debug 模式）
-    if (kDebugMode && sl.isRegistered<Alice>()) {
-      sl<Alice>().setNavigatorKey(_navigatorKey);
+    // Alice HTTP Inspector — 创建时传入 navigatorKey，确保 showInspector 可用
+    if (kDebugMode) {
+      final alice = Alice(
+        showNotification: true,
+        showInspectorOnShake: true,
+        navigatorKey: _navigatorKey,
+      );
+      sl.registerSingleton<Alice>(alice);
     }
+
+    _router = _buildRouter(ctx);
   }
 
   /// 使用 RouteModules 构建 GoRouter
