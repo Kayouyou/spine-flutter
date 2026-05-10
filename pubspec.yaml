@@ -34,13 +34,16 @@ dependencies:
   locale:
     path: packages/services/locale
 
-  # ===== 业务功能层 =====
+  # ===== 🔽 自动生成的 Feature 依赖（不要手动修改） =====
+  # <<<< FEATURE_DEPENDENCIES >>>>
   feature_home:
     path: packages/features/feature_home
   feature_detail:
     path: packages/features/feature_detail
   feature_auth:
     path: packages/features/feature_auth
+  # >>>> FEATURE_DEPENDENCIES
+  # ===== 🔼 =====
 
   component_library:
     path: packages/infrastructure/component_library

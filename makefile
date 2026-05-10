@@ -71,16 +71,18 @@ create-feature:
 		echo "用法: make create-feature name=test_mason"; \
 		exit 1; \
 	fi
-	@echo "=== 1/3 生成 Feature 包 ==="
+	@echo "=== 1/4 生成 Feature 包 ==="
 	mason make feature --name $(name) --output-dir packages/features/feature_$(name)
-	@echo "=== 2/3 安装依赖 ==="
+	@echo "=== 2/4 添加 pubspec 依赖 ==="
+	@sed -i.bak '/<<<< FEATURE_DEPENDENCIES >>>>/a\  feature_$(name):\n    path: packages/features/feature_$(name)' pubspec.yaml && rm pubspec.yaml.bak
+	@echo "=== 3/4 安装依赖 ==="
 	melos bs
-	@echo "=== 3/3 生成 freezed 代码 ==="
+	@echo "=== 4/4 生成 freezed 代码 ==="
 	cd packages/features/feature_$(name) && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 5/4 运行分析验证 ==="
+	cd packages/features/feature_$(name) && dart analyze
 	@echo ""
-	@echo "=== ✅ 完成！后续手动步骤 ==="
-	@echo "1. 在 routing 包中添加路由"
-	@echo "2. 在 lib/core/di/setup.dart 注册 setupFeatureXxx(sl)"
+	@echo "=== ✅ 完成！路由和 DI 已通过 RouteModuleRegistry 自动注册 ==="
 
 # 生成 Retrofit API 模块
 create-api:

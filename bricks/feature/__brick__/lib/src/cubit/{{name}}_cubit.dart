@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:domain/domain.dart';
 import '{{name}}_state.dart';
-import '../repository/{{name}}_repository.dart';
 
 /// {{name.pascalCase()}} 状态管理 Cubit
 class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
@@ -9,7 +8,6 @@ class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
 
   {{name.pascalCase()}}Cubit(this._repository) : super(const {{name.pascalCase()}}State.initial());
 
-  /// 加载 {{name.pascalCase()}} 数据
   Future<void> loadData() async {
     emit(const {{name.pascalCase()}}State.loading());
 
@@ -20,7 +18,6 @@ class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
     );
   }
 
-  /// 刷新 {{name.pascalCase()}} 数据
   Future<void> refreshData() async {
     emit(const {{name.pascalCase()}}State.loading());
 
@@ -31,7 +28,6 @@ class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
     );
   }
 
-  /// 重试加载
   Future<void> retry() async {
     await loadData();
   }
