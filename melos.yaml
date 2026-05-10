@@ -1,5 +1,6 @@
 name: my_app
 packages:
+  - .
   - packages/domain
   - packages/infrastructure/*
   - packages/services/*
