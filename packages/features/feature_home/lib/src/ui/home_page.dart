@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:alice/alice.dart';
 import 'package:component_library/component_library.dart';
 import 'package:routing/routing.dart';
 import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -22,7 +24,16 @@ class HomePage extends StatelessWidget {
           icon: const Icon(Icons.refresh),
           onPressed: () => context.read<HomeCubit>().refreshData(),
         ),
-        // 调试面板按钮 — 已移至 app 层（T3.2）
+        // 调试面板按钮（仅 Debug 模式）
+        if (kDebugMode)
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () {
+              final alice = GetIt.instance<Alice>();
+              alice.showInspector();
+            },
+            tooltip: '调试面板',
+          ),
       ],
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
