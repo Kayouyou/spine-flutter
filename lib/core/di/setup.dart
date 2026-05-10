@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
+import 'package:alice/alice.dart';
 import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
@@ -61,7 +62,17 @@ void setupDependencies() {
   // 三步骤
   // 每个模块负责组装自己的依赖，主应用只需调用一次 setupXxx(sl)
 
-  // ===== Step 2: Dio（依赖 TokenStorage） =====
+  // ===== Step 2: Alice HTTP Inspector（仅 debug 模式）=====
+  // 必须在 Dio 之前注册，以便 createDio 可依赖
+  if (kDebugMode) {
+    final alice = Alice(
+      showNotification: true,
+      showInspectorOnShake: true,
+    );
+    getIt.registerSingleton<Alice>(alice);
+  }
+
+  // ===== Step 3: Dio（依赖 TokenStorage） =====
   final autoCancelInterceptor = AutoCancelInterceptor(
     tagProvider: () => RequestContext.currentTag,
     registerFn: (tag, token) =>
@@ -79,6 +90,7 @@ void setupDependencies() {
     tokenStorage: sl<TokenStorage>(),
     connectTimeout: Duration(seconds: config.networkTimeout),
     receiveTimeout: Duration(seconds: config.networkTimeout),
+    alice: kDebugMode ? sl<Alice>() : null, // HTTP Inspector
   );
   dio.options.baseUrl = config.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);
