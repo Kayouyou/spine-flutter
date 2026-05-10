@@ -2,25 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:component_library/component_library.dart';
+import 'package:routing/routing.dart';
 import '../cubit/detail_cubit.dart';
 import '../cubit/detail_state.dart';
 
 /// 详情页
 ///
 /// 职责：展示详情内容，响应加载状态
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   final String? id;
 
   const DetailPage({super.key, this.id});
 
   @override
-  Widget build(BuildContext context) {
-    if (id != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<DetailCubit>().loadData(id!);
-      });
-    }
+  State<DetailPage> createState() => _DetailPageState();
+}
 
+class _DetailPageState extends State<DetailPage> with LifecycleMixin<DetailPage> {
+  @override
+  void onPageEnter() {
+    if (widget.id != null) {
+      context.read<DetailCubit>().loadData(widget.id!);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AppScaffold(
       title: '详情页',
       body: BlocBuilder<DetailCubit, DetailState>(
