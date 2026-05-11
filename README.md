@@ -878,7 +878,61 @@ cd packages/features/feature_settings && dart run build_runner build --delete-co
 | `api_gen` | 从砖块 vars 生成单个 Retrofit API 文件（模板级） | `mason make api_gen --domain xxx ...` |
 | `api_gen_spec` ⭐ | 从 JSON spec 文件自动生成全部 API 代码（推荐） | `make gen-api-mason spec=auth.json` |
 
-### API 代码生成（推荐 Mason 方式）
+### 自动化对齐方案（单入口：根目录）
+
+本项目统一原则：**只保留根目录入口，不引入第二套命令体系**。
+
+#### 入口与边界
+
+- 入口唯一：`make`（根目录）
+- 模板唯一：根目录 `mason.yaml` + `bricks/`
+- 不新增平行目录：不再引入 `tool/mason` 这类第二入口
+- 不新增重复命令：已有命令可覆盖的场景，不再增加新命令
+
+#### 五个技术维度与现有命令映射（完全对齐当前架构）
+
+| 维度 | 当前推荐命令 | 生成位置（当前架构） | 是否需要新增命令 |
+|------|--------------|----------------------|------------------|
+| UI 组件/页面 | `make create-feature name=xxx` | `packages/features/feature_xxx/` | 否 |
+| 接口层（Retrofit） | `make create-api name=xxx baseUrl=/api/v1 [model=xxx]` | `packages/infrastructure/api/` | 否 |
+| Domain 模型 | `make create-model name=xxx` | `packages/domain/` | 否 |
+| 数据缓存（Hive） | `make create-hive-model name=xxx typeId=N` | `packages/infrastructure/key_value_storage/` | 否 |
+| 路由/状态管理 | `make create-feature name=xxx` | Feature 包内 `routes/` + `cubit/` | 否 |
+
+> 说明：`create-feature` 会生成路由模块与 Cubit 代码，但根 DI 仍建议显式接入（稳定优先）。
+
+#### 必须自动化（手工风险高）
+
+- 新增 Feature：`make create-feature name=xxx`
+- 新增 API：`make create-api name=xxx baseUrl=/api/v1 [model=xxx]`
+- 新增共享模型：`make create-model name=xxx`
+- 新增 Hive 模型：`make create-hive-model name=xxx typeId=N`
+- 批量 API 刷新：`make refresh-api-mason`
+
+#### 可选但建议（一次配置，长期收益）
+
+- 联合生成：`make scaffold-api name=xxx baseUrl=/api/v1`
+- 单 spec 生成：`make gen-api-mason spec=auth.json`
+- 本地覆盖率报告：`make coverage-local`
+
+#### 无需新增自动化（当前阶段）
+
+- 再增加 `mason-*` 平行命令
+- 再创建第二套模板目录
+- 为低频静态文档页增加模板生成
+
+#### 新增 Feature 的标准落地步骤（显式注册模式）
+
+1. 生成 Feature 包：`make create-feature name=settings`
+2. 在根 `pubspec.yaml` 确认 path 依赖（命令会自动追加）
+3. 在 `lib/core/di/setup.dart` 显式接入：
+   - `FeatureRegistry.instance.register('feature_settings', setupFeatureSettings);`
+4. 统一执行：`FeatureRegistry.instance.runAll(sl);`
+5. 验证：`make lint && make test`
+
+> 提示：如果 `create-feature` 输出中出现“DI 自动注册”字样，以本节为准；当前稳定策略是“根 DI 显式注册 + 统一执行”。
+
+
 
 JSON spec 文件位于 `packages/infrastructure/api/spec/`（如 `auth.json`、`user.json` 等）。
 

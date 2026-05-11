@@ -6,10 +6,10 @@
 - 深入检查各模块实现与代码生成链路
 
 ## 阶段
-- [in_progress] 1. 收集当前项目结构、关键配置、测试与验证链路
-- [pending] 2. 深入检查 app、DI、router、feature、service、storage、api、domain
-- [pending] 3. 重新评估 mason/codegen 闭环、脚手架可扩展性
-- [pending] 4. 输出评分、问题清单、优化建议、场景验证
+- [completed] 1. 收集当前项目结构、关键配置、测试与验证链路
+- [completed] 2. 深入检查 app、DI、router、feature、service、storage、api、domain
+- [completed] 3. 重新评估 mason/codegen 闭环、脚手架可扩展性
+- [completed] 4. 输出评分、问题清单、优化建议、场景验证
 
 ## 关注点
 - 根应用是否已纳入 Melos/CI 验收
