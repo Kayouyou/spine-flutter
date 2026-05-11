@@ -326,8 +326,9 @@ void setupDependencies() {
 }
 ```
 
-> **设计说明**：FeatureRegistry 采用"显式注册 + 统一执行"模式。
+> **设计说明**：FeatureRegistry 采用"显式注册 + 统一执行"模式（收集器模式）。
 > Barrel 文件不依赖 import 副作用注册，避免热重载/冷启动时序问题。
+> 保留 FeatureRegistry 的价值：防重复注册保护、统一执行入口、为未来启动顺序控制预留扩展。
 > 新增 feature 只需在 setup.dart 加一行 `register` + 一行 `import`。
 
 ### 步骤 9：运行

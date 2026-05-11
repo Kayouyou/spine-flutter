@@ -1,15 +1,16 @@
 import 'package:get_it/get_it.dart';
 
-/// Feature DI 注册中心（收集器模式）
+/// Feature DI 注册中心（显式收集器模式）
 ///
-/// 各 Feature 的 setup 函数通过显式注册收集到此，
-/// Root DI 调用 runAll(sl) 统一执行。
+/// 设计意图：
+/// 1. 统一收集各 feature 的 setup 函数，runAll 统一执行，降低遗漏风险
+/// 2. 提供防重复注册保护（register 的 _names 去重）
+/// 3. 为未来可能的 feature 启动顺序控制（如 priority）预留扩展点
 ///
-/// 使用：
-///   // Root DI (setup.dart)
-///   FeatureRegistry.instance.register('feature_home', setupFeatureHome);
-///   FeatureRegistry.instance.register('feature_detail', setupFeatureDetail);
-///   FeatureRegistry.instance.runAll(sl);
+/// 为什么不直接在 root 调 setupFeatureXxx(sl)？
+/// - 直接调用也能工作，但 FeatureRegistry 提供了额外的安全性保障
+///   和统一执行入口。当 feature 数量增加时，runAll 比多行 setup 调用
+///   更清晰，且防重复机制能避免 hot reload 场景下的 GetIt 冲突。
 class FeatureRegistry {
   static final FeatureRegistry instance = FeatureRegistry._();
   FeatureRegistry._();

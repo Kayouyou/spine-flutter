@@ -35,7 +35,7 @@ void main() {
     RouteModuleRegistry.instance.clear();
   });
 
-  group('RouteModuleRegistry auto-registration', () {
+  group('RouteModuleRegistry explicit registration', () {
     test('get returns routes for feature_home', () {
       final routes = RouteModuleRegistry.instance.get('feature_home', ctx);
       expect(routes, isNotEmpty);

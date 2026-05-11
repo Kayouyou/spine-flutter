@@ -48,6 +48,12 @@ packages/services/auth/build/
 
 # Build artifacts in all packages
 **/build/
+
+# Test artifacts
+**/build/test_cache/
+**/test_hive/
+**/*.cache.dill.track.dill
+
 .worktrees/
 
 # FVM Version Cache
