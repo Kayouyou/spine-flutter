@@ -1,6 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'data_syncable.dart';
 
+/// ⚠️ SCAFFOLD MODE: 示例实现，仅展示 DataSync 模式用法。
+///
+/// 真实项目应替换为:
+/// - UserProfileSyncable（拉取用户信息）
+/// - ConfigSyncable（同步远程配置）
+/// - CacheWarmupSyncable（预热缓存）
+///
 /// 示例 Syncable：应用启动时同步用户偏好
 ///
 /// 这是 DataSync 模式的最小示例。真实场景中可替换为：

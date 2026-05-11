@@ -1,15 +1,14 @@
 import 'package:get_it/get_it.dart';
 
-/// Feature DI 注册中心
+/// Feature DI 注册中心（收集器模式）
 ///
-/// 每个 Feature 在自己的 barrel 文件中注册 setup 函数，
-/// Root DI 只需调用 runAll(sl) 即可运行全部 setup。
+/// 各 Feature 的 setup 函数通过显式注册收集到此，
+/// Root DI 调用 runAll(sl) 统一执行。
 ///
 /// 使用：
-///   // Feature barrel 文件中
+///   // Root DI (setup.dart)
 ///   FeatureRegistry.instance.register('feature_home', setupFeatureHome);
-///
-///   // Root DI
+///   FeatureRegistry.instance.register('feature_detail', setupFeatureDetail);
 ///   FeatureRegistry.instance.runAll(sl);
 class FeatureRegistry {
   static final FeatureRegistry instance = FeatureRegistry._();
@@ -20,7 +19,7 @@ class FeatureRegistry {
 
   /// 注册 Feature 的 DI setup 函数，返回 name 用于顶层赋值
   String register(String name, void Function(GetIt) setup) {
-    if (_names.contains(name)) return name; // hot reload 安全
+    if (_names.contains(name)) return name; // 防重复注册
     _names.add(name);
     _setups.add(setup);
     return name;

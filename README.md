@@ -162,7 +162,7 @@ make create-feature name=settings
 
 自动执行三步：生成文件 → `melos bs` 安装依赖 → `build_runner` 生成 freezed 代码。
 
-完成后路由和 DI 已通过 RouteModuleRegistry + FeatureRegistry 自动注册，无需手动操作。
+完成后 RouteModule 自动注册，DI 需在 `lib/core/di/setup.dart` 中显式注册一行（见手动方式步骤 8）。
 
 > 详细用法见 [Mason 代码模板](#mason-代码模板) 章节。
 
@@ -275,14 +275,15 @@ void setupFeatureSettings(ServiceLocator sl) {
 }
 ```
 
-### 步骤 7：添加路由（infrastructure 层）
+### 步骤 7：添加路由模块（infrastructure 层）
 
 ```dart
-// packages/infrastructure/routing/lib/app_router.dart
-GoRouter getRouter(RouteContext ctx) {
-  return GoRouter(
-    initialLocation: '/settings',
-    routes: [
+// packages/features/feature_settings/lib/src/routes/settings_route_module.dart
+class SettingsRouteModule extends RouteModule {
+  SettingsRouteModule(super.ctx);
+  @override
+  List<RouteBase> build() {
+    return [
       GoRoute(
         path: '/settings',
         builder: (context, state) => BlocProvider(
@@ -290,31 +291,44 @@ GoRouter getRouter(RouteContext ctx) {
           child: const SettingsPage(),
         ),
       ),
-    ],
-  );
+    ];
+  }
 }
-```
 
-### 步骤 8：根项目注册（lib 层）
-
-```dart
-// lib/core/di/setup.dart
-import 'package:feature_settings/feature_settings.dart';
-
-void setupDependencies() {
-  // ... 其他注册
+// packages/features/feature_settings/lib/src/di/setup.dart
+void setupFeatureSettings(GetIt sl) {
+  // 注册 DI
+  sl.registerFactory<SettingsRepository>(() => SettingsRepositoryImpl(sl<KeyValueStorage>()));
+  sl.registerFactory<SettingsCubit>(() => SettingsCubit(sl<SettingsRepository>()));
   
-  // 注册新功能
-  setupFeatureSettings(sl);
+  // 路由自动注册（FeatureRegistry + RouteModuleRegistry 自动接入）
+  RouteModuleRegistry.instance.register('feature_settings', (ctx) => SettingsRouteModule(ctx));
 }
 ```
 
-```dart
-// pubspec.yaml（添加本地包依赖）
+### 步骤 8：添加根依赖 + 显式注册
+
+```yaml
+# pubspec.yaml（添加本地包依赖）
 dependencies:
   feature_settings:
     path: packages/features/feature_settings
 ```
+
+```dart
+// lib/core/di/setup.dart（添加一行 import + 一行 register）
+import 'package:feature_settings/feature_settings.dart';
+
+void setupDependencies() {
+  // ... 其他注册
+  FeatureRegistry.instance.register('feature_settings', setupFeatureSettings);
+  FeatureRegistry.instance.runAll(sl);
+}
+```
+
+> **设计说明**：FeatureRegistry 采用"显式注册 + 统一执行"模式。
+> Barrel 文件不依赖 import 副作用注册，避免热重载/冷启动时序问题。
+> 新增 feature 只需在 setup.dart 加一行 `register` + 一行 `import`。
 
 ### 步骤 9：运行
 
@@ -706,6 +720,13 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 最近架构演进
 
+### FeatureRegistry 收口为显式注册模式（2026-05-11）
+- 移除 barrel 文件中的 `FeatureRegistry.register`（import 副作用不稳定，冷启动/热重载时序问题）
+- `lib/core/di/setup.dart` 显式 `register` + `runAll` 统一执行
+- 新增 `test/unit/di/feature_registry_test.dart`（5 个守门测试）
+- 新增 `test/unit/routing/route_module_registry_test.dart`（6 个守门测试）
+- README 文档对齐显式注册行为
+
 ### Result<T, E> 模式（2026-05-09）
 - domain 层引入 `Result<T, E>` 密封类替代 try-catch 错误处理
 - 所有仓储接口/实现返回 `Result<T, DomainException>`
@@ -739,20 +760,20 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 
 ## 架构评分
 
-当前架构评分：**7.8/10**（审计后调整，目标 9.0/10）
+当前架构评分：**8.8/10**（2026-05-10 审计后为 7.8，经 P0-P3 修复后升至 8.8，目标 9.2/10）
 
 > 📌 2026-05 审计发现：原 9.0/10 评分偏高，部分设计意图未完全落地。详见 [审计发现摘要](#审计发现摘要)。
 
 ### 审计发现摘要
 
-| 维度 | 设计意图 | 实际现状 | 差距 |
-|------|---------|---------|------|
-| 整体架构 | 8.8/10 | 7.x | 1.0+ |
-| Auth DI | 依赖注入 | 页面直接 bypass | 严重 |
-| Repository 模式 | 接口在 domain | 模板生成在 feature | 中等 |
-| 类型安全 | 全类型化 | Map\<String,dynamic\> 在 domain 层 | 中等 |
-| DataSync | 按 spec 需实现 | 空实现 | 中等 |
-| 路由 | 模块自动注册 | 手动组装 | 中等 |
+| 维度 | 设计意图 | 实际现状 | 差距 | 状态 |
+|------|---------|---------|------|------|
+| Auth DI | 依赖注入 | 页面直接 bypass | 严重 | 已修复 |
+| Repository 模式 | 接口在 domain | 模板生成在 feature | 中等 | 已修复 |
+| 类型安全 | 全类型化 | Map\<String,dynamic\> 在 domain 层 | 中等 | P4 待处理 |
+| DataSync | 按 spec 需实现 | 空实现 | 中等 | 已标注 |
+| 路由自动注册 | 全链路自动 | import 副作用不稳定 | 中等 | **收口为显式注册** |
+| 测试守门 | 自动接入有测试 | 无 | 中等 | **已修复** |
 
 | 维度 | 评分 | 说明 |
 |------|------|------|

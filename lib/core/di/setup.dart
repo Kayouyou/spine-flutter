@@ -1,5 +1,4 @@
 // Flutter imports:
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -93,9 +92,12 @@ void setupDependencies() {
   sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
 
   // ===== Step 5: 业务功能层 =====
-  setupFeatureHome(sl);
-  setupFeatureDetail(sl);
-  setupFeatureAuth(sl);
+  // 显式注册后 runAll 统一执行。
+  // 新增 feature 时只需在此处加一行 register + 一行 import。
+  FeatureRegistry.instance.register('feature_home', setupFeatureHome);
+  FeatureRegistry.instance.register('feature_detail', setupFeatureDetail);
+  FeatureRegistry.instance.register('feature_auth', setupFeatureAuth);
+  FeatureRegistry.instance.runAll(sl);
 
   configureEasyLoading();
 }

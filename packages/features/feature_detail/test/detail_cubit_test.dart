@@ -56,7 +56,7 @@ void main() {
         isA<DetailError>(),
       ],
       verify: (cubit) {
-        expect(cubit.state.runtimeType, DetailError);
+        expect(cubit.state, isA<DetailError>());
       },
     );
 

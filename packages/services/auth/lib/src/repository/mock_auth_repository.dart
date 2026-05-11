@@ -1,6 +1,14 @@
 import 'package:domain/domain.dart';
 
-/// Mock 认证仓储实现（用于测试和脚手架）
+/// ⚠️ SCAFFOLD MODE: Mock 实现，仅用于脚手架演示和测试。
+///
+/// 真实项目应替换为:
+/// 1. 在 setupAuth 中使用 AuthRepositoryImpl（见同目录 auth_repository_impl.dart）
+/// 2. 或通过环境变量切换 mock/real:
+///    sl.registerLazySingleton<AuthRepository>(() {
+///      if (kDebugMode) return MockAuthRepository();
+///      return AuthRepositoryImpl(sl<UserApi>());
+///    });
 ///
 /// 实现 AuthRepository 接口，返回 Result 类型。
 class MockAuthRepository implements AuthRepository {
