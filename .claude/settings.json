@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:github.com)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Skill(fewer-permission-prompts)",
+      "Bash(GIT_SSH_COMMAND=\"ssh\" git push)",
+      "Read(//Users/yeyangyang/.claude/skills/brainstorming/scripts/**)",
+      "Bash(node server.cjs --port 52341 --screen-dir /var/folders/c2/_bccwf097r3158w3mzdt4hcr0000gn/T/brainstorm-session/content --state-dir /var/folders/c2/_bccwf097r3158w3mzdt4hcr0000gn/T/brainstorm-session/state)",
+      "Bash(curl -s http://localhost:52341/health)",
+      "Bash(flutter test*)",
+      "Bash(flutter analyze*)",
+      "Bash(dart test*)",
+      "Bash(dart analyze*)",
+      "Bash(flutter pub get*)",
+      "Bash(melos test*)",
+      "Bash(melos validate)",
+      "Bash(melos exec*)",
+      "Bash(melos bs)",
+      "Bash(melos analyze*)",
+      "Bash(flutter gen-l10n)",
+      "Bash(mkdir -p *)",
+      "Bash(sleep *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

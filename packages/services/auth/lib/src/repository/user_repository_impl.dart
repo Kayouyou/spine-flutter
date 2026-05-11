@@ -1,4 +1,4 @@
-// packages/services/auth/lib/src/repository/auth_repository_impl.dart
+// packages/services/auth/lib/src/repository/user_repository_impl.dart
 import 'package:dio/dio.dart';
 import 'package:api/api.dart';
 import 'package:domain/domain.dart';
@@ -7,10 +7,10 @@ import 'package:domain/domain.dart';
 ///
 /// 通过 UserApi（Retrofit 代码生成）访问后端，将 DioException 映射为 DomainException。
 /// 返回 Result 类型处理成功和异常。
-class AuthRepositoryImpl implements UserRepository {
+class UserRepositoryImpl implements UserRepository {
   final UserApi _userApi;
 
-  AuthRepositoryImpl(this._userApi);
+  UserRepositoryImpl(this._userApi);
 
   @override
   Future<Result<User, DomainException>> getCurrentUser() async {

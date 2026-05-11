@@ -3,7 +3,7 @@ import 'package:domain/domain.dart';
 /// ⚠️ SCAFFOLD MODE: Mock 实现，仅用于脚手架演示和测试。
 ///
 /// 真实项目应替换为:
-/// 1. 在 setupAuth 中使用 AuthRepositoryImpl（见同目录 auth_repository_impl.dart）
+/// 1. 在 setupAuth 中使用 UserRepositoryImpl（见同目录 user_repository_impl.dart）
 /// 2. 或通过环境变量切换 mock/real:
 ///    sl.registerLazySingleton<AuthRepository>(() {
 ///      if (kDebugMode) return MockAuthRepository();

@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:api/api.dart';
 import 'package:domain/domain.dart';
 import 'package:key_value_storage/key_value_storage.dart';
-import '../repository/auth_repository_impl.dart';
+import '../repository/user_repository_impl.dart';
 import '../cubit/auth_cubit.dart';
 import '../repository/mock_auth_repository.dart';
 import '../manager.dart';
@@ -12,7 +12,7 @@ import '../manager.dart';
 void setupAuth(GetIt sl) {
   sl.registerLazySingleton<UserRepository>(() {
     final userApi = UserApi(sl<Dio>());
-    return AuthRepositoryImpl(userApi);
+    return UserRepositoryImpl(userApi);
   });
 
   sl.registerFactory<AuthRepository>(() => MockAuthRepository()); // ⚠️ SCAFFOLD MODE — 见 mock_auth_repository.dart 注释

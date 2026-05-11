@@ -9,11 +9,11 @@ class MockUserApi extends Mock implements UserApi {}
 
 void main() {
   late MockUserApi mockApi;
-  late AuthRepositoryImpl repo;
+  late UserRepositoryImpl repo;
 
   setUp(() {
     mockApi = MockUserApi();
-    repo = AuthRepositoryImpl(mockApi);
+    repo = UserRepositoryImpl(mockApi);
   });
 
   group('getCurrentUser', () {
