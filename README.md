@@ -757,6 +757,12 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 - 新增 `make gen-api-mason` / `gen-all-apis-mason` / `refresh-api-mason` 目标
 - 输出与 `gen_api.dart` **完全一致**，Dart 脚本保留为备用
 
+### AuthRepository 返回类型增强 + Usecase 补齐（2026-05-12）
+- `AuthRepository.login()/register()` 返回 `Result<LoginResult>` 携带 `userId` + `token`，替代裸 `bool`，消除调用方 hardcode
+- 新增 `LoginResult` 模型（domain 层），统一认证结果数据结构
+- 新增 3 个 Usecase（`LoginUseCase` / `GetHomeDataUseCase` / `GetDetailDataUseCase`），收拢业务编排到 domain 层
+- 删除 `feature_auth` 包内的重复 `MockAuthRepository`
+
 ---
 
 ## 架构评分

@@ -14,12 +14,11 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _repository.login(username, password);
     // 穷尽匹配处理结果
     result.when(
-      success: (success) {
-        if (success) {
-          emit(state.copyWith(status: AuthStatus.loggedIn, userId: 'mock-user-1'));
-        } else {
-          emit(state.copyWith(status: AuthStatus.error, errorMessage: '登录失败'));
-        }
+      success: (loginResult) {
+        emit(state.copyWith(
+          status: AuthStatus.loggedIn,
+          userId: loginResult.userId,
+        ));
       },
       failure: (error) => emit(state.copyWith(
         status: AuthStatus.error,

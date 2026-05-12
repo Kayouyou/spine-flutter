@@ -20,9 +20,9 @@ class LoginCubit extends Cubit<LoginState> {
 
     final result = await _repository.login(state.username, state.password);
     result.when(
-      success: (success) => emit(state.copyWith(
-        status: success ? LoginStatus.success : LoginStatus.error,
-        errorMessage: success ? null : '用户名或密码错误',
+      success: (_) => emit(state.copyWith(
+        status: LoginStatus.success,
+        errorMessage: null,
       ),),
       failure: (error) => emit(state.copyWith(
         status: LoginStatus.error,
@@ -36,9 +36,9 @@ class LoginCubit extends Cubit<LoginState> {
 
     final result = await _repository.register(state.username, state.password);
     result.when(
-      success: (success) => emit(state.copyWith(
-        status: success ? LoginStatus.success : LoginStatus.error,
-        errorMessage: success ? null : '注册失败',
+      success: (_) => emit(state.copyWith(
+        status: LoginStatus.success,
+        errorMessage: null,
       ),),
       failure: (error) => emit(state.copyWith(
         status: LoginStatus.error,

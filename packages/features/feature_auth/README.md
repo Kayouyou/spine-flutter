@@ -17,9 +17,6 @@ feature_auth/
 │       ├── cubit/
 │       │   ├── login_cubit.dart    # LoginCubit（login/reset）
 │       │   └── login_state.dart    # LoginState（initial/loading/success/error）
-│       ├── repository/
-│       │   ├── auth_repository.dart       # AuthRepository 抽象接口
-│       │   └── mock_auth_repository.dart  # Mock 实现（延迟模拟）
 │       ├── ui/
 │       │   ├── login_page.dart     # 登录页面（支持 redirect）
 │       │   └── register_page.dart  # 注册页面（支持 redirect）
@@ -42,7 +39,6 @@ import 'package:feature_auth/feature_auth.dart';
 ## 注册方式
 
 - LoginCubit: **Factory**（页面级，每次创建新实例）
-- MockAuthRepository: Factory
 
 ## 依赖
 
