@@ -26,6 +26,7 @@
 - [Domain 测试](#domain-测试)
 - [Login/Register 示例](#loginregister-示例)
 - [测试覆盖率](#测试覆盖率)
+- [Solo + AI 开发指南](docs/solo-ai-scaffold-guide.md)
 
 ---
 
@@ -846,6 +847,14 @@ melos clean       # 清理所有包构建缓存
 
 `melos.yaml` 定义包路径、脚本命令和 bootstrapping 行为。
 
+### 依赖版本一致性
+
+```bash
+melos run check:versions
+```
+
+用于检查 workspace 中关键依赖（`get_it`, `go_router`, `flutter_bloc`, `freezed_annotation`, `freezed`, `build_runner`）是否发生版本漂移。
+
 ---
 
 ## Mason 代码模板
@@ -999,7 +1008,40 @@ make refresh-api
 
 ---
 
-## 路由守卫
+## 可选模块（BootstrapOptions）
+
+高级能力默认关闭，可按需打开：
+
+```dart
+// main.dart 或其他入口
+import 'package:my_app/core/bootstrap/bootstrap_options.dart';
+import 'package:my_app/core/startup/launcher.dart';
+
+Future<void> main() async {
+  await AppLauncher.launch(
+    const MyApp(),
+    bootstrapOptions: const BootstrapOptions(
+      enableDebugTools: true,   // Alice HTTP Inspector
+      enableDataSync: true,     // 启动时数据同步
+      enableUpgradePrompt: true, // 版本更新检查
+    ),
+  );
+}
+```
+
+| 选项 | 默认 | 说明 |
+|------|------|------|
+| `enableDebugTools` | false | 启用 Alice HTTP Inspector（摇一摇打开） + DEBUG 角标 |
+| `enableDataSync` | false | 启用启动时数据同步（DataSyncManager） |
+| `enableUpgradePrompt` | false | 启用版本更新检查提示 |
+
+### 添加新选项
+
+1. 在 `BootstrapOptions` 中加 `final bool` 属性（默认 `false`）
+2. 在 `setupDependencies()` / `app.dart` / `launcher.dart` 对应位置读取选项
+3. 默认关闭，保持 solo 项目最小启动
+
+---
 
 环境自动启用（debug/staging）。白名单：`/`, `/home`, `/login`, `/register`。
 
