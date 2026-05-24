@@ -813,6 +813,19 @@ melos run validate
 
 ---
 
+### 一键体检
+
+```bash
+make scaffold-check
+```
+
+该命令专门检查脚手架契约是否仍然成立：
+- Feature 模板不再使用副作用注册
+- 根 composition root 仍保留显式注册
+- workspace 级 analyze / test / l10n / deps 校验通过
+
+---
+
 ## Melos 多包管理
 
 项目使用 Melos 管理 Monorepo 多包依赖。

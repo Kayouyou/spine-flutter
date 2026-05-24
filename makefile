@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help gen-api-mason gen-all-apis-mason refresh-api-mason
+.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help gen-api-mason gen-all-apis-mason refresh-api-mason scaffold-check
 
 # ============================================================================
 # 基础命令
@@ -180,6 +180,14 @@ add-api:
 	@echo "   }"
 	@echo "4. 在 DI setup 中注册 Repository"
 	@echo "5. 参考 packages/services/auth/lib/src/repository/"
+
+# ============================================================================
+# 脚手架体检
+# ============================================================================
+
+scaffold-check:
+	@chmod +x scripts/scaffold_check.sh
+	@./scripts/scaffold_check.sh
 
 # ============================================================================
 # Catch-all 规则（防止未知目标报错）
