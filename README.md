@@ -308,28 +308,14 @@ void setupFeatureSettings(GetIt sl) {
 
 ### 步骤 8：添加根依赖 + 显式注册
 
-```yaml
-# pubspec.yaml（添加本地包依赖）
-dependencies:
-  feature_settings:
-    path: packages/features/feature_settings
-```
+当前项目的唯一推荐做法：
 
-```dart
-// lib/core/di/setup.dart（添加一行 import + 一行 register）
-import 'package:feature_settings/feature_settings.dart';
+1. 在根 `pubspec.yaml` 添加 path 依赖
+2. 在 `lib/core/di/setup.dart` 添加 import
+3. 调用 `FeatureRegistry.instance.register('feature_settings', setupFeatureSettings);`
+4. 保持 `FeatureRegistry.instance.runAll(sl);` 作为统一执行入口
 
-void setupDependencies() {
-  // ... 其他注册
-  FeatureRegistry.instance.register('feature_settings', setupFeatureSettings);
-  FeatureRegistry.instance.runAll(sl);
-}
-```
-
-> **设计说明**：FeatureRegistry 采用"显式注册 + 统一执行"模式（收集器模式）。
-> Barrel 文件不依赖 import 副作用注册，避免热重载/冷启动时序问题。
-> 保留 FeatureRegistry 的价值：防重复注册保护、统一执行入口、为未来启动顺序控制预留扩展。
-> 新增 feature 只需在 setup.dart 加一行 `register` + 一行 `import`。
+> 不再依赖 import 副作用自动注册。
 
 ### 步骤 9：运行
 

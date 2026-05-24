@@ -180,6 +180,12 @@ grep -r "GetIt.instance" packages/features/
 
 如果发现违规，需要重构为构造函数注入模式。
 
+## FeatureRegistry 规则
+
+- `FeatureRegistry.instance.register(...)` 只允许出现在 `lib/core/di/setup.dart`
+- Feature 包可以暴露 `setupFeatureXxx`，但不负责自行接入根应用
+- Mason 模板生成的代码不得依赖 import 副作用完成注册
+
 ## 相关文档
 
 - [环境配置](./environment-config.md) - IAppConfig 正确使用方式

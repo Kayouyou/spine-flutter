@@ -82,7 +82,11 @@ create-feature:
 	@echo "=== 5/4 运行分析验证 ==="
 	cd packages/features/feature_$(name) && dart analyze
 	@echo ""
-	@echo "=== ✅ 完成！路由和 DI 已通过 RouteModuleRegistry 自动注册 ==="
+	@echo ""
+	@echo "=== ✅ 完成！下一步请在 lib/core/di/setup.dart 中显式注册 ==="
+	@echo "1. 添加 feature_$(name) 的 import"
+	@echo "2. 添加 FeatureRegistry.instance.register('feature_$(name)', setupFeatureXxx);"
+	@echo "然后运行: make lint && make test"
 
 # 生成 Retrofit API 模块
 create-api:
