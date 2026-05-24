@@ -16,20 +16,29 @@ void main() {
     });
 
     test('build returns list with two routes', () {
-      final module = DetailRouteModule(ctx);
+      final module = DetailRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       expect(routes.length, 2);
     });
 
     test('first route path is /detail', () {
-      final module = DetailRouteModule(ctx);
+      final module = DetailRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       final detailRoute = routes[0] as GoRoute;
       expect(detailRoute.path, '/detail');
     });
 
     test('second route path is /detail/:id', () {
-      final module = DetailRouteModule(ctx);
+      final module = DetailRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       final detailWithIdRoute = routes[1] as GoRoute;
       expect(detailWithIdRoute.path, '/detail/:id');

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
 import '../cubit/home_cubit.dart';
 import '../ui/home_page.dart';
 
-/// 首页路由模块
-///
-/// 包含路径: /home
 class HomeRouteModule extends RouteModule {
-  const HomeRouteModule(super.ctx);
+  final HomeCubit Function() createCubit;
+  final VoidCallback? onOpenDebugInspector;
+
+  const HomeRouteModule(
+    super.ctx, {
+    required this.createCubit,
+    this.onOpenDebugInspector,
+  });
 
   @override
   List<RouteBase> build() {
@@ -19,8 +22,10 @@ class HomeRouteModule extends RouteModule {
         path: '/home',
         pageBuilder: (context, state) {
           Widget page = BlocProvider(
-            create: (_) => GetIt.instance<HomeCubit>(),
-            child: const HomePage(),
+            create: (_) => createCubit(),
+            child: HomePage(
+              onOpenDebugInspector: onOpenDebugInspector,
+            ),
           );
           if (ctx.routeWrapper != null) {
             page = ctx.routeWrapper!(page);

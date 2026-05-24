@@ -7,10 +7,14 @@ import 'package:feature_detail/src/repository/detail_repository_impl.dart';
 import '../routes/detail_route_module.dart';
 
 void setupFeatureDetail(GetIt sl) {
-  // DI 注册
   sl.registerFactory<DetailRepository>(() => DetailRepositoryImpl(sl<Dio>()));
   sl.registerFactory<DetailCubit>(() => DetailCubit(sl<DetailRepository>()));
-  
-  // 路由注册
-  RouteModuleRegistry.instance.register('feature_detail', (ctx) => DetailRouteModule(ctx));
+
+  RouteModuleRegistry.instance.register(
+    'feature_detail',
+    (ctx) => DetailRouteModule(
+      ctx,
+      createCubit: () => sl<DetailCubit>(),
+    ),
+  );
 }

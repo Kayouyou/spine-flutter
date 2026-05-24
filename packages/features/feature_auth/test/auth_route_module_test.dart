@@ -16,20 +16,29 @@ void main() {
     });
 
     test('build returns list with two routes', () {
-      final module = AuthRouteModule(ctx);
+      final module = AuthRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       expect(routes.length, 2);
     });
 
     test('first route path is /login', () {
-      final module = AuthRouteModule(ctx);
+      final module = AuthRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       final loginRoute = routes[0] as GoRoute;
       expect(loginRoute.path, '/login');
     });
 
     test('second route path is /register', () {
-      final module = AuthRouteModule(ctx);
+      final module = AuthRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used'),
+      );
       final routes = module.build();
       final registerRoute = routes[1] as GoRoute;
       expect(registerRoute.path, '/register');

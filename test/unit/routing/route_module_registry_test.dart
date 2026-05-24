@@ -19,15 +19,24 @@ void main() {
     // since clear() wiped them
     RouteModuleRegistry.instance.register(
       'feature_home',
-      (c) => HomeRouteModule(c),
+      (c) => HomeRouteModule(
+        c,
+        createCubit: () => throw UnimplementedError('not used'),
+      ),
     );
     RouteModuleRegistry.instance.register(
       'feature_detail',
-      (c) => DetailRouteModule(c),
+      (c) => DetailRouteModule(
+        c,
+        createCubit: () => throw UnimplementedError('not used'),
+      ),
     );
     RouteModuleRegistry.instance.register(
       'feature_auth',
-      (c) => AuthRouteModule(c),
+      (c) => AuthRouteModule(
+        c,
+        createCubit: () => throw UnimplementedError('not used'),
+      ),
     );
   });
 

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:routing/routing.dart';
 import '../cubit/detail_cubit.dart';
 import '../ui/detail_page.dart';
 
-/// 详情页路由模块
-///
-/// 包含路径: /detail, /detail/:id
 class DetailRouteModule extends RouteModule {
-  const DetailRouteModule(super.ctx);
+  final DetailCubit Function() createCubit;
+
+  const DetailRouteModule(
+    super.ctx, {
+    required this.createCubit,
+  });
 
   @override
   List<RouteBase> build() {
@@ -19,7 +20,7 @@ class DetailRouteModule extends RouteModule {
         path: '/detail',
         pageBuilder: (context, state) {
           Widget page = BlocProvider(
-            create: (_) => GetIt.instance<DetailCubit>(),
+            create: (_) => createCubit(),
             child: const DetailPage(),
           );
           if (ctx.routeWrapper != null) {
@@ -33,7 +34,7 @@ class DetailRouteModule extends RouteModule {
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'];
           Widget page = BlocProvider(
-            create: (_) => GetIt.instance<DetailCubit>(),
+            create: (_) => createCubit(),
             child: DetailPage(id: id),
           );
           if (ctx.routeWrapper != null) {

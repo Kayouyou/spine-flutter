@@ -16,13 +16,19 @@ void main() {
     });
 
     test('build returns list with one route for /home', () {
-      final module = HomeRouteModule(ctx);
+      final module = HomeRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used in this test'),
+      );
       final routes = module.build();
       expect(routes.length, 1);
     });
 
     test('route path is /home', () {
-      final module = HomeRouteModule(ctx);
+      final module = HomeRouteModule(
+        ctx,
+        createCubit: () => throw UnimplementedError('not used in this test'),
+      );
       final routes = module.build();
       final route = routes.first as GoRoute;
       expect(route.path, '/home');
