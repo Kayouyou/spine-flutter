@@ -262,8 +262,8 @@ class SettingsCubit extends Cubit<SettingsState> {
 ### 步骤 6：DI 注册（feature 层）
 
 ```dart
-// packages/features/feature_settings/lib/di/setup.dart
-void setupFeatureSettings(ServiceLocator sl) {
+// packages/features/feature_settings/lib/src/di/setup.dart
+void setupFeatureSettings(GetIt sl) {
   // 注册仓储实现
   sl.registerFactory<SettingsRepository>(
     () => SettingsRepositoryImpl(sl<KeyValueStorage>()),
@@ -273,6 +273,15 @@ void setupFeatureSettings(ServiceLocator sl) {
   sl.registerFactory<SettingsCubit>(
     () => SettingsCubit(sl<SettingsRepository>()),
   );
+  
+  // 路由注册：通过闭包把 cubit 工厂传给 RouteModule
+  RouteModuleRegistry.instance.register(
+    'feature_settings',
+    (ctx) => SettingsRouteModule(
+      ctx,
+      createCubit: () => sl<SettingsCubit>(),
+    ),
+  );
 }
 ```
 
@@ -281,29 +290,31 @@ void setupFeatureSettings(ServiceLocator sl) {
 ```dart
 // packages/features/feature_settings/lib/src/routes/settings_route_module.dart
 class SettingsRouteModule extends RouteModule {
-  SettingsRouteModule(super.ctx);
+  final SettingsCubit Function() createCubit;
+
+  const SettingsRouteModule(
+    super.ctx, {
+    required this.createCubit,
+  });
+
   @override
   List<RouteBase> build() {
     return [
       GoRoute(
         path: '/settings',
-        builder: (context, state) => BlocProvider(
-          create: (context) => sl<SettingsCubit>()..loadSettings(),
-          child: const SettingsPage(),
-        ),
+        pageBuilder: (context, state) {
+          Widget page = BlocProvider(
+            create: (_) => createCubit()..loadSettings(),
+            child: const SettingsPage(),
+          );
+          if (ctx.routeWrapper != null) {
+            page = ctx.routeWrapper!(page);
+          }
+          return MaterialPage(child: page);
+        },
       ),
     ];
   }
-}
-
-// packages/features/feature_settings/lib/src/di/setup.dart
-void setupFeatureSettings(GetIt sl) {
-  // 注册 DI
-  sl.registerFactory<SettingsRepository>(() => SettingsRepositoryImpl(sl<KeyValueStorage>()));
-  sl.registerFactory<SettingsCubit>(() => SettingsCubit(sl<SettingsRepository>()));
-  
-  // 路由自动注册（FeatureRegistry + RouteModuleRegistry 自动接入）
-  RouteModuleRegistry.instance.register('feature_settings', (ctx) => SettingsRouteModule(ctx));
 }
 ```
 
@@ -408,6 +419,7 @@ melos test:coverage
 | `make create-api name=xxx baseUrl=/api/v1 [modelName=xxx]` | 创建 Retrofit API 模块（指定 modelName=dynamic 可不传模型） |
 | `make scaffold-api name=xxx baseUrl=/api/v1` | 一键创建 Model + API（create-model + create-api） |
 | `make create-hive-model name=xxx typeId=N` | 创建 @HiveType 本地存储模型 |
+| `make scaffold-check` | 脚手架健康检查（契约测试 + workspace 验证） |
 | `make add-api` | 查看添加 API 端点步骤 |
 | `make dev` | 开发环境运行（env/.env.dev） |
 | `make staging` | 预发布环境运行（env/.env.staging） |
@@ -707,6 +719,14 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 ---
 
 ## 最近架构演进
+
+### 脚手架硬链路闭环（2026-05-24）
+- 创建 `scripts/add_feature_dependency.py`（跨平台替代 macOS 不兼容的 sed），`make create-feature` 完整跑通
+- feature 模板自包含：新增本地 `{{name}}_repository.dart`，state 改用 `Map<String, dynamic>` 替代不存在的 `{{name.pascalCase()}}Data`
+- 移除 feature 包内直接 `GetIt.instance`，RouteModule 改为 `createCubit` 工厂注入 + `pageBuilder` + `ctx.routeWrapper`
+- `BootstrapOptions` 可选模块：Debug Tools / Data Sync / Upgrade Prompt 默认关闭
+- 契约测试覆盖 7 项：显式注册、无 GetIt 直接访问、脚本存在性、路由工厂、版本检查含 bricks、模板 pubspec 对齐
+- 新增 `make scaffold-check` 作为一键验收入口
 
 ### FeatureRegistry 收口为显式注册模式（2026-05-11）
 - 移除 barrel 文件中的 `FeatureRegistry.register`（import 副作用不稳定，冷启动/热重载时序问题）
