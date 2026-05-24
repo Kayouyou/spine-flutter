@@ -25,6 +25,26 @@
 | 方法数量 | 多个（login、logout） | 单一（execute） |
 | 注册方式 | Singleton | Factory |
 
+## 业务服务层 vs 业务功能层（容易搞混）
+
+很多新接手的人容易把 **services/** 和 **features/** 搞混，两者的区别：
+
+| 维度 | services/（业务服务层） | features/（业务功能层） |
+|------|------------------------|------------------------|
+| 有没有页面 | ❌ 没有 UI | ✅ 有页面，用户直接看到 |
+| 面向谁 | 面向 features，提供全局能力 | 面向用户，用户可操作 |
+| 跨功能？ | ✅ 是，任何 feature 都能用 | ❌ 否，一个 feature 只做一件事 |
+| 生命周期 | 全局单例（registerSingleton） | 每次路由创建新实例（registerFactory） |
+| 典型内容 | AuthCubit、NetworkCubit、LocaleCubit | HomeCubit+HomePage、DetailCubit+DetailPage |
+| 依赖方向 | 依赖 infrastructure（Dio, Hive） | 依赖 services（通过 Repository 注入） |
+| DI 注册位置 | `services/x/lib/src/di/setup.dart` | `features/x/lib/src/di/setup.dart` |
+
+**依赖方向：features → services → infrastructure**
+
+以登录为例：
+- **services/auth** 提供 `AuthRepository`（认证能力）、`AuthCubit`（全局认证状态）
+- **features/feature_auth** 使用这些能力，组装成 `LoginPage` + `LoginCubit`（用户能看到的登录页面）
+
 ## 与其他层协作
 
 ### 调用 UseCase
