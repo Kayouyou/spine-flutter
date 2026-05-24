@@ -15,35 +15,57 @@
 | 独立测试 | ✓ 单独运行 | ✗ 必须跑整体 |
 | 依赖控制 | ✓ feature 只依赖需要的 | ✗ 依赖所有 |
 
-## 业务服务 vs UseCase 判断标准
+## UseCase vs 业务服务 vs 业务功能（三个概念的区别）
 
-| 维度 | 业务服务（AuthManager） | UseCase（GetUserInfoUseCase） |
-|-----|----------------------|---------------------------|
-| 生命周期 | app 级别（长期存在） | 请求级别（用完销毁） |
-| 有状态 | ✓ 有（isLoggedIn） | ✗ 无状态 |
-| 职责 | 提供某种**能力** | 执行某个**任务** |
-| 方法数量 | 多个（login、logout） | 单一（execute） |
-| 注册方式 | Singleton | Factory |
+很多新接手的人容易把这三个搞混，用一句话记忆：
 
-## 业务服务层 vs 业务功能层（容易搞混）
+> **UseCase** → "一次任务"（调用 execute，做完就走）
+> **Service** → "一个管家"（全局管家，长期在位）
+> **Feature** → "一间店铺"（有门面有内容，用户直接逛）
 
-很多新接手的人容易把 **services/** 和 **features/** 搞混，两者的区别：
+| 维度 | UseCase（domain/usecases） | Service（services/） | Feature（features/） |
+|------|---------------------------|---------------------|---------------------|
+| **一句话** | 执行一个业务任务 | 提供一种全局能力 | 提供一个用户功能页面 |
+| **在哪层** | domain（最核心） | services（中间层） | features（最外层） |
+| **有状态？** | ❌ 无状态，用完就丢 | ✅ 有状态，长期存活 | ✅ 有状态，随页面生命周期 |
+| **方法数** | 只有 `execute()` 一个 | 多个（login/logout/refresh...） | 多个（Cubit/Page 组合） |
+| **面向谁** | 面向调用者，编排逻辑 | 面向 features，提供能力 | 面向用户，展示界面 |
+| **生命周期** | Factory（每次新建） | Singleton（全局唯一） | Factory（路由创建时新建） |
+| **注册位置** | domain 或 services 的 setup | services/x/di/setup.dart | features/x/di/setup.dart |
+
+**以"用户登录"为例，三者怎么协作：**
+
+```
+用户操作 → LoginPage（Feature）
+              │
+              │ 调用 LoginCubit.login()
+              ▼
+        LoginCubit（Feature 层）
+              │
+              │ 调用 UseCase 或直接调用 Repository
+              ▼
+        LoginUseCase（domain/usecases）
+              │
+              │ 编排多个操作：验证 → 调 API → 存 Token → 触发同步
+              ▼
+        AuthRepository（services/auth）
+              │
+              │ 发起真实 HTTP 请求
+              ▼
+        AuthManager（services/auth）
+              │
+              │ 登录后全局状态管理：isLoggedIn、token、用户信息
+```
+
+## 业务服务层 vs 业务功能层（补充说明）
 
 | 维度 | services/（业务服务层） | features/（业务功能层） |
 |------|------------------------|------------------------|
 | 有没有页面 | ❌ 没有 UI | ✅ 有页面，用户直接看到 |
-| 面向谁 | 面向 features，提供全局能力 | 面向用户，用户可操作 |
 | 跨功能？ | ✅ 是，任何 feature 都能用 | ❌ 否，一个 feature 只做一件事 |
-| 生命周期 | 全局单例（registerSingleton） | 每次路由创建新实例（registerFactory） |
-| 典型内容 | AuthCubit、NetworkCubit、LocaleCubit | HomeCubit+HomePage、DetailCubit+DetailPage |
 | 依赖方向 | 依赖 infrastructure（Dio, Hive） | 依赖 services（通过 Repository 注入） |
-| DI 注册位置 | `services/x/lib/src/di/setup.dart` | `features/x/lib/src/di/setup.dart` |
 
 **依赖方向：features → services → infrastructure**
-
-以登录为例：
-- **services/auth** 提供 `AuthRepository`（认证能力）、`AuthCubit`（全局认证状态）
-- **features/feature_auth** 使用这些能力，组装成 `LoginPage` + `LoginCubit`（用户能看到的登录页面）
 
 ## 与其他层协作
 
