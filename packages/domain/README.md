@@ -8,9 +8,11 @@
 |------|------|-------------|
 | models/ | 共用数据模型 | 否（纯 Dart） |
 | repositories/ | 仓储抽象接口 | 否 |
-| exceptions/ | 领域异常体系 | 否 |
-| enums/ | 共用枚举 | 否 |
 | usecases/ | 业务逻辑编排（UseCase） | 否 |
+| exceptions/ | 领域异常体系（sealed class） | 否 |
+| enums/ | 共用枚举 | 否 |
+| config/ | 应用配置抽象（IAppConfig） | 否 |
+| result.dart | 统一结果类型 Result\<T, E\> | 否 |
 
 ## 依赖方向
 
