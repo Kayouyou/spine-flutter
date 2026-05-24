@@ -12,25 +12,27 @@ class DebugToolsWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!kDebugMode) return child;
-    return Stack(
+    return Directionality(
       textDirection: TextDirection.ltr,
-      children: [
-        child,
-        Positioned(
-          right: 0,
-          top: 0,
-          child: SafeArea(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              color: Colors.orange,
-              child: const Text(
-                'DEBUG',
-                style: TextStyle(fontSize: 10, color: Colors.white),
+      child: Stack(
+        children: [
+          child,
+          Positioned(
+            right: 0,
+            top: 0,
+            child: SafeArea(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                color: Colors.orange,
+                child: const Text(
+                  'DEBUG',
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
