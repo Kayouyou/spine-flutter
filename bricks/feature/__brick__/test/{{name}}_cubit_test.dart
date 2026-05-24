@@ -42,7 +42,7 @@ void main() {
       'loadData 发出 loading 然后 error（失败）',
       build: () {
         when(() => mockRepository.get{{name.pascalCase()}}Data())
-            .thenAnswer((_) async => Result.failure(NetworkException('网络错误')));
+            .thenAnswer((_) async => Result.failure(const NetworkException('网络错误')));
         return cubit;
       },
       act: (cubit) => cubit.loadData(),
