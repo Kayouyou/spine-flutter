@@ -74,7 +74,7 @@ create-feature:
 	@echo "=== 1/4 生成 Feature 包 ==="
 	mason make feature --name $(name) --output-dir packages/features/feature_$(name)
 	@echo "=== 2/4 添加 pubspec 依赖 ==="
-	@sed -i.bak '/<<<< FEATURE_DEPENDENCIES >>>>/a\  feature_$(name):\n    path: packages/features/feature_$(name)' pubspec.yaml && rm pubspec.yaml.bak
+	@python3 scripts/add_feature_dependency.py $(name)
 	@echo "=== 3/4 安装依赖 ==="
 	melos bs
 	@echo "=== 4/4 生成 freezed 代码 ==="

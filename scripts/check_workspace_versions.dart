@@ -11,7 +11,7 @@ const trackedPackages = [
 ];
 
 void main() {
-  final skipDirs = ['/bricks/', '/.worktrees/', '/ios/.symlinks/', '/macos/'];
+  final skipDirs = ['/.worktrees/', '/ios/.symlinks/', '/macos/'];
 
   final pubspecs = Directory('.')
       .listSync(recursive: true)
