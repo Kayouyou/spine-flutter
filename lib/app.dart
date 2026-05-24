@@ -16,9 +16,12 @@ import 'package:network/network.dart';
 import 'package:routing/routing.dart';
 
 // Project imports:
+import 'core/bootstrap/bootstrap_options.dart';
 import 'core/di/locator.dart';
+import 'core/widgets/debug/debug_tools_wrapper.dart';
 import 'core/widgets/network/network_banner.dart';
 import 'core/widgets/request_scope.dart';
+import 'core/widgets/upgrade/upgrade_wrapper.dart';
 import 'src/theme/app_theme.dart';
 
 /// 主应用Widget
@@ -52,7 +55,8 @@ class _MyAppState extends State<MyApp> {
       routeWrapper: (child) => RequestScope(child: child),
     );
     // Alice HTTP Inspector — 创建时传入 navigatorKey，确保 showInspector 可用
-    if (kDebugMode && !sl.isRegistered<Alice>()) {
+    final options = sl<BootstrapOptions>();
+    if (kDebugMode && options.enableDebugTools && !sl.isRegistered<Alice>()) {
       final alice = Alice(
         showNotification: true,
         showInspectorOnShake: true,
@@ -110,6 +114,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final options = sl<BootstrapOptions>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<LocaleCubit>()),
@@ -118,7 +123,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {
-          return MaterialApp.router(
+          Widget app = MaterialApp.router(
             title: '骨架演示',
             theme: appLightTheme,
             darkTheme: appDarkTheme,
@@ -148,6 +153,13 @@ class _MyAppState extends State<MyApp> {
               );
             },
           );
+          if (options.enableDebugTools) {
+            app = DebugToolsWrapper(child: app);
+          }
+          if (options.enableUpgradePrompt) {
+            app = UpgradeWrapper(child: app);
+          }
+          return app;
         },
       ),
     );

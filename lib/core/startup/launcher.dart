@@ -14,6 +14,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 // Project imports:
 import 'package:domain/domain.dart';
+import '../bootstrap/bootstrap_options.dart';
 import '../di/locator.dart';
 import '../di/setup.dart';
 import '../utils/logger.dart';
@@ -36,7 +37,9 @@ class AppLauncher {
   /// 启动应用
   ///
   /// [app] 是根 Widget（通常为 MyApp）。
-  static Future<void> launch(Widget app) async {
+  /// [bootstrapOptions] 控制高级能力开关，默认全部关闭。
+  static Future<void> launch(Widget app,
+      {BootstrapOptions bootstrapOptions = const BootstrapOptions()}) async {
     // ===== 阶段 1: 核心初始化 =====
     WidgetsFlutterBinding.ensureInitialized();
     StartupProfiler.start();
@@ -64,7 +67,7 @@ class AppLauncher {
     StartupProfiler.mark('错误处理器安装');
 
     // 依赖注入配置
-    setupDependencies();
+    setupDependencies(options: bootstrapOptions);
     StartupProfiler.mark('依赖注入完成');
 
     // ===== Sentry 初始化（依赖 IAppConfig 配置）=====
@@ -98,7 +101,9 @@ class AppLauncher {
     StartupProfiler.mark('认证检查完成');
 
     // 数据同步 — 触发后不等待（后台执行）
-    sl<DataSyncManager>().sync();
+    if (bootstrapOptions.enableDataSync) {
+      sl<DataSyncManager>().sync();
+    }
     StartupProfiler.mark('数据同步启动');
 
     // ===== 阶段 4: 启动 UI =====

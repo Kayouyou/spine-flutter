@@ -33,6 +33,10 @@ scripts:
       ./scripts/check_deps.sh
     description: 检查依赖方向 - feature 包不得引用 my_app
 
+  check:versions:
+    run: dart run scripts/check_workspace_versions.dart
+    description: 检查 workspace 关键依赖版本是否漂移
+
   validate:
     run: |
       echo "▸ Step 1: 依赖方向检查..."

@@ -51,7 +51,7 @@ dependencies:
     path: packages/infrastructure/routing
 
   # Dependency Injection
-  get_it: ^7.6.0
+  get_it: ^7.7.0
   injectable: ^2.5.0            # DI 代码生成注解
   equatable: ^2.0.5
 
@@ -104,9 +104,9 @@ dev_dependencies:
 
   # Code Generation
   injectable_generator: ^2.6.2   # injectable 代码生成器
-  build_runner: ^2.4.8
+  build_runner: ^2.4.9
   flutter_gen_runner: ^5.7.0
-  freezed: ^2.4.0            # freezed 代码生成器
+  freezed: ^2.5.2            # freezed 代码生成器
   hive_generator: ^2.0.0
 
   # Debug 工具
