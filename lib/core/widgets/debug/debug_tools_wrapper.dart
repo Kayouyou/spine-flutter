@@ -13,6 +13,7 @@ class DebugToolsWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!kDebugMode) return child;
     return Stack(
+      textDirection: TextDirection.ltr,
       children: [
         child,
         Positioned(
