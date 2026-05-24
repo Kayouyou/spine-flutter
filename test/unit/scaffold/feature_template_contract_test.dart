@@ -28,6 +28,22 @@ void main() {
       );
     });
 
+    test('make create-feature uses portable dependency insertion', () {
+      final makefile = File('makefile').readAsStringSync();
+      final helper = File('scripts/add_feature_dependency.py');
+
+      expect(
+        helper.existsSync(),
+        isTrue,
+        reason: 'macOS sed 不可靠，依赖插入应交给独立脚本',
+      );
+      expect(
+        makefile.contains('python3 scripts/add_feature_dependency.py'),
+        isTrue,
+        reason: 'make create-feature 应通过可移植脚本更新 pubspec.yaml',
+      );
+    });
+
     test('feature route template does not access GetIt directly', () {
       final file = File(
         'bricks/feature/__brick__/lib/src/routes/{{name}}_route_module.dart',

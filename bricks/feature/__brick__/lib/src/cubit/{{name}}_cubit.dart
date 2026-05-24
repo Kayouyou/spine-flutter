@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:domain/domain.dart';
+import '../repository/{{name}}_repository.dart';
 import '{{name}}_state.dart';
 
 /// {{name.pascalCase()}} 状态管理 Cubit
