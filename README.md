@@ -23,6 +23,7 @@
 - [Mason 代码模板](#mason-代码模板)
 - [监控与更新](#监控与更新)
 - [路由守卫](#路由守卫)
+- [DI 注入流程](docs/di-injection-flow.md)
 - [Domain 测试](#domain-测试)
 - [Login/Register 示例](#loginregister-示例)
 - [测试覆盖率](#测试覆盖率)

@@ -1,0 +1,286 @@
+<mxfile host="Electron" modified="2026-05-24T12:00:00.000Z" agent="drawio" version="24.0.0" type="device">
+  <diagram id="di-injection-flow" name="DI Injection Flow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Background -->
+        <mxCell id="2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1400" height="900" as="geometry"/>
+        </mxCell>
+
+        <!-- Title -->
+        <mxCell id="3" value="DI Injection Flow: GetIt + FeatureRegistry + RouteModule" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="800" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Layer 1: App Entry -->
+        <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="60" width="1300" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="11" value="App Entry (main.dart)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="60" y="65" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="12" value="main() → runZonedGuarded() → runApp(MyApp())" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="500" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="13" value="setupDependencies()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4caf50;strokeWidth=2;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1050" y="75" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: App Entry → Composition Root -->
+        <mxCell id="14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1150" y="125" as="sourcePoint"/>
+            <mxPoint x="1150" y="180" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Layer 2: Composition Root -->
+        <mxCell id="20" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#2196f3;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="180" width="1300" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="21" value="Composition Root (lib/core/di/setup.dart)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#1565c0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="185" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- GetIt Box -->
+        <mxCell id="22" value="GetIt (Service Locator)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1976d2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="215" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="23" value="sl.registerSingleton&lt;Dio&gt;(createDio(...))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="100" y="245" width="400" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="24" value="sl.registerSingleton&lt;TokenStorage&gt;(TokenStorage(sl&lt;KeyValueStorage&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="100" y="270" width="450" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="25" value="sl.registerSingleton&lt;BootstrapOptions&gt;(options)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="100" y="295" width="350" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Services Box -->
+        <mxCell id="26" value="Services" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1976d2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="215" width="150" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="27" value="setupAuth(sl)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="620" y="245" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="28" value="setupDataSync(sl)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="620" y="270" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="29" value="(仅 options.enableDataSync 时调用)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#888888;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="830" y="270" width="200" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- FeatureRegistry Box -->
+        <mxCell id="30" value="FeatureRegistry" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1976d2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="305" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="31" value="instance.register('feature_home', setupFeatureHome)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="620" y="330" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="32" value="instance.register('feature_auth', setupFeatureAuth)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="620" y="355" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="33" value="instance.register('feature_detail', setupFeatureDetail)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="620" y="380" width="350" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- runAll call -->
+        <mxCell id="34" value="FeatureRegistry.instance.runAll(sl)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ff9800;strokeWidth=2;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1050" y="240" width="280" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="35" value="遍历所有已注册的 feature setup 函数，传入 GetIt 实例执行" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="285" width="300" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrows from Composition Root to Features -->
+        <mxCell id="40" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="34">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1190" y="280" as="sourcePoint"/>
+            <Array>
+              <mxPoint x="1190" y="420"/>
+              <mxPoint x="260" y="420"/>
+            </Array>
+            <mxPoint x="260" y="440" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="41" value="sl" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#ff9800;" vertex="1" connectable="0" parent="40">
+          <mxGeometry x="-0.8" y="1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1190" y="420" as="sourcePoint"/>
+            <Array>
+              <mxPoint x="1190" y="420"/>
+              <mxPoint x="700" y="420"/>
+            </Array>
+            <mxPoint x="700" y="440" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1190" y="420" as="sourcePoint"/>
+            <Array>
+              <mxPoint x="1190" y="420"/>
+              <mxPoint x="1140" y="420"/>
+            </Array>
+            <mxPoint x="1140" y="440" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Layer 3: Feature Setup Functions -->
+        <mxCell id="50" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9c27b0;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="1300" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="51" value="Feature Setup Functions（通过 FeatureRegistry.runAll(sl) 调用）" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#7b1fa2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="425" width="500" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- feature_home setup -->
+        <mxCell id="52" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ce93d8;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="455" width="370" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="53" value="setupFeatureHome(GetIt sl)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#7b1fa2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="250" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="54" value="1. sl.registerFactory&lt;HomeRepository&gt;(HomeRepositoryImpl(sl&lt;Dio&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="490" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="55" value="2. sl.registerFactory&lt;HomeCubit&gt;(HomeCubit(sl&lt;HomeRepository&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="515" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="56" value="3. RouteModuleRegistry.register('feature_home', (ctx) =&gt; HomeRouteModule(ctx, createCubit: () =&gt; sl&lt;HomeCubit&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="540" width="340" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="57" value="★ 关键：通过闭包把 sl&lt;HomeCubit&gt; 工厂函数传给 RouteModule，而非让 RouteModule 直接访问 GetIt" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#ff6f00;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="585" width="340" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- feature_auth setup -->
+        <mxCell id="58" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ce93d8;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="455" width="370" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="59" value="setupFeatureAuth(GetIt sl)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#7b1fa2;" vertex="1" parent="1">
+          <mxGeometry x="480" y="460" width="250" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="60" value="1. sl.registerFactory&lt;LoginCubit&gt;(LoginCubit(sl&lt;AuthRepository&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="490" y="490" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="61" value="2. RouteModuleRegistry.register('feature_auth', (ctx) =&gt; AuthRouteModule(ctx, createCubit: () =&gt; sl&lt;LoginCubit&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="490" y="515" width="340" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="62" value="注：AuthRepository 已在 setupAuth(sl) 中注册，此处无需重复" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="490" y="565" width="300" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- feature_detail setup -->
+        <mxCell id="63" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ce93d8;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="455" width="370" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="64" value="setupFeatureDetail(GetIt sl)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#7b1fa2;" vertex="1" parent="1">
+          <mxGeometry x="880" y="460" width="250" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="65" value="1. sl.registerFactory&lt;DetailRepository&gt;(DetailRepositoryImpl(sl&lt;Dio&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="890" y="490" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="66" value="2. sl.registerFactory&lt;DetailCubit&gt;(DetailCubit(sl&lt;DetailRepository&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="890" y="515" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="67" value="3. RouteModuleRegistry.register('feature_detail', (ctx) =&gt; DetailRouteModule(ctx, createCubit: () =&gt; sl&lt;DetailCubit&gt;()))" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="890" y="540" width="340" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to UI Layer -->
+        <mxCell id="70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="255" y="620" as="sourcePoint"/>
+            <Array>
+              <mxPoint x="255" y="670"/>
+              <mxPoint x="260" y="670"/>
+            </Array>
+            <mxPoint x="260" y="690" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Layer 4: UI Layer / Routing -->
+        <mxCell id="80" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#3f51b5;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="670" width="1300" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="81" value="UI Layer + Routing（用户导航触发）" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="60" y="675" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- GoRouter -->
+        <mxCell id="82" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7986cb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="705" width="400" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="83" value="GoRouter (StatefulShellRoute)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="80" y="710" width="250" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="84" value="用户点击导航 → /home" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="740" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="85" value="→ GoRouter 找到 RouteModuleRegistry 中的 /home 路由" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="765" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="86" value="→ HomeRouteModule.pageBuilder(context, state) 被调用" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="90" y="790" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="87" value="→ pageBuilder 内部：" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="100" y="815" width="200" height="15" as="geometry"/>
+        </mxCell>
+
+        <!-- BlocProvider -->
+        <mxCell id="88" value="BlocProvider(create: (_) =&gt; createCubit())" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ffc107;strokeWidth=2;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="120" y="835" width="320" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- HomePage -->
+        <mxCell id="89" value="HomePage()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="160" y="870" width="240" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- RouteModule pageBuilder detail -->
+        <mxCell id="90" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7986cb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="705" width="400" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="91" value="RouteModule.pageBuilder 内部实现" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="510" y="710" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="92" value="pageBuilder: (context, state) {&#xa;  Widget page = BlocProvider(&#xa;    create: (_) =&gt; createCubit(), // ← 从 setup.dart 传入的工厂函数&#xa;    child: HomePage(...),&#xa;  );&#xa;  if (ctx.routeWrapper != null) {&#xa;    page = ctx.routeWrapper!(page); // ← RequestScope 等包装&#xa;  }&#xa;  return MaterialPage(child: page);&#xa;}" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=monospace;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="510" y="735" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Data Flow detail -->
+        <mxCell id="100" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7986cb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="705" width="400" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="101" value="数据流（以 HomeCubit 为例）" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="940" y="710" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="102" value="1. HomePage 调用 context.read&lt;HomeCubit&gt;().loadData()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="950" y="740" width="370" height="18" as="geometry"/>
+        </mxCell>
+        <mxCell id="103" value="2. HomeCubit 通过构造函数获取 _repository" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="950" y="760" width="370" height="18" as="geometry"/>
+        </mxCell>
+        <mxCell id="104" value="3. _repository.getHomeData() → 发起 API 请求" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="950" y="780" width="370" height="18" as="geometry"/>
+        </mxCell>
+        <mxCell id="105" value="4. Result.success(data) / Result.failure(error)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="950" y="800" width="370" height="18" as="geometry"/>
+        </mxCell>
+        <mxCell id="106" value="5. emit(HomeLoaded(data)) → UI 更新" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="950" y="820" width="370" height="18" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
