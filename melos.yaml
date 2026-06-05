@@ -1,4 +1,4 @@
-name: my_app
+name: spine_flutter
 packages:
   - .
   - packages/domain
@@ -31,7 +31,7 @@ scripts:
   check:deps:
     run: |
       ./scripts/check_deps.sh
-    description: 检查依赖方向 - feature 包不得引用 my_app
+    description: 检查依赖方向 - feature 包不得引用 spine_flutter
 
   check:versions:
     run: dart run scripts/check_workspace_versions.dart

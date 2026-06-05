@@ -22,7 +22,7 @@ import 'component_library_localizations_zh.dart';
 /// return MaterialApp(
 ///   localizationsDelegates: ComponentLibraryLocalizations.localizationsDelegates,
 ///   supportedLocales: ComponentLibraryLocalizations.supportedLocales,
-///   home: MyApplicationHome(),
+///   home: SpineFlutterlicationHome(),
 /// );
 /// ```
 ///

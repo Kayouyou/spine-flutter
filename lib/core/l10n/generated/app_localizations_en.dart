@@ -45,7 +45,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loading => 'Loading...';
 
   @override
-  String get appName => 'My App';
+  String get appName => 'Spine Flutter';
 
   @override
   String get homeTitle => 'Home';

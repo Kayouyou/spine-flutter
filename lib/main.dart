@@ -9,5 +9,5 @@ import 'app.dart';
 import 'core/startup/launcher.dart';
 
 Future<void> main() async {
-  await AppLauncher.launch(const MyApp());
+  await AppLauncher.launch(const SpineFlutter());
 }

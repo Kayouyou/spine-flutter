@@ -1,7 +1,7 @@
 # Flutter 项目架构深度分析报告
 
 **日期**: 2026-05-07  
-**项目**: my_app (Clean Architecture + Feature-First Flutter Monorepo)  
+**项目**: spine_flutter (Clean Architecture + Feature-First Flutter Monorepo)  
 **分析范围**: 全部 14 个本地包 + lib 装配层  
 **总体评分**: **7.5 / 10**
 

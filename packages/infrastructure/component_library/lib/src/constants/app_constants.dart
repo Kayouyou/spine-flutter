@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   /// 应用名称
-  static const String appName = 'MyApp';
+  static const String appName = 'SpineFlutter';
 
   /// 应用版本
   static const String version = '1.0.0';

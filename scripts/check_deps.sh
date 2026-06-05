@@ -4,10 +4,10 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if grep -rq "package:my_app" packages/features/; then
-  echo "❌ Feature packages must not import my_app"
-  grep -r "package:my_app" packages/features/
+if grep -rq "package:spine_flutter" packages/features/; then
+  echo "❌ Feature packages must not import spine_flutter"
+  grep -r "package:spine_flutter" packages/features/
   exit 1
 fi
-echo "✅ No forbidden my_app imports in feature packages"
+echo "✅ No forbidden spine_flutter imports in feature packages"
 exit 0

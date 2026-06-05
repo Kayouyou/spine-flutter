@@ -690,7 +690,7 @@ git commit -m "chore(workspace): align package versions and add drift guard"
 ```dart
 // test/unit/bootstrap/bootstrap_options_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/bootstrap/bootstrap_options.dart';
+import 'package:spine_flutter/core/bootstrap/bootstrap_options.dart';
 
 void main() {
   test('defaults keep optional integrations disabled', () {

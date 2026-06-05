@@ -23,7 +23,7 @@ Theme toggle switch SHALL reflect current theme state and allow user to change.
 - **THEN** ThemeCubit.setTheme(ThemeMode.light) is called
 
 ### Requirement: MaterialApp uses dynamic theme
-MyApp SHALL rebuild with new theme when ThemeCubit state changes.
+SpineFlutter SHALL rebuild with new theme when ThemeCubit state changes.
 
 #### Scenario: Theme rebuild
 - **WHEN** ThemeCubit emits new ThemeState

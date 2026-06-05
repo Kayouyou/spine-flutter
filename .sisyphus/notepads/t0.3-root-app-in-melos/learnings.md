@@ -4,7 +4,7 @@
 
 ### What worked
 - Adding `.` to melos.yaml `packages:` list is the standard way to include the root package
-- After the change, `melos list` shows `my_app` (the root package) alongside sub-packages
+- After the change, `melos list` shows `spine_flutter` (the root package) alongside sub-packages
 - CI analyze job already had `flutter analyze` at root level (independent of melos), so no CI change needed
 - CI test job uses `melos test` which automatically picks up the root app now
 

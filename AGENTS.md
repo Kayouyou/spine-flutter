@@ -27,7 +27,7 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 
 | # | 规则 | 怎么验证 | 违反后果 |
 |---|---|---|---|
-| R1 | feature 包**不得** import `package:my_app/...` | `scripts/check_deps.sh` | CI 红 |
+| R1 | feature 包**不得** import `package:spine_flutter/...` | `scripts/check_deps.sh` | CI 红 |
 | R2 | domain 包**不得** import Flutter 任何包 | `pubspec.yaml` 里 SDK = `^3.0` 无 flutter 依赖 | `flutter pub get` 失败 |
 | R3 | infrastructure 不依赖 services (反过来可以) | `scripts/check_deps.sh` | CI 红 |
 | R4 | services 不依赖 features (反过来可以) | `scripts/check_deps.sh` | CI 红 |
@@ -68,7 +68,7 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 ```
 .
 ├── lib/                          # 入口 (AppLauncher 启动)
-│   ├── main.dart                 # 14 行: AppLauncher.launch(MyApp())
+│   ├── main.dart                 # 14 行: AppLauncher.launch(SpineFlutter())
 │   ├── app.dart                  # StatefulShellRoute + RouteModuleRegistry 装配
 │   └── core/
 │       ├── bootstrap/            # BootstrapOptions (enable* flag)
@@ -202,7 +202,7 @@ class FeatureXxxModule {
 }
 ```
 
-为什么不用 `package:my_app/core/di/setup.dart` barrel: barrel 会触发所有 feature 加载, 启动时 N 个 import 排队, 还要解决循环依赖。显式注册按需加载。
+为什么不用 `package:spine_flutter/core/di/setup.dart` barrel: barrel 会触发所有 feature 加载, 启动时 N 个 import 排队, 还要解决循环依赖。显式注册按需加载。
 
 ### 5.2 FeatureRegistry (启动期统一装配)
 
@@ -484,7 +484,7 @@ try {
 - ❌ 跳过 pre-commit (`git commit --no-verify`)
 - ❌ 跳过 CI (`gh pr merge --admin`)
 - ❌ 改 `lib/main.dart` (那是入口, 改它等于改所有)
-- ❌ barrel import (`import 'package:my_app/core/...'`)
+- ❌ barrel import (`import 'package:spine_flutter/core/...'`)
 - ❌ feature 包之间互相 import
 - ❌ 强推 (`git push --force`)
 - ❌ amend 已经 push 的 commit

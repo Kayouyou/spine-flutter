@@ -39,7 +39,7 @@ class AppLauncher {
 
   /// 启动应用
   ///
-  /// [app] 是根 Widget（通常为 MyApp）。
+  /// [app] 是根 Widget（通常为 SpineFlutter）。
   /// [bootstrapOptions] 控制高级能力开关，默认全部关闭。
   static Future<void> launch(Widget app,
       {BootstrapOptions bootstrapOptions = const BootstrapOptions(),}) async {

@@ -22,7 +22,7 @@
         <mxCell id="11" value="App Entry (main.dart)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#2e7d32;" vertex="1" parent="1">
           <mxGeometry x="60" y="65" width="200" height="20" as="geometry"/>
         </mxCell>
-        <mxCell id="12" value="main() → runZonedGuarded() → runApp(MyApp())" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+        <mxCell id="12" value="main() → runZonedGuarded() → runApp(SpineFlutter())" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
           <mxGeometry x="60" y="90" width="500" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="13" value="setupDependencies()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4caf50;strokeWidth=2;fontSize=12;fontStyle=1" vertex="1" parent="1">

@@ -592,7 +592,7 @@ output-class-name: AppLocalizations
   "unknown": "Unknown error",
   "retry": "Retry",
   "loading": "Loading...",
-  "appName": "My App",
+  "appName": "Spine Flutter",
   "homeTitle": "Home",
   "detailTitle": "Detail"
 }
@@ -826,7 +826,7 @@ sl.registerSingleton<LocaleCubit>(
 // 在App顶层提供
 BlocProvider(
   create: (context) => sl<LocaleCubit>(),
-  child: MyApp(),
+  child: SpineFlutter(),
 )
 
 // 切换语言
@@ -1843,14 +1843,14 @@ import 'core/global/locale/locale_cubit.dart';
 /// 职责：配置全局Provider、主题、路由
 /// Provider：
 ///   - LocaleCubit：语言管理
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatefulWidget {
+  const SpineFlutter({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<SpineFlutter> createState() => _SpineFlutterState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SpineFlutterState extends State<SpineFlutter> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 

@@ -384,7 +384,7 @@ void main() {
 - [ ] **Step 6: 验证**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test packages/services/error/test/
 ```
@@ -555,7 +555,7 @@ class NetworkCubit extends Cubit<NetworkState> {
 - [ ] **Step 4: 验证**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test packages/services/network/test/
 ```
@@ -674,7 +674,7 @@ void _noop() {}
 - [ ] **Step 2: 验证 — RTL 测试通过**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter test test/widget/rtl_layout_test.dart
 ```
 预期: 5 个 RTL 测试全部通过。

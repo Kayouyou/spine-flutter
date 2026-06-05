@@ -30,7 +30,7 @@
 - [ ] 4.2 Implement `ThemeState` with ThemeMode enum
 - [ ] 4.3 Add `setTheme(ThemeMode)` method with KeyValueStorage persistence
 - [ ] 4.4 Register ThemeCubit as Singleton in `lib/core/di/setup.dart`
-- [ ] 4.5 Wrap MyApp with BlocProvider for ThemeCubit
+- [ ] 4.5 Wrap SpineFlutter with BlocProvider for ThemeCubit
 - [ ] 4.6 Update MaterialApp to use dynamic `theme` from ThemeState
 - [ ] 4.7 Test theme persistence across app restart
 

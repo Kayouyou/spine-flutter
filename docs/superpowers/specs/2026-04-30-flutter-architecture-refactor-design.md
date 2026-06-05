@@ -100,7 +100,7 @@ lib/core/constants/
 ```dart
 // app_constants.dart
 class AppConstants {
-  static const String appName = 'MyApp';
+  static const String appName = 'SpineFlutter';
   static const String version = '1.0.0';
   static const Duration defaultTimeout = Duration(seconds: 30);
 }

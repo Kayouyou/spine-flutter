@@ -38,7 +38,7 @@
 ### 推荐：context.l10n 扩展
 
 ```dart
-import 'package:my_app/core/l10n/l10n_ext.dart';
+import 'package:spine_flutter/core/l10n/l10n_ext.dart';
 
 Text(context.l10n.retry)
 Text(context.l10n.homeTitle)

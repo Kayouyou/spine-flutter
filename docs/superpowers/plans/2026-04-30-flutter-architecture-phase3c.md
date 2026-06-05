@@ -198,7 +198,7 @@ import 'network_state.dart';
 /// ```dart
 /// BlocProvider(
 ///   create: (context) => NetworkCubit()..startListening(),
-///   child: MyApp(),
+///   child: SpineFlutter(),
 /// )
 /// ```
 class NetworkCubit extends Cubit<NetworkState> {
@@ -294,7 +294,7 @@ MultiBlocProvider(
     BlocProvider(create: (context) => NetworkCubit()..startListening()),
     BlocProvider(create: (context) => LocaleCubit()),
   ],
-  child: MyApp(),
+  child: SpineFlutter(),
 )
 ```
 
@@ -729,14 +729,14 @@ import 'core/widgets/network/network_banner.dart';
 import 'core/widgets/network/network_ui_handler.dart';
 
 /// 主应用Widget
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatefulWidget {
+  const SpineFlutter({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<SpineFlutter> createState() => _SpineFlutterState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SpineFlutterState extends State<SpineFlutter> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 

@@ -30,14 +30,14 @@ import 'src/theme/app_theme.dart';
 /// Provider：
 ///   - LocaleCubit：语言管理
 ///   - NetworkCubit：网络状态管理
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatefulWidget {
+  const SpineFlutter({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<SpineFlutter> createState() => _SpineFlutterState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SpineFlutterState extends State<SpineFlutter> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 

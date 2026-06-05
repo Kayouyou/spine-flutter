@@ -557,7 +557,7 @@ dependencies:
 
 - [ ] **Step 4: Rewrite app.dart**
 
-Replace `_MyAppState.initState()` (lines 39-62) in `lib/app.dart`:
+Replace `_SpineFlutterState.initState()` (lines 39-62) in `lib/app.dart`:
 
 ```dart
   late final GoRouter _router;
@@ -681,7 +681,7 @@ Replace file `packages/infrastructure/routing/lib/src/routes/app_router.dart`:
 /// ═══════════════════════════════════════════════════════════
 /// 模块: 路由入口（向后兼容）
 /// 文件: app_router.dart
-/// 说明: 路由组装逻辑已迁移至 my_app/lib/app.dart
+/// 说明: 路由组装逻辑已迁移至 spine_flutter/lib/app.dart
 ///       RouteModule 实现已迁移至各 feature 包
 /// ═══════════════════════════════════════════════════════════
 
@@ -692,7 +692,7 @@ export 'route_module.dart';
 - [ ] **Step 9: Run melos bootstrap**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && melos bootstrap
+cd /Users/yeyangyang/Desktop/spine_flutter && melos bootstrap
 ```
 Expected: SUCCESS.
 

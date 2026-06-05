@@ -74,7 +74,7 @@ class EnvironmentConfig {
 class AppConfig {
   AppConfig._();
 
-  static const String appName = 'My App';
+  static const String appName = 'Spine Flutter';
   static const String appVersion = '1.0.0';
   static const String appPackageName = 'com.example.myapp';
 }

@@ -439,7 +439,7 @@ packages/component_library/lib/
 ```dart
 // packages/routing/lib/routing.dart（需要更新 import）
 // 之前：
-import 'package:my_app/features/home/ui/home_page.dart';
+import 'package:spine_flutter/features/home/ui/home_page.dart';
 
 // 之后：
 import 'package:feature_home/feature_home.dart';
@@ -533,7 +533,7 @@ void main() {
         BlocProvider<NetworkCubit>(create: (_) => sl<NetworkCubit>()),
         BlocProvider<LocaleCubit>(create: (_) => sl<LocaleCubit>()),
       ],
-      child: const MyApp(),
+      child: const SpineFlutter(),
     ),
   );
 }

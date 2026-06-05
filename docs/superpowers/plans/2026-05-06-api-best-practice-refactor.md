@@ -249,7 +249,7 @@ git commit -m "refactor(api): migrate RepositoryImpl endpoints to ApiEndpoints c
 
 ```bash
 # 在 http_error.dart 的 HttpsException.create 工厂上做 LSP 引用检查
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 ```
 
 如果 `lsp_find_references` 显示零外部引用（仅 `http_error.dart` 自身和要删除的 `retry_interceptor.dart`），则删除整个 `http_error.dart`。

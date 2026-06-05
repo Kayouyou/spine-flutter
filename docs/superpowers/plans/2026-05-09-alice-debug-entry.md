@@ -130,7 +130,7 @@ import 'package:alice/alice.dart';
 
 运行：
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && make lint
+cd /Users/yeyangyang/Desktop/spine_flutter && make lint
 ```
 
 预期：无 error，通过静态分析。

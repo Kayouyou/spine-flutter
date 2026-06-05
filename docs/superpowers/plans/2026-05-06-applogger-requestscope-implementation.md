@@ -56,7 +56,7 @@ class RequestContext {
 // test/unit/middleware/request_context_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/middleware/request_context.dart';
+import 'package:spine_flutter/core/middleware/request_context.dart';
 
 void main() {
   group('RequestContext', () {
@@ -324,7 +324,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:api/api.dart';
-import 'package:my_app/core/middleware/request_context.dart';
+import 'package:spine_flutter/core/middleware/request_context.dart';
 
 void main() {
   group('RequestScope', () {
@@ -869,7 +869,7 @@ git commit -m "feat: inject AppLogger into TokenRenewalInterceptor, add AutoCanc
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/widgets/request_scope.dart';  // ← NEW
+import 'package:spine_flutter/core/widgets/request_scope.dart';  // ← NEW
 
 import 'route_context.dart';
 import 'route_module.dart';
@@ -942,7 +942,7 @@ In `router.dart`, change lines 39-45:
 
 Add import at top:
 ```dart
-import 'package:my_app/core/widgets/request_scope.dart';
+import 'package:spine_flutter/core/widgets/request_scope.dart';
 ```
 
 - [ ] **Step 3: Run analysis**
@@ -1005,8 +1005,8 @@ Verify the following manually or via Widget test:
 import 'package:flutter_test/flutter_test.dart';
 import 'package:api/api.dart';
 import 'package:dio/dio.dart';
-import 'package:my_app/core/di/locator.dart';
-import 'package:my_app/core/di/setup.dart';
+import 'package:spine_flutter/core/di/locator.dart';
+import 'package:spine_flutter/core/di/setup.dart';
 
 void main() {
   group('Integration: DI wiring', () {

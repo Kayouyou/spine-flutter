@@ -114,7 +114,7 @@ void main() async {
       options.dsn = EnvironmentConfig.sentryDsn;
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () => runApp(const MyApp()),
+    appRunner: () => runApp(const SpineFlutter()),
   );
 }
 ```

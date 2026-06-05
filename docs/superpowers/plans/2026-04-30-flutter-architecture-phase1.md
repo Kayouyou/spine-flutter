@@ -182,7 +182,7 @@ BlocProvider(
 ```dart
 // main.dart中使用
 void main() {
-  AppLauncher.launch(const MyApp());
+  AppLauncher.launch(const SpineFlutter());
 }
 
 // 性能计时
@@ -667,7 +667,7 @@ import '../sync/manager.dart';
 ///
 /// 职责：管理App完整启动流程
 /// 流程：初始化Flutter binding → 配置系统UI → 初始化SDK → 启动App
-/// 使用：main.dart中调用 `AppLauncher.launch(const MyApp())`
+/// 使用：main.dart中调用 `AppLauncher.launch(const SpineFlutter())`
 class AppLauncher {
   AppLauncher._();
 
@@ -762,7 +762,7 @@ class AppConstants {
   AppConstants._();
 
   /// 应用名称
-  static const String appName = 'MyApp';
+  static const String appName = 'SpineFlutter';
 
   /// 应用版本
   static const String version = '1.0.0';
@@ -1401,7 +1401,7 @@ void main() {
   configureEasyLoading();
 
   // 启动App
-  AppLauncher.launch(const MyApp());
+  AppLauncher.launch(const SpineFlutter());
 }
 ```
 
@@ -1418,14 +1418,14 @@ import 'package:routing/routing.dart';
 import 'src/theme/app_theme.dart';
 
 /// 主应用Widget
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatefulWidget {
+  const SpineFlutter({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<SpineFlutter> createState() => _SpineFlutterState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SpineFlutterState extends State<SpineFlutter> {
   late final GoRouter _router;
   final _navigatorKey = GlobalKey<NavigatorState>();
 

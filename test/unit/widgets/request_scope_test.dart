@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:api/api.dart';
 
 // Project imports:
-import 'package:my_app/core/middleware/request_context.dart';
-import 'package:my_app/core/widgets/request_scope.dart';
+import 'package:spine_flutter/core/middleware/request_context.dart';
+import 'package:spine_flutter/core/widgets/request_scope.dart';
 
 void main() {
   group('RequestScope', () {

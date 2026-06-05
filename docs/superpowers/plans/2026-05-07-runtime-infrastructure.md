@@ -134,7 +134,7 @@ class EnvironmentConfig {
 
 class AppConfig {
   AppConfig._();
-  static const String appName = 'My App';
+  static const String appName = 'Spine Flutter';
   static const String appVersion = '1.0.0';
   static const String appPackageName = 'com.example.myapp';
 }
@@ -278,7 +278,7 @@ Future<void> main() async {
       if (EnvironmentConfig.sentryDsn.isNotEmpty) {
         AppErrorHandler.instance.setReporter(SentryReporter());
       }
-      runApp(const MyApp());
+      runApp(const SpineFlutter());
     },
   );
 }
@@ -343,7 +343,7 @@ flutter pub get
 
 ```dart
 import 'package:upgrader/upgrader.dart';
-import 'package:my_app/config.dart';
+import 'package:spine_flutter/config.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -378,7 +378,7 @@ class HomePage extends StatelessWidget {
 
 ```dart
 import 'package:upgrader/upgrader.dart';
-import 'package:my_app/config.dart';
+import 'package:spine_flutter/config.dart';
 
 class ForceUpdateChecker {
   static final _upgrader = Upgrader(

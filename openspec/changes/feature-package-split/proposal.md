@@ -556,7 +556,7 @@ infrastructure 被 domain、services、features 依赖
 
 **改造前：**
 ```
-my_app/
+spine_flutter/
 ├── lib/
 │   ├── core/                    ← 混合：组装逻辑 + 业务实现
 │   │   ├── auth/                ← 业务服务，需提取
@@ -578,7 +578,7 @@ my_app/
 
 **改造后：**
 ```
-my_app/
+spine_flutter/
 ├── lib/
 │   └── core/                    ← 只剩组装层
 │       ├── di/                  ← 依赖注入配置
@@ -981,8 +981,8 @@ dev_dependencies:
 ### 主 app pubspec.yaml
 
 ```yaml
-# my_app/pubspec.yaml
-name: my_app
+# spine_flutter/pubspec.yaml
+name: spine_flutter
 description: 主应用
 publish_to: 'none'
 
@@ -1442,11 +1442,11 @@ void main() async {
   // DI 注册
   await setupDependencies();
 
-  runApp(const MyApp());
+  runApp(const SpineFlutter());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatelessWidget {
+  const SpineFlutter({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -2426,7 +2426,7 @@ void main() {
         BlocProvider<LocaleCubit>(create: (_) => sl<LocaleCubit>()),
         // 其他全局 Cubit...
       ],
-      child: const MyApp(),
+      child: const SpineFlutter(),
     ),
   );
 }

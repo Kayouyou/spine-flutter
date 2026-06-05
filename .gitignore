@@ -58,3 +58,8 @@ packages/services/auth/build/
 
 # FVM Version Cache
 .fvm/
+
+# Mason brick cache (含本机绝对路径, 不应入库)
+.mason/
+mason-lock.json
+**/bricks.json

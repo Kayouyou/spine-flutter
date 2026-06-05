@@ -162,7 +162,7 @@ void main() {
 - [ ] **Step 4: 验证 — flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter test packages/features/feature_home/test/
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter test packages/features/feature_home/test/
 ```
 预期: 所有测试通过。
 
@@ -318,7 +318,7 @@ void main() {
 - [ ] **Step 3: 验证 — flutter test 全部通过**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter test
 ```
 预期: 所有已有 + 新增测试通过。
@@ -573,7 +573,7 @@ class _ExampleUserSync extends DataSyncable {
 - [ ] **Step 6: 验证 — flutter analyze + flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test
 ```
@@ -965,7 +965,7 @@ export 'src/widgets/error_card.dart';
 - [ ] **Step 6: 验证**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test packages/infrastructure/component_library/test/
 ```

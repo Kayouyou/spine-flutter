@@ -973,8 +973,8 @@ import 'package:network/network.dart';
 import 'core/di/locator.dart';
 import 'config.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SpineFlutter extends StatelessWidget {
+  const SpineFlutter({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1302,7 +1302,7 @@ lcov --remove coverage/lcov.info \
   -o coverage/lcov_filtered.info
 
 # Generate HTML
-genhtml coverage/lcov_filtered.info -o coverage/html --title "My App Coverage"
+genhtml coverage/lcov_filtered.info -o coverage/html --title "Spine Flutter Coverage"
 
 echo "Opening coverage report..."
 open coverage/html/index.html || xdg-open coverage/html/index.html

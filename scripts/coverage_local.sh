@@ -20,7 +20,7 @@ lcov --remove coverage/lcov.info \
   -o coverage/lcov_filtered.info
 
 # Generate HTML
-genhtml coverage/lcov_filtered.info -o coverage/html --title "My App Coverage"
+genhtml coverage/lcov_filtered.info -o coverage/html --title "Spine Flutter Coverage"
 
 echo "Opening coverage report..."
 open coverage/html/index.html || xdg-open coverage/html/index.html

@@ -9,7 +9,7 @@
 
 ## Overview
 
-This document defines the transformation plan to elevate the my_app Flutter monorepo from its current architecture score of 7.8/10 to a target of 9.0/10. The transformation spans seven phases over approximately 18-28 days, addressing critical gaps between the scaffold's design intent and actual implementation consistency.
+This document defines the transformation plan to elevate the spine_flutter Flutter monorepo from its current architecture score of 7.8/10 to a target of 9.0/10. The transformation spans seven phases over approximately 18-28 days, addressing critical gaps between the scaffold's design intent and actual implementation consistency.
 
 **Guiding Principles (Non-Negotiable):**
 
@@ -24,7 +24,7 @@ This document defines the transformation plan to elevate the my_app Flutter mono
 
 ### Current State Assessment
 
-The my_app Flutter monorepo uses Clean Architecture with Melos for multi-package management. A recent team audit revealed:
+The spine_flutter Flutter monorepo uses Clean Architecture with Melos for multi-package management. A recent team audit revealed:
 
 | Dimension | Design Intent | Actual Consistency | Gap |
 |-----------|---------------|---------------------|-----|

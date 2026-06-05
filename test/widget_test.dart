@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// App smoke test — 独立于DI环境测试UI构建
 ///
-/// 注意：MyApp本身需要sl<LocaleCubit>()等DI依赖，
+/// 注意：SpineFlutter本身需要sl<LocaleCubit>()等DI依赖，
 /// 不能直接在测试中pumpWidget。改为测试页面组件的可渲染性。
 void main() {
   testWidgets('HomePage smoke test', (WidgetTester tester) async {

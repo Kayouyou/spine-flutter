@@ -23,7 +23,7 @@
 #### 1.1 melos.yaml
 
 ```yaml
-name: my_app
+name: spine_flutter
 packages:
   - packages/domain
   - packages/infrastructure/*

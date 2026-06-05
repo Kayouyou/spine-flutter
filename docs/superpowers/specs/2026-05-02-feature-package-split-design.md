@@ -224,7 +224,7 @@ packages/features/feature_home/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupDependencies();
-  runApp(const MyApp());
+  runApp(const SpineFlutter());
 }
 
 // lib/core/di/setup.dart
@@ -405,7 +405,7 @@ class GetUserInfoUseCase {
 ## 目录结构总览
 
 ```
-my_app/
+spine_flutter/
 ├── lib/
 │   └── core/                    ← 只剩组装层
 │       ├── di/                  ← 依赖注入配置

@@ -28,7 +28,7 @@ import 'package:error/error.dart';
 // 在应用启动时注册
 void main() {
   AppErrorHandler.setup();
-  runApp(const MyApp());
+  runApp(const SpineFlutter());
 }
 ```
 

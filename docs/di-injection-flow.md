@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     subgraph Entry["应用入口 (main.dart)"]
-        E1["main() → runApp(MyApp())"]
+        E1["main() → runApp(SpineFlutter())"]
     end
 
     subgraph Composition["依赖注入编排 (lib/core/di/setup.dart)"]

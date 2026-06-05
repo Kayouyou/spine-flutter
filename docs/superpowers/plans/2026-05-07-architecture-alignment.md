@@ -80,7 +80,7 @@ class ModuleARouteModule extends RouteModule {
 - [ ] **Step 2: 验证 — flutter analyze 零错误**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter analyze packages/infrastructure/routing/lib/src/routes/module_a.dart
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter analyze packages/infrastructure/routing/lib/src/routes/module_a.dart
 ```
 预期: `No issues found!`
 
@@ -166,7 +166,7 @@ class _InfoTile extends StatelessWidget {
 - [ ] **Step 4: 验证 — flutter analyze 零错误**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter analyze packages/infrastructure/routing/
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter analyze packages/infrastructure/routing/
 ```
 预期: `No issues found!`
 
@@ -199,7 +199,7 @@ GoRoute(
 - [ ] **Step 6: 验证全项目 — flutter analyze + flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test
 ```
@@ -300,7 +300,7 @@ onPressed: () => context.go('${AppRoutes.login}?redirect=$redirect'),
 - [ ] **Step 5: 验证 — flutter analyze + flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 flutter analyze
 flutter test
 ```
@@ -492,7 +492,7 @@ enum NetworkUIStyle { banner, toast, snackbar, dialog, none }
 - [ ] **Step 6: 运行 build_runner 生成 freezed 代码**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 dart run build_runner build --delete-conflicting-outputs
 ```
 预期: 成功生成 5 个 `.freezed.dart` 文件。
@@ -500,14 +500,14 @@ dart run build_runner build --delete-conflicting-outputs
 - [ ] **Step 7: 验证 — flutter analyze（检查遗漏）**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter analyze
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter analyze
 ```
 预期: `No issues found!`
 
 - [ ] **Step 8: 验证 — flutter test（确认行为不变）**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter test
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter test
 ```
 预期: 所有已有测试通过。如果测试直接引用旧 state 构造函数（如 `HomeLoading()`），会因为 freezed 改用工厂方法而编译失败——此时需同步修改测试文件。
 
@@ -608,7 +608,7 @@ export 'src/repositories/auth_repository.dart';
 - [ ] **Step 3: 删除 feature_auth 中的本地 AuthRepository 接口**
 
 ```bash
-rm /Users/yeyangyang/Desktop/my_app/packages/features/feature_auth/lib/src/repository/auth_repository.dart
+rm /Users/yeyangyang/Desktop/spine_flutter/packages/features/feature_auth/lib/src/repository/auth_repository.dart
 ```
 
 - [ ] **Step 4: 更新 feature_auth/feature_auth.dart barrel file — 移除已删除文件的 export**
@@ -642,7 +642,7 @@ import 'package:domain/domain.dart';
 - [ ] **Step 6: 更新 feature_auth 包的 pubspec.yaml — 确认依赖 domain**
 
 ```bash
-grep -r "domain" /Users/yeyangyang/Desktop/my_app/packages/features/feature_auth/pubspec.yaml
+grep -r "domain" /Users/yeyangyang/Desktop/spine_flutter/packages/features/feature_auth/pubspec.yaml
 ```
 如果不存在 domain 依赖，添加:
 ```yaml
@@ -665,14 +665,14 @@ export 'src/repository/mock_auth_repository.dart';  // Mock 实现保留
 - [ ] **Step 8: 验证 — flutter analyze**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter analyze
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter analyze
 ```
 预期: `No issues found!`。如果出现 import 找不到的错误，按错误提示修正。
 
 - [ ] **Step 9: 验证 — flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter test
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter test
 ```
 预期: 所有已有测试通过。
 
@@ -944,7 +944,7 @@ class PreferencesService {
 - [ ] **Step 3: 更新 key_value_storage barrel file — 导出 preference_key.dart**
 
 ```bash
-grep "preference" /Users/yeyangyang/Desktop/my_app/packages/infrastructure/key_value_storage/lib/key_value_storage.dart
+grep "preference" /Users/yeyangyang/Desktop/spine_flutter/packages/infrastructure/key_value_storage/lib/key_value_storage.dart
 ```
 如果不存在，添加:
 ```dart
@@ -956,7 +956,7 @@ export 'src/preference_key.dart';
 搜索所有使用 `PreferencesService.AgreePrivacyAndProtocol` 等静态常量的地方:
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app
+cd /Users/yeyangyang/Desktop/spine_flutter
 rg "PreferencesService\.[A-Z]" --type dart
 ```
 
@@ -976,14 +976,14 @@ prefs.getBool(PreferenceKey.firstLaunchOnboardingCompleted);
 - [ ] **Step 5: 验证 — flutter analyze 全项目**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter analyze
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter analyze
 ```
 预期: `No issues found!`。可能出现 type error 因为方法签名变更——按错误提示逐一修复调用方。
 
 - [ ] **Step 6: 验证 — flutter test**
 
 ```bash
-cd /Users/yeyangyang/Desktop/my_app && flutter test
+cd /Users/yeyangyang/Desktop/spine_flutter && flutter test
 ```
 预期: 所有已有测试通过。
 

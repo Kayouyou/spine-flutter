@@ -55,7 +55,7 @@
 ## 目录结构
 
 ```
-my_app/
+spine_flutter/
 ├── lib/                          # 主应用
 │   ├── main.dart                 # 入口文件
 │   ├── app.dart                  # 主应用 Widget
@@ -453,7 +453,7 @@ melos test:coverage
 
 | 工具 | 触发时机 | 检查内容 | 跳过方式 |
 |------|----------|----------|----------|
-| **check_deps.sh** | hook / CI / 手动 | Feature 包不得反向依赖 my_app | — |
+| **check_deps.sh** | hook / CI / 手动 | Feature 包不得反向依赖 spine_flutter | — |
 | **pre-commit hook** | `git commit` 时 | check_deps → l10n → analyze(仅 error) → 增量测试 | `git commit --no-verify` |
 | **check_l10n.sh** | hook / CI / 手动 | ARB 文件 key 数量一致（模板: `app_zh.arb`） | — |
 | **CI (GitHub Actions)** | push 到 main | check_deps → l10n → analyze(仅 error) → test → build | — |
@@ -837,7 +837,7 @@ melos run validate
 包含 4 项检查：
 | # | 检查 | 说明 |
 |---|------|------|
-| 1 | `check_deps.sh` | Feature 包不得反向依赖 my_app |
+| 1 | `check_deps.sh` | Feature 包不得反向依赖 spine_flutter |
 | 2 | `check_l10n.sh` | ARB 翻译 key 数量一致 |
 | 3 | `melos analyze` | 静态分析（--no-fatal-infos --no-fatal-warnings） |
 | 4 | `melos test` | 全量测试通过 |
@@ -1046,12 +1046,12 @@ make refresh-api
 
 ```dart
 // main.dart 或其他入口
-import 'package:my_app/core/bootstrap/bootstrap_options.dart';
-import 'package:my_app/core/startup/launcher.dart';
+import 'package:spine_flutter/core/bootstrap/bootstrap_options.dart';
+import 'package:spine_flutter/core/startup/launcher.dart';
 
 Future<void> main() async {
   await AppLauncher.launch(
-    const MyApp(),
+    const SpineFlutter(),
     bootstrapOptions: const BootstrapOptions(
       enableDebugTools: true,   // Alice HTTP Inspector
       enableDataSync: true,     // 启动时数据同步
@@ -1264,7 +1264,7 @@ A: Feature 是一个完整的功能模块，包含状态、仓储、UI。Page �
 |------|------|------|
 | 依赖更新 | [Dependabot](https://github.com/Kayouyou/spine-flutter/network/dependencies) — 5 个 group 合并 PR, 节省审阅成本 | 每周一 |
 | CI 检查 | GitHub Actions — analyze + test + build 三件套, 全过才能 merge | 每次 push / PR |
-| 依赖方向守门 | `scripts/check_deps.sh` — feature 包不得反向依赖 my_app | 本地 + CI |
+| 依赖方向守门 | `scripts/check_deps.sh` — feature 包不得反向依赖 spine_flutter | 本地 + CI |
 | ARB 翻译一致性 | `scripts/check_l10n.sh` | 本地 + CI |
 | 一键验收 | `make scaffold-check` | 手动 |
 
