@@ -24,6 +24,7 @@ void main() {
     testWidgets('CustomAppBar back button shows in RTL when canPop', (tester) async {
       await tester.pumpWidget(wrapRTL(
         Navigator(
+          // ignore: deprecated_member_use
           onPopPage: (route, result) => route.didPop(result),
           pages: const [
             MaterialPage(child: SizedBox()),

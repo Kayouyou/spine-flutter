@@ -24,7 +24,7 @@ void main() {
       // 模拟迁移：添加 newField
       for (final key in oldBox.keys) {
         final oldData = Map<String, dynamic>.from(oldBox.get(key) as Map);
-        newBox.put(key, {...oldData, 'newField': 'transformed_${oldData['name']}'});
+        await newBox.put(key, {...oldData, 'newField': 'transformed_${oldData['name']}'});
       }
       
       final key1 = newBox.get('key1') as Map;

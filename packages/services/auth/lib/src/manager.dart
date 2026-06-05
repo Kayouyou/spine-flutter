@@ -40,7 +40,7 @@ class AuthManager {
     }
 
     final result = await _userRepository.getCurrentUser();
-    result.when(
+    await result.when(
       success: (user) async {
         await _tokenStorage.setUserId(user.id);
         _authCubit.loggedIn(user.id);

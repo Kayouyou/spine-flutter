@@ -117,6 +117,7 @@ void main() {
     blocTest<NetworkCubit, NetworkState>(
       'startListening监听网络变化流',
       setUp: () {
+        // ignore: close_sinks
         final controller = StreamController<List<ConnectivityResult>>();
         when(() => mockConnectivity.onConnectivityChanged)
             .thenAnswer((_) => controller.stream);
@@ -125,6 +126,7 @@ void main() {
       act: (cubit) {
         cubit.startListening();
         // 模拟网络断开
+        // ignore: close_sinks
         final controller = StreamController<List<ConnectivityResult>>();
         when(() => mockConnectivity.onConnectivityChanged)
             .thenAnswer((_) => controller.stream);

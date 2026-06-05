@@ -46,6 +46,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: BlocProvider<HomeCubit>.value(
+          // ignore: unawaited_futures
           value: FakeHomeCubit()..loadData(),
           child: const HomePage(),
         ),

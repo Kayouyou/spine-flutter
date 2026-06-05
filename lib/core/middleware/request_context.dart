@@ -5,7 +5,7 @@
 class RequestContext {
   static String? _currentTag;
 
-  static void setTag(String tag) => _currentTag = tag;
+  static set tag(String tag) => _currentTag = tag;
   static String? get currentTag => _currentTag;
   static void clear() => _currentTag = null;
 }

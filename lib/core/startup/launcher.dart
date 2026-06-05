@@ -1,5 +1,8 @@
 // lib/core/startup/launcher.dart
 
+// Dart imports:
+import 'dart:async';
+
 // Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +105,7 @@ class AppLauncher {
 
     // 数据同步 — 触发后不等待（后台执行）
     if (bootstrapOptions.enableDataSync) {
-      sl<DataSyncManager>().sync();
+      unawaited(sl<DataSyncManager>().sync());
     }
     StartupProfiler.mark('数据同步启动');
 

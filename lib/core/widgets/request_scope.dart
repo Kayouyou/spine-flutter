@@ -46,7 +46,7 @@ class _RequestScopeState extends State<RequestScope> {
     // overrideTag 在 initState 即可确定，无需依赖 inherited widget
     if (widget.overrideTag != null) {
       _tag = widget.overrideTag;
-      RequestContext.setTag(_tag!);
+      RequestContext.tag = _tag!;
     }
   }
 
@@ -56,7 +56,7 @@ class _RequestScopeState extends State<RequestScope> {
     // GoRouterState 依赖 inherited widget，需在 didChangeDependencies 中获取
     if (_tag == null) {
       _tag = _extractPathFromRouter();
-      RequestContext.setTag(_tag!);
+      RequestContext.tag = _tag!;
     }
   }
 

@@ -211,12 +211,14 @@ class TokenRenewalInterceptor extends Interceptor {
     final completer = Completer<Response>();
 
     // 当Completer完成时，将结果传递给handler
-    completer.future.then((newResponse) {
-      handler.next(newResponse);
-    }).catchError((error) {
-      _logger.warning('续期过程中出错，返回原始响应: $error');
-      handler.next(response);
-    });
+    unawaited(
+      completer.future.then((newResponse) {
+        handler.next(newResponse);
+      }).catchError((error) {
+        _logger.warning('续期过程中出错，返回原始响应: $error');
+        handler.next(response);
+      }),
+    );
 
     // 3. 将当前请求添加到缓存队列
     _addToPendingRequests(
@@ -248,7 +250,7 @@ class TokenRenewalInterceptor extends Interceptor {
       _renewalCompleter = Completer<bool>();
 
       // 使用Future.microtask确保不阻塞当前线程
-      Future.microtask(() async {
+      unawaited(Future.microtask(() async {
         try {
           _logger.info('开始执行token续期流程');
 
@@ -294,7 +296,7 @@ class TokenRenewalInterceptor extends Interceptor {
             }
           });
         }
-      });
+      }));
     });
   }
 
@@ -704,7 +706,7 @@ class TokenRenewalInterceptor extends Interceptor {
       createHttpClient: () {
         final client = HttpClient();
         client.findProxy = (uri) {
-          return 'PROXY ${HttpConstant.Proxy_Ip}:${HttpConstant.Proxy_Port}';
+          return 'PROXY ${HttpConstant.proxyIp}:${HttpConstant.Proxy_Port}';
         };
         client.badCertificateCallback = (cert, host, port) => true;
         return client;

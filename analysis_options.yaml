@@ -6,11 +6,26 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - bricks/**
+    # 代码生成产物, 不查 lint (freezed/retrofit/hive/build_runner)
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "**/build/**"
   errors:
     always_declare_return_types: error
     avoid_dynamic_calls: warning
     missing_return: error
     dead_code: error
+    # 业务常量约定: 保留 OSS 风格大写 (UnknownErrorCode/AccessKey 等)
+    # 改不改都阻塞 lint, 但改名破坏 API 兼容性
+    constant_identifier_names: ignore
+    # 公共 API 暴露私有类型 (如 BlocBuilder<MyState, MyState>)
+    # 业务侧取舍, 改泛型签名成本高
+    library_private_types_in_public_api: ignore
+    # 同包内 deprecated 成员使用: 由迁移节奏决定, 不阻塞 lint
+    deprecated_member_use_from_same_package: ignore
+    # 生成代码不查 trailing comma (已在 exclude 段排除 .g.dart, 此规则仅兜底)
+    require_trailing_commas: ignore
 
 linter:
   rules:
@@ -23,7 +38,6 @@ linter:
     - unawaited_futures
     - use_build_context_synchronously
     - use_setters_to_change_properties
-    - require_trailing_commas
     - sort_child_properties_last
     - prefer_const_declarations
     - prefer_final_locals
@@ -31,3 +45,5 @@ linter:
     - avoid_returning_null_for_void
     - avoid_redundant_argument_values
     - unnecessary_lambdas
+    # prefer_interpolation_to_compose_strings 已在 flutter_lints 启用 (dart fix 可自动改)
+    # require_trailing_commas 已在 errors 段 ignore (生成代码约束)

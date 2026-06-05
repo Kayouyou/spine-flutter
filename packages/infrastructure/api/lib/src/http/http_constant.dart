@@ -21,7 +21,7 @@ class HttpConstant {
   static const CompanyIp = '192.168.1.181'; // 公司ipni
   static const HomeIp = '192.168.66.176'; // 家ip
   static const IphoneIp = '172.20.10.11'; // 手机 热点ip
-  static var Proxy_Ip = CompanyIp; // 代理服务ip
+  static var proxyIp = CompanyIp; // 代理服务ip
   static const Proxy_Port = 8888; // 代理服务端口
 
   static const int reTokenCode = 1000102; // token续期的code

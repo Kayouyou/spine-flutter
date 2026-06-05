@@ -90,9 +90,9 @@ class HeaderInterceptor extends Interceptor {
     final sortedSignBodyValueStr =
         sortedSignBody.values.reduce((value, element) {
       if (value.length == 0) {
-        return value + element;
+        return '$value$element';
       } else {
-        return value + ',' + element;
+        return '$value,$element';
       }
     });
 

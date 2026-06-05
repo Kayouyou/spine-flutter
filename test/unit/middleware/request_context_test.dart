@@ -10,18 +10,18 @@ void main() {
     });
 
     test('setTag sets currentTag', () {
-      RequestContext.setTag('/home');
+      RequestContext.tag = '/home';
       expect(RequestContext.currentTag, '/home');
     });
 
     test('setTag overwrites previous tag', () {
-      RequestContext.setTag('/home');
-      RequestContext.setTag('/detail/:id');
+      RequestContext.tag = '/home';
+      RequestContext.tag = '/detail/:id';
       expect(RequestContext.currentTag, '/detail/:id');
     });
 
     test('clear resets currentTag to null', () {
-      RequestContext.setTag('/home');
+      RequestContext.tag = '/home';
       RequestContext.clear();
       expect(RequestContext.currentTag, isNull);
     });
