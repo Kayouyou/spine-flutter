@@ -1,0 +1,57 @@
+# Dependabot PR 专用 CI workflow
+# 关键: 必须在 PR 触发的 CI 中跑 `melos bs` (monorepo 关键)
+#       Dependabot 默认不开 Actions 写权限, 在仓库 Settings > Actions > General
+#       勾选 "Allow GitHub Actions to create and approve pull requests"
+#
+# 与主 CI (.github/workflows/ci.yml) 区别:
+#   - 主 CI: 跑全量 (analyze + test + build), 给人工 PR 用
+#   - 本文件: 跑 melos 增量 + analyze, 给 Dependabot PR 用 (快, 防 spam)
+
+name: Dependabot PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+# Dependabot PR 用单独 concurrency 排队, 避免和主 CI 互相挤
+concurrency:
+  group: dependabot-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-and-test:
+    name: melos bootstrap + analyze + 增量测试
+    runs-on: ubuntu-latest
+    # 只跑 Dependabot 提的 PR, 节省 CI 配额
+    if: github.actor == 'dependabot[bot]'
+    timeout-minutes: 20
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Flutter (锁版本, 与主 CI 一致)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.3'
+          channel: 'stable'
+
+      - name: 激活 melos
+        run: dart pub global activate melos
+
+      # ===== monorepo 关键: Dependabot 改了 pubspec 必须 melos bs =====
+      - name: melos bootstrap
+        run: melos bs
+
+      - name: 检查依赖方向
+        run: ./scripts/check_deps.sh
+
+      - name: 检查 ARB 翻译一致性
+        run: ./scripts/check_l10n.sh
+
+      - name: melos analyze (全包)
+        run: melos analyze
+
+      - name: melos test (跑受影响的包, 比全量快)
+        run: melos test:affected

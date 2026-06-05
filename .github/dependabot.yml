@@ -1,0 +1,276 @@
+# Dependabot configuration
+# 维护方: GitHub 官方 (非社区插件)
+# 作用: 每周自动检测过期依赖, 提 PR 让你 review 或自动合并
+# 文档: https://docs.github.com/code-security/dependabot
+
+version: 2
+
+# 启用生态无关的元数据更新 (如 GitHub Actions 自身)
+# 注意: 仓库是 private, Dependabot 对 private 仓库免费层 10 PR/月
+#       Pro/Team 100 PR/月, Enterprise 不限
+#       通过 groups 合并 PR 可显著降低数量
+
+updates:
+  # ===== 根 pubspec.yaml =====
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "area/root"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+      include: "scope"
+    groups:
+      # 把所有 minor/patch 合并成 1 个 PR, 避免 PR 轰炸
+      flutter-and-bloc:
+        patterns:
+          - "flutter"
+          - "flutter_test"
+          - "flutter_*"
+          - "flutter_bloc"
+          - "bloc"
+          - "hydrated_bloc"
+          - "replay_bloc"
+          - "bloc_concurrency"
+          - "bloc_test"
+        update-types: ["minor", "patch"]
+      codegen:
+        patterns:
+          - "freezed"
+          - "freezed_annotation"
+          - "build_runner"
+          - "injectable"
+          - "injectable_generator"
+          - "hive_generator"
+          - "json_serializable"
+        update-types: ["minor", "patch"]
+      network-stack:
+        patterns:
+          - "dio"
+          - "retrofit"
+          - "connectivity_plus"
+          - "rxdart"
+        update-types: ["minor", "patch"]
+      storage-stack:
+        patterns:
+          - "hive"
+          - "hive_flutter"
+          - "path_provider"
+          - "shared_preferences"
+        update-types: ["minor", "patch"]
+      dev-tools:
+        patterns:
+          - "melos"
+          - "import_sorter"
+          - "mocktail"
+        update-types: ["minor", "patch"]
+      # 默认分组: 兜底, 收容所有没被上面匹配的小众依赖
+      misc-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ===== packages/ 子包 (monorepo 关键) =====
+  # Dependabot 不会自动识别 pub workspaces / melos, 必须显式列 directory
+  - package-ecosystem: "pub"
+    directory: "/packages/domain"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/domain"
+    commit-message:
+      prefix: "deps(domain)"
+    groups:
+      all-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "pub"
+    directory: "/packages/infrastructure/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/infrastructure"
+    commit-message:
+      prefix: "deps(infrastructure/api)"
+    groups:
+      all-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "pub"
+    directory: "/packages/infrastructure/key_value_storage"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/infrastructure"
+    commit-message:
+      prefix: "deps(infrastructure/kv)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/infrastructure/list_cache"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/infrastructure"
+    commit-message:
+      prefix: "deps(infrastructure/list_cache)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/infrastructure/component_library"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/infrastructure"
+    commit-message:
+      prefix: "deps(infrastructure/component_library)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/infrastructure/routing"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/infrastructure"
+    commit-message:
+      prefix: "deps(infrastructure/routing)"
+
+  # services 层 (合并为一组, 减少 PR 数)
+  - package-ecosystem: "pub"
+    directory: "/packages/services/auth"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/services"
+    commit-message:
+      prefix: "deps(services/auth)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/services/network"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/services"
+    commit-message:
+      prefix: "deps(services/network)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/services/locale"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/services"
+    commit-message:
+      prefix: "deps(services/locale)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/services/error"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/services"
+    commit-message:
+      prefix: "deps(services/error)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/services/data_sync"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/services"
+    commit-message:
+      prefix: "deps(services/data_sync)"
+
+  # features 层 (3 个示例 feature, 实际用 Mason 生成后会自然追加)
+  - package-ecosystem: "pub"
+    directory: "/packages/features/feature_auth"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/features"
+    commit-message:
+      prefix: "deps(features/feature_auth)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/features/feature_home"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/features"
+    commit-message:
+      prefix: "deps(features/feature_home)"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/features/feature_detail"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/features"
+    commit-message:
+      prefix: "deps(features/feature_detail)"
+
+  # ===== GitHub Actions 自身版本守门 =====
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "area/ci"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
