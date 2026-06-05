@@ -1,0 +1,129 @@
+name: Release
+
+# tag 推送 (v*.*.*) 触发, 跑全套检查 + 打 debug 产物 + 上传 artifact
+# 用法: 本地 `git tag v0.2.0 && git push --tags` 即可触发
+# 不会自动 bump version 或发版到商店 — 那是发布日手动做
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '可选: 跑指定 tag (留空跑当前 HEAD 模拟发版校验)'
+        required: false
+
+# 串行: release 一次只跑一个, 避免 tag 风暴
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-and-build:
+    name: 发版前校验 + 产物
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出代码 (含完整 history, 拿 tag)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 取 tag 名
+        id: tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            echo "name=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 提取版本号 (去掉 v 前缀)
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: 校验 pubspec.yaml version 与 tag 一致
+        run: |
+          PUB_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          if [ "$PUB_VERSION" != "$VERSION" ]; then
+            echo "::error::pubspec version ($PUB_VERSION) ≠ tag ($VERSION)"
+            echo "请先: 1) 改 pubspec.yaml 的 version  2) commit  3) 再打 tag"
+            exit 1
+          fi
+          echo "✓ version 一致: $VERSION"
+
+      - name: 提取 changelog (本版本段)
+        run: |
+          awk '/^## \[?v?$VERSION\]?/{flag=1; next} /^## /{flag=0} flag' CHANGELOG.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "::warning::CHANGELOG.md 没找到 [$VERSION] 段, 用空 release notes"
+            echo "Release $VERSION" > release_notes.md
+          fi
+
+      - name: 安装 Flutter (锁版本)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.10'
+          channel: 'stable'
+
+      - name: 激活 melos
+        run: dart pub global activate melos
+
+      - name: monorepo 准备
+        run: melos bs
+
+      - name: 守门脚本
+        run: |
+          ./scripts/check_deps.sh
+          ./scripts/check_l10n.sh
+
+      - name: 静态分析 (0 issue 强制)
+        run: melos analyze
+
+      - name: 全量测试
+        run: melos test
+
+      - name: 构建 Android APK (debug)
+        run: flutter build apk --debug
+
+      - name: 构建 iOS (无签名, 仅校验编译)
+        run: |
+          if [ -d "ios" ]; then
+            cd ios && pod install --repo-update && cd ..
+            flutter build ios --debug --no-codesign
+          else
+            echo "(跳过 iOS, ios 目录不存在)"
+          fi
+
+      - name: 收集构建产物
+        run: |
+          mkdir -p release-artifacts
+          [ -f build/app/outputs/flutter-apk/app-debug.apk ] && cp build/app/outputs/flutter-apk/app-debug.apk release-artifacts/
+          [ -d build/ios/iphoneos/Runner.app ] && cp -r build/ios/iphoneos/Runner.app release-artifacts/
+          ls -la release-artifacts/
+
+      - name: 上传 release 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ steps.tag.outputs.name }}
+          path: release-artifacts/
+          retention-days: 30
+
+      - name: 上传 release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes-${{ steps.tag.outputs.name }}
+          path: release_notes.md
+          retention-days: 30
+
+      - name: 创建 GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.tag.outputs.name }}
+          body_path: release_notes.md
+          draft: true
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
