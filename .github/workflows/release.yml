@@ -88,6 +88,7 @@ jobs:
         run: flutter build apk --debug
 
       - name: 构建 iOS (无签名, 仅校验编译)
+        if: runner.os == 'macOS'
         run: |
           if [ -d "ios" ]; then
             cd ios && pod install --repo-update && cd ..
