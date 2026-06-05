@@ -21,7 +21,7 @@ jobs:
       - name: Run tests with coverage
         run: melos test:coverage
       - name: Upload to codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
