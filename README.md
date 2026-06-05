@@ -3,7 +3,7 @@
 [![CI](https://github.com/Kayouyou/spine-flutter/actions/workflows/ci.yml/badge.svg)](https://github.com/Kayouyou/spine-flutter/actions/workflows/ci.yml)
 [![Dependabot](https://img.shields.io/badge/dependabot-enabled-025e8c?logo=dependabot&logoColor=white)](https://github.com/Kayouyou/spine-flutter/network/dependencies)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-![Flutter](https://img.shields.io/badge/flutter-3.22.3-46d1fd?logo=flutter&logoColor=white)
+![Flutter](https://img.shields.io/badge/flutter-3.38.10-46d1fd?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/dart-3.x-0175c2?logo=dart&logoColor=white)
 ![Monorepo](https://img.shields.io/badge/architecture-monorepo-orange)
 ![AI Friendly](https://img.shields.io/badge/AI-friendly-8a2be2)

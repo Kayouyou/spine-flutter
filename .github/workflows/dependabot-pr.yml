@@ -34,7 +34,7 @@ jobs:
       - name: 安装 Flutter (锁版本, 与主 CI 一致)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.3'
+          flutter-version: '3.38.10'
           channel: 'stable'
 
       - name: 激活 melos

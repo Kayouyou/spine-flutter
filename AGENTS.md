@@ -56,7 +56,7 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 | 调试 | alice (HTTP) | — |
 | 包管理 | melos | latest |
 | 砖块 | mason | latest |
-| Flutter | 3.22.3 (FVM 锁版) | — |
+| Flutter | 3.38.10 (FVM 锁 stable channel) | — |
 | Dart | 3.x | — |
 
 **升级前必读**: `docs/runtime-infrastructure.md` 和 `openspec/changes/` 里同主题变更。
