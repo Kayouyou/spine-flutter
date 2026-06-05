@@ -20,6 +20,7 @@ updates:
       time: "09:00"
       timezone: "Asia/Shanghai"
     open-pull-requests-limit: 5
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/root"
@@ -86,6 +87,7 @@ updates:
       time: "09:00"
       timezone: "Asia/Shanghai"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/domain"
@@ -102,6 +104,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/infrastructure"
@@ -118,6 +121,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/infrastructure"
@@ -130,6 +134,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/infrastructure"
@@ -142,6 +147,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/infrastructure"
@@ -154,6 +160,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/infrastructure"
@@ -167,6 +174,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/services"
@@ -179,6 +187,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/services"
@@ -191,6 +200,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/services"
@@ -203,6 +213,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/services"
@@ -215,6 +226,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/services"
@@ -228,6 +240,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/features"
@@ -240,6 +253,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/features"
@@ -252,6 +266,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/features"
@@ -265,6 +280,7 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    delete-branch-after-merge: true
     labels:
       - "dependencies"
       - "area/ci"
