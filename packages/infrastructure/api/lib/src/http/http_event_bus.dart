@@ -32,6 +32,6 @@ class HttpEventBus {
 }
 
 class EventKeys {
-  static const String logout = "Logout";
-  static const String hasToken = "hasToken";
+  static const String logout = 'Logout';
+  static const String hasToken = 'hasToken';
 }

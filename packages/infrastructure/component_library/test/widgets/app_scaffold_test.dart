@@ -6,10 +6,10 @@ void main() {
   group('AppScaffold', () {
     testWidgets('renders with title (simple mode)', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: AppScaffold(
             title: '首页',
-            body: const Center(child: Text('内容')),
+            body: Center(child: Text('内容')),
           ),
         ),
       );
@@ -21,10 +21,10 @@ void main() {
 
     testWidgets('renders with custom appBar (advanced mode)', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: AppScaffold(
             appBar: CustomAppBar(title: '自定义标题'),
-            body: const Center(child: Text('内容')),
+            body: Center(child: Text('内容')),
           ),
         ),
       );
@@ -75,11 +75,11 @@ void main() {
 
     testWidgets('hides back button when showBackButton is false', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: AppScaffold(
             title: '首页',
             showBackButton: false,
-            body: const Center(child: Text('内容')),
+            body: Center(child: Text('内容')),
           ),
         ),
       );

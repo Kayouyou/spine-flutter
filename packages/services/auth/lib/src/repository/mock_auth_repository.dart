@@ -18,21 +18,21 @@ class MockAuthRepository implements AuthRepository {
   Future<Result<LoginResult, DomainException>> login(String username, String password) async {
     await Future.delayed(const Duration(milliseconds: 100));
     _loggedIn = username.isNotEmpty && password.isNotEmpty;
-    return Result.success(LoginResult(
+    return Result.success(const LoginResult(
       userId: 'mock-user-1',
       token: 'mock-token-xxx',
-    ));
+    ),);
   }
 
   @override
   Future<Result<LoginResult, DomainException>> register(String username, String password) async {
     await Future.delayed(const Duration(milliseconds: 100));
     _loggedIn = username.isNotEmpty && password.isNotEmpty;
-    return Result.success(LoginResult(
+    return Result.success(const LoginResult(
       userId: 'mock-user-1',
       token: 'mock-token-xxx',
       isNewUser: true,
-    ));
+    ),);
   }
 
   @override

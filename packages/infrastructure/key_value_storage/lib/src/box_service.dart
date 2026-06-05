@@ -62,7 +62,7 @@ class BoxService<T> {
     return values;
   }
 
-  Future<List<T>> where(bool test(T element)) async {
+  Future<List<T>> where(bool Function(T element) test) async {
     final values = await getAllValues();
     return values.where(test).toList();
   }

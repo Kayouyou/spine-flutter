@@ -4,15 +4,11 @@ import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:get_it/get_it.dart';
 import 'package:routing/routing.dart';
-import 'package:feature_auth/src/cubit/login_cubit.dart';
-import 'package:feature_detail/src/cubit/detail_cubit.dart';
-import 'package:feature_home/src/cubit/home_cubit.dart';
-import 'package:dio/dio.dart';
 
 void main() {
   late GetIt sl;
 
-  void _setup() {
+  void setup() {
     FeatureRegistry.instance.clear();
     sl.reset();
     FeatureRegistry.instance.register('feature_home', setupFeatureHome);
@@ -22,7 +18,7 @@ void main() {
 
   setUp(() {
     sl = GetIt.instance;
-    _setup();
+    setup();
   });
 
   tearDown(() {

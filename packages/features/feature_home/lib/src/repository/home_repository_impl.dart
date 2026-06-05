@@ -10,7 +10,7 @@ class HomeRepositoryImpl implements HomeRepository {
 
   HomeRepositoryImpl(this._dio)
       : _cacheManager = ListCacheManager<HomeData>(
-          config: CacheConfig.staleWhileRevalidate(pageSize: 20),
+          config: CacheConfig.staleWhileRevalidate(),
         ) {
     _homeApi = api.HomeApi(_dio);
   }
@@ -29,7 +29,7 @@ class HomeRepositoryImpl implements HomeRepository {
       if (result.data.isNotEmpty) {
         return Result.success(result.data.first);
       }
-      return Result.failure(NetworkException('No data'));
+      return Result.failure(const NetworkException('No data'));
     } on DioException catch (e) {
       return Result.failure(e.toDomainException());
     }

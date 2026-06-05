@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'preference_key.dart';
 
 class PreferencesService {
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<void> setString(PreferenceKey key, String value) async {
     final prefs = await _prefs;
@@ -38,14 +38,14 @@ class PreferencesService {
 
   Future<void> saveMap(Map<String, dynamic> map, PreferenceKey key) async {
     final prefs = await SharedPreferences.getInstance();
-    String jsonString = jsonEncode(map);
+    final String jsonString = jsonEncode(map);
     await prefs.setString(key.rawKey, jsonString);
   }
 
   Future<Map<String, dynamic>> readMapFromSharedPreferences(
-      PreferenceKey key) async {
+      PreferenceKey key,) async {
     final prefs = await SharedPreferences.getInstance();
-    String? jsonString = prefs.getString(key.rawKey);
+    final String? jsonString = prefs.getString(key.rawKey);
     if (jsonString != null) {
       return jsonDecode(jsonString);
     } else {
@@ -76,39 +76,39 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
 
     final privacyProtocol =
-        await prefs.getBool(PreferenceKey.agreePrivacyAndProtocol.rawKey);
+        prefs.getBool(PreferenceKey.agreePrivacyAndProtocol.rawKey);
     final driverLicense =
-        await prefs.getBool(PreferenceKey.agreePrivacyDriverLicense.rawKey);
-    final firstLaunchOnboardingCompleted = await prefs
+        prefs.getBool(PreferenceKey.agreePrivacyDriverLicense.rawKey);
+    final firstLaunchOnboardingCompleted = prefs
         .getBool(PreferenceKey.firstLaunchOnboardingCompleted.rawKey);
 
     debugPrint(
-        'PreferencesService.clear() - 保存的值: privacy=$privacyProtocol, driver=$driverLicense, onboarding=$firstLaunchOnboardingCompleted');
+        'PreferencesService.clear() - 保存的值: privacy=$privacyProtocol, driver=$driverLicense, onboarding=$firstLaunchOnboardingCompleted',);
 
     await prefs.clear();
 
     if (privacyProtocol == true) {
       await prefs.setBool(
-          PreferenceKey.agreePrivacyAndProtocol.rawKey, true);
+          PreferenceKey.agreePrivacyAndProtocol.rawKey, true,);
       debugPrint(
-          'PreferencesService.clear() - 已恢复AgreePrivacyAndProtocol为true');
+          'PreferencesService.clear() - 已恢复AgreePrivacyAndProtocol为true',);
     } else {
       debugPrint(
-          'PreferencesService.clear() - AgreePrivacyAndProtocol未恢复，原值为: $privacyProtocol');
+          'PreferencesService.clear() - AgreePrivacyAndProtocol未恢复，原值为: $privacyProtocol',);
     }
 
     if (driverLicense == true) {
       await prefs.setBool(
-          PreferenceKey.agreePrivacyDriverLicense.rawKey, true);
+          PreferenceKey.agreePrivacyDriverLicense.rawKey, true,);
       debugPrint(
-          'PreferencesService.clear() - 已恢复AgreePrivacyDriverLicense为true');
+          'PreferencesService.clear() - 已恢复AgreePrivacyDriverLicense为true',);
     }
 
     if (firstLaunchOnboardingCompleted == true) {
       await prefs.setBool(
-          PreferenceKey.firstLaunchOnboardingCompleted.rawKey, true);
+          PreferenceKey.firstLaunchOnboardingCompleted.rawKey, true,);
       debugPrint(
-          'PreferencesService.clear() - 已恢复FirstLaunchOnboardingCompleted为true');
+          'PreferencesService.clear() - 已恢复FirstLaunchOnboardingCompleted为true',);
     }
   }
 

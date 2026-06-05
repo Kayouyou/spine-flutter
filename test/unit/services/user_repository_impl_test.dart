@@ -18,12 +18,11 @@ void main() {
 
   group('getCurrentUser', () {
     test('200 时返回 User', () async {
-      when(() => mockApi.getCurrentUser()).thenAnswer((_) async => UserProfile(
+      when(() => mockApi.getCurrentUser()).thenAnswer((_) async => const UserProfile(
         id: '1',
         name: 'Test',
         email: 'test@test.com',
-        avatar: null,
-      ));
+      ),);
 
       final result = await repo.getCurrentUser();
       result.when(

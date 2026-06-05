@@ -39,7 +39,7 @@ class AppLauncher {
   /// [app] 是根 Widget（通常为 MyApp）。
   /// [bootstrapOptions] 控制高级能力开关，默认全部关闭。
   static Future<void> launch(Widget app,
-      {BootstrapOptions bootstrapOptions = const BootstrapOptions()}) async {
+      {BootstrapOptions bootstrapOptions = const BootstrapOptions(),}) async {
     // ===== 阶段 1: 核心初始化 =====
     WidgetsFlutterBinding.ensureInitialized();
     StartupProfiler.start();

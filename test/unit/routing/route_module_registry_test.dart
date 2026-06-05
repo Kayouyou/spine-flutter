@@ -40,9 +40,7 @@ void main() {
     );
   });
 
-  tearDown(() {
-    RouteModuleRegistry.instance.clear();
-  });
+  tearDown(RouteModuleRegistry.instance.clear);
 
   group('RouteModuleRegistry explicit registration', () {
     test('get returns routes for feature_home', () {

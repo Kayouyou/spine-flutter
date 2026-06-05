@@ -49,7 +49,7 @@ void main() {
         tokenStorage: mockTokenStorage,
         authCubit: mockAuthCubit,
       );
-      expect(() => manager.dispose(), returnsNormally);
+      expect(manager.dispose, returnsNormally);
     });
   });
 }

@@ -35,7 +35,6 @@ class CacheResult<T> extends Equatable {
   ) {
     return CacheResult(
       data: data,
-      isFromCache: false,
       hasMore: hasMore,
       totalCount: totalCount,
     );

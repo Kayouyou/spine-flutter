@@ -3,7 +3,6 @@
 // 使用: Image.asset(Assets.images.icon.path)
 
 // Package imports:
-import 'package:error/error.dart';
 
 // Project imports:
 import 'app.dart';

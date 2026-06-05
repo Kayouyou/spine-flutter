@@ -18,7 +18,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(state.copyWith(
           status: AuthStatus.loggedIn,
           userId: loginResult.userId,
-        ));
+        ),);
       },
       failure: (error) => emit(state.copyWith(
         status: AuthStatus.error,

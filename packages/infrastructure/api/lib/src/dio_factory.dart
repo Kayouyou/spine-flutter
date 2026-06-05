@@ -40,7 +40,7 @@ Dio createDio({
     connectTimeout: connectTimeout ?? const Duration(seconds: 10),
     receiveTimeout: receiveTimeout ?? const Duration(seconds: 10),
     headers: {'Content-Type': 'application/json'},
-  ));
+  ),);
 
   // [0] Auto-cancel — 调用方注入（closes over RequestContext + CancelTokenManager）
   if (autoCancelInterceptor != null) {
@@ -69,7 +69,7 @@ Dio createDio({
       }
       handler.next(error);
     },
-  ));
+  ),);
 
   // [3] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
   if (kDebugMode) {

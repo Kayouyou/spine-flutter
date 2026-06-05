@@ -90,11 +90,11 @@ void _writeModel(String dir, String name, Map<String, dynamic> def) {
   buffer.writeln('  const factory $name({');
   for (final f in fields) {
     final req = f['optional'] == true ? '' : 'required ';
-    buffer.writeln('    ${req}${f['type']} ${f['name']},');
+    buffer.writeln('    $req${f['type']} ${f['name']},');
   }
   buffer.writeln('  }) = _$name;');
   buffer.writeln();
-  buffer.writeln("  factory $name.fromJson(Map<String, dynamic> json) => _\$${name}FromJson(json);");
+  buffer.writeln('  factory $name.fromJson(Map<String, dynamic> json) => _\$${name}FromJson(json);');
   buffer.writeln('}');
 
   File('$dir/$snake.dart').writeAsStringSync(buffer.toString());
@@ -215,7 +215,7 @@ void _updateBarrel(String apiDir, List<String> modelNames, String domain) {
   }
   
   if (newExports.isNotEmpty) {
-    File(barrelPath).writeAsStringSync(barrel.trimRight() + '\n' + newExports.join('\n') + '\n');
+    File(barrelPath).writeAsStringSync('${barrel.trimRight()}\n${newExports.join('\n')}\n');
     print('✅ Barrel: +${newExports.length} exports');
   }
 }

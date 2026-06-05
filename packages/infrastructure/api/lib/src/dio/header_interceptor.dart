@@ -66,8 +66,8 @@ class HeaderInterceptor extends Interceptor {
         return a.toLowerCase().compareTo(b.toLowerCase());
       });
 
-    final sortedSignBody = Map();
-    sortedKeys.forEach((element) {
+    final sortedSignBody = {};
+    for (final element in sortedKeys) {
       debugPrint('m ${signBody[element]}');
       // final type = signBody[element].runtimeType.toString();
       // debugPrint(signBody[element].runtimeType.toString());
@@ -84,7 +84,7 @@ class HeaderInterceptor extends Interceptor {
         }
       }
       // }
-    });
+    }
 
     // body's value => string
     final sortedSignBodyValueStr =

@@ -7,12 +7,12 @@ import 'package:domain/domain.dart';
 class _FakeHomeRepository implements HomeRepository {
   @override
   Future<Result<HomeData, DomainException>> getHomeData() async {
-    return Result.failure(NetworkException('unknown'));
+    return Result.failure(const NetworkException('unknown'));
   }
 
   @override
   Future<Result<HomeData, DomainException>> refreshHomeData() async {
-    return Result.failure(NetworkException('unknown'));
+    return Result.failure(const NetworkException('unknown'));
   }
 }
 

@@ -40,12 +40,12 @@ class NetworkCubit extends Cubit<NetworkState> {
       emit(NetworkState(
         status:
             isConnected ? NetworkStatus.connected : NetworkStatus.disconnected,
-      ));
+      ),);
     } catch (e) {
       emit(NetworkState(
         status: NetworkStatus.disconnected,
         lastDisconnectedAt: DateTime.now(),
-      ));
+      ),);
     }
   }
 

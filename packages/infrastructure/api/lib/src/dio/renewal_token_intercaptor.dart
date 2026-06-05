@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
-import 'package:api/src/http/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:synchronized/synchronized.dart';
@@ -9,8 +8,6 @@ import 'package:key_value_storage/key_value_storage.dart';
 
 import 'package:uuid/uuid.dart';
 import '../../api.dart';
-import 'package:api/src/endpoints/api_endpoints.dart' show ApiBase;
-import '../http/http_constant.dart';
 import 'header_interceptor.dart';
 
 /*
@@ -147,7 +144,7 @@ class TokenRenewalInterceptor extends Interceptor {
   TokenRenewalState _renewalState = TokenRenewalState.idle;
 
   // 续期请求路径标识
-  static const String _tokenRenewalPath = "User/Token/Renewal";
+  static const String _tokenRenewalPath = 'User/Token/Renewal';
 
   // 最近一次续期时间
   DateTime? _lastRenewalTime;
@@ -177,7 +174,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
       _pendingRequests.add(request);
       _logger.debug(
-          '添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}');
+          '添加请求到队列: ${requestOptions.path}, 当前队列大小: ${_pendingRequests.length}',);
     } catch (e) {
       _logger.error('添加请求到队列时出错: $e');
     }
@@ -240,7 +237,7 @@ class TokenRenewalInterceptor extends Interceptor {
       // 如果短时间内已经续期成功，直接重试请求
       if (_renewalState == TokenRenewalState.success &&
           _lastRenewalTime != null &&
-          DateTime.now().difference(_lastRenewalTime!) < Duration(seconds: 5)) {
+          DateTime.now().difference(_lastRenewalTime!) < const Duration(seconds: 5)) {
         _logger.debug('短时间内已经续期成功，直接重试请求');
         await _retryAllPendingRequests();
         return;
@@ -291,7 +288,7 @@ class TokenRenewalInterceptor extends Interceptor {
           _renewalState = TokenRenewalState.failed;
         } finally {
           // 延迟重置状态，确保所有请求都有时间处理
-          Future.delayed(Duration(seconds: 3), () {
+          Future.delayed(const Duration(seconds: 3), () {
             if (_renewalState != TokenRenewalState.renewing) {
               _renewalState = TokenRenewalState.idle;
             }
@@ -303,7 +300,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
   /// 处理续期请求的响应
   Future<void> _handleRenewalResponse(
-      Response response, ResponseInterceptorHandler handler) async {
+      Response response, ResponseInterceptorHandler handler,) async {
     // 如果不是第一个续期请求，等待已有的续期完成
     if (_renewalState == TokenRenewalState.renewing &&
         _renewalCompleter != null) {
@@ -312,7 +309,7 @@ class TokenRenewalInterceptor extends Interceptor {
       try {
         // 等待续期完成
         final success = await _renewalCompleter!.future.timeout(
-          Duration(seconds: 10),
+          const Duration(seconds: 10),
           onTimeout: () {
             _logger.warning('等待被动续期超时');
             return false;
@@ -331,7 +328,7 @@ class TokenRenewalInterceptor extends Interceptor {
                 data: {
                   'code': 0,
                   'message': 'Token renewal successful',
-                  'data': {'token': token, 'expires': 7200}
+                  'data': {'token': token, 'expires': 7200},
                 },
               );
               return handler.next(successResponse);
@@ -376,7 +373,7 @@ class TokenRenewalInterceptor extends Interceptor {
       }
 
       // 延迟重置状态
-      Future.delayed(Duration(seconds: 3), () {
+      Future.delayed(const Duration(seconds: 3), () {
         _renewalState = TokenRenewalState.idle;
       });
 
@@ -403,7 +400,7 @@ class TokenRenewalInterceptor extends Interceptor {
       if (_lastRenewalTime != null) {
         final timeSinceLastRenewal =
             DateTime.now().difference(_lastRenewalTime!);
-        if (timeSinceLastRenewal < Duration(seconds: 5)) {
+        if (timeSinceLastRenewal < const Duration(seconds: 5)) {
           _logger.debug('最近已经续期过，跳过本次续期');
           return true;
         }
@@ -422,7 +419,7 @@ class TokenRenewalInterceptor extends Interceptor {
         'version': HttpConstant.Version,
         'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
         'signType': HttpConstant.SignType.toString(),
-        'nonce': Uuid().v4(),
+        'nonce': const Uuid().v4(),
         'token': '',
         'sign': '',
       };
@@ -544,7 +541,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
       // 批次间添加短暂延迟，避免请求风暴
       if (end < requests.length) {
-        await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(const Duration(milliseconds: 50));
       }
     }
 
@@ -593,7 +590,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
       // 批次间添加短暂延迟，避免请求风暴（fire-and-forget）
       if (end < requests.length) {
-        Future.delayed(Duration(milliseconds: 50));
+        Future.delayed(const Duration(milliseconds: 50));
       }
     }
 
@@ -602,7 +599,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
   /// 重试单个请求，失败时重试一次
   Future<Response?> _retryRequestWithRetry(
-      RequestOptions requestOptions) async {
+      RequestOptions requestOptions,) async {
     try {
       // 第一次尝试
       return await _retryRequest(requestOptions);
@@ -611,7 +608,7 @@ class TokenRenewalInterceptor extends Interceptor {
 
       try {
         // 短暂延迟后第二次尝试
-        await Future.delayed(Duration(milliseconds: 200));
+        await Future.delayed(const Duration(milliseconds: 200));
         return await _retryRequest(requestOptions);
       } catch (e) {
         _logger.warning('第二次重试也失败，放弃重试: ${requestOptions.path}, 错误: $e');
@@ -625,10 +622,10 @@ class TokenRenewalInterceptor extends Interceptor {
     // 获取最新token
     final token =
         _tokenStorage != null ? await _tokenStorage!.getToken() : null;
-    final _headers = requestOptions.headers;
-    final _token = _headers['token'];
-    if (_token != null && _token is String && _token.isNotEmpty) {
-      _headers['token'] = token;
+    final headers = requestOptions.headers;
+    final token0 = headers['token'];
+    if (token0 != null && token0 is String && token0.isNotEmpty) {
+      headers['token'] = token;
     }
 
     // 创建新的请求选项，保留原始请求的所有参数
@@ -676,7 +673,7 @@ class TokenRenewalInterceptor extends Interceptor {
       {required String url,
       required Map<String, dynamic> params,
       required Map<String, dynamic> headers,
-      required CancelToken cancelToken}) async {
+      required CancelToken cancelToken,}) async {
     // 创建专用的Dio实例用于续期请求
     final tokenDio = Dio()..interceptors.add(HeaderInterceptor());
     _configureProxy(tokenDio);
@@ -690,8 +687,8 @@ class TokenRenewalInterceptor extends Interceptor {
       options: Options(
         headers: headers,
         validateStatus: (status) => true, // 接受所有状态码
-        receiveTimeout: Duration(seconds: HttpConstant.ReceiveTimeout),
-        sendTimeout: Duration(seconds: HttpConstant.SendTimeout),
+        receiveTimeout: const Duration(seconds: HttpConstant.ReceiveTimeout),
+        sendTimeout: const Duration(seconds: HttpConstant.SendTimeout),
       ),
     );
 

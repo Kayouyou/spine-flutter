@@ -3,7 +3,7 @@ import 'package:my_app/core/middleware/request_context.dart';
 
 void main() {
   group('RequestContext', () {
-    tearDown(() => RequestContext.clear());
+    tearDown(RequestContext.clear);
 
     test('currentTag returns null by default', () {
       expect(RequestContext.currentTag, isNull);

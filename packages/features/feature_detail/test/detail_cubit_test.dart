@@ -28,7 +28,7 @@ void main() {
       build: () {
         when(() => mockRepo.getDetailData('1'))
             .thenAnswer((_) async => Result.success<DetailData, DomainException>(
-                const DetailData(id: '1', title: 'detail')));
+                const DetailData(id: '1', title: 'detail'),),);
         return DetailCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData('1'),
@@ -65,7 +65,7 @@ void main() {
       build: () {
         when(() => mockRepo.getDetailData('42'))
             .thenAnswer((_) async => Result.success<DetailData, DomainException>(
-                const DetailData(id: '42', title: 'retry')));
+                const DetailData(id: '42', title: 'retry'),),);
         return DetailCubit(mockRepo);
       },
       act: (cubit) => cubit.retry('42'),

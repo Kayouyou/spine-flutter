@@ -11,10 +11,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('HomePage smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: _TestScaffold(
           title: '首页',
-          body: const Text('骨架搭建完成'),
+          body: Text('骨架搭建完成'),
         ),
       ),
     );
@@ -26,10 +26,10 @@ void main() {
 
   testWidgets('DetailPage smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: _TestScaffold(
           title: '详情页',
-          body: const Text('详情页面'),
+          body: Text('详情页面'),
         ),
       ),
     );

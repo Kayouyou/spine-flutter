@@ -21,7 +21,7 @@ class UserRepositoryImpl implements UserRepository {
         name: profile.name,
         email: profile.email,
         avatar: profile.avatar,
-      ));
+      ),);
     } on DioException catch (e) {
       return Result.failure(_mapError(e));
     }
@@ -34,7 +34,7 @@ class UserRepositoryImpl implements UserRepository {
         name: data.name,
         email: data.email,
         avatar: data.avatar,
-      ));
+      ),);
       return Result.success(null);
     } on DioException catch (e) {
       return Result.failure(_mapError(e));

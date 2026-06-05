@@ -14,7 +14,7 @@ void main() {
     });
 
     test('toJson produces correct map', () {
-      final user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
+      const user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
       final map = user.toJson();
 
       expect(map['id'], '1');
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('toJson omits null fields', () {
-      final user = User(id: '1', name: 'Test');
+      const user = User(id: '1', name: 'Test');
       final map = user.toJson();
 
       expect(map['avatar'], isNull);
@@ -32,16 +32,16 @@ void main() {
     });
 
     test('equality works correctly', () {
-      final user1 = User(id: '1', name: 'Test');
-      final user2 = User(id: '1', name: 'Test');
-      final user3 = User(id: '2', name: 'Other');
+      const user1 = User(id: '1', name: 'Test');
+      const user2 = User(id: '1', name: 'Test');
+      const user3 = User(id: '2', name: 'Other');
 
       expect(user1, user2);
       expect(user1, isNot(user3));
     });
 
     test('props includes all fields', () {
-      final user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
+      const user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
       expect(user.props, ['1', 'Test', 'url', 'test@example.com']);
     });
   });

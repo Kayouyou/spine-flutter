@@ -22,7 +22,7 @@ void main() {
     when(() => mockConnectivity.checkConnectivity())
         .thenAnswer((_) async => [ConnectivityResult.wifi]);
     when(() => mockConnectivity.onConnectivityChanged)
-        .thenAnswer((_) => Stream<List<ConnectivityResult>>.empty());
+        .thenAnswer((_) => const Stream<List<ConnectivityResult>>.empty());
   });
 
   group('NetworkState', () {
@@ -84,10 +84,10 @@ void main() {
         ..emit(NetworkState(
           status: NetworkStatus.disconnected,
           lastDisconnectedAt: DateTime.now(),
-        )),
+        ),),
       act: (cubit) => cubit.checkNow(),
       expect: () => [
-        NetworkState(status: NetworkStatus.connected),
+        const NetworkState(status: NetworkStatus.connected),
       ],
     );
 
@@ -110,7 +110,7 @@ void main() {
       build: () => NetworkCubit(connectivity: mockConnectivity),
       act: (cubit) => cubit.setUIStyle(NetworkUIStyle.toast),
       expect: () => [
-        NetworkState(status: NetworkStatus.disconnected, uiStyle: NetworkUIStyle.toast),
+        const NetworkState(status: NetworkStatus.disconnected, uiStyle: NetworkUIStyle.toast),
       ],
     );
 
@@ -146,12 +146,12 @@ void main() {
     });
 
     test('disconnectedDuration计算断网时长', () async {
-      final disconnectTime = DateTime.now().subtract(Duration(minutes: 5));
+      final disconnectTime = DateTime.now().subtract(const Duration(minutes: 5));
       final cubit = NetworkCubit(connectivity: mockConnectivity)
         ..emit(NetworkState(
           status: NetworkStatus.disconnected,
           lastDisconnectedAt: disconnectTime,
-        ));
+        ),);
 
       final duration = cubit.disconnectedDuration;
       expect(duration, isNotNull);

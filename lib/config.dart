@@ -24,10 +24,10 @@ class EnvironmentConfig {
   );
 
   /// Sentry DSN（从环境文件读取，生产环境需要配置）
-  static const sentryDsn = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+  static const sentryDsn = String.fromEnvironment('SENTRY_DSN');
 
   /// App Store ID（从环境文件读取，生产环境需要配置）
-  static const appStoreId = String.fromEnvironment('APP_STORE_ID', defaultValue: '');
+  static const appStoreId = String.fromEnvironment('APP_STORE_ID');
 
   /// 当前环境
   static AppEnvironment get current {

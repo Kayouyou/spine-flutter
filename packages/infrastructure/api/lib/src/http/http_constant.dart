@@ -6,7 +6,7 @@ class HttpConstant {
   static const String Http_Host =
       IsRelease ? 'fn.jzfeng.com' : '47.92.151.39:5216';
   static const String AccessKeyId =
-      String.fromEnvironment('OVSX_APP_TOKEN', defaultValue: '');
+      String.fromEnvironment('OVSX_APP_TOKEN');
 
   static const int ReceiveTimeout = 15000;
   static const int ConnectTimeout = 15000;
@@ -34,7 +34,7 @@ class HttpConstant {
 }
 
 class AliyunOSSConstant {
-  static const AccessKey = String.fromEnvironment('OVSX_OSS_TOKEN', defaultValue: '');
+  static const AccessKey = String.fromEnvironment('OVSX_OSS_TOKEN');
 
   static const BucketName = 'ovsx-usr';
   static const Endpoint = 'https://oss-cn-zhangjiakou.aliyuncs.com';

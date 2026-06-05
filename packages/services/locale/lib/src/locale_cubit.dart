@@ -12,7 +12,7 @@ import 'locale_state.dart';
 class LocaleCubit extends HydratedCubit<LocaleState> {
   static const String _storagePrefix = 'LocaleCubit';
 
-  LocaleCubit() : super(LocaleState(locale: Locale('zh')));
+  LocaleCubit() : super(const LocaleState(locale: Locale('zh')));
 
   @override
   String get storagePrefix => _storagePrefix;
@@ -41,6 +41,6 @@ class LocaleCubit extends HydratedCubit<LocaleState> {
 
   /// 重置为默认语言（中文）
   Future<void> resetToDefault() async {
-    emit(LocaleState(locale: Locale('zh')));
+    emit(const LocaleState(locale: Locale('zh')));
   }
 }

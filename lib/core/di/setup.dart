@@ -66,8 +66,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
   // ===== Step 2: Dio（依赖 TokenStorage） =====
   final autoCancelInterceptor = AutoCancelInterceptor(
     tagProvider: () => RequestContext.currentTag,
-    registerFn: (tag, token) =>
-        CancelTokenManager.instance.register(tag, token),
+    registerFn: CancelTokenManager.instance.register,
   );
 
   final config = sl<IAppConfig>();

@@ -30,7 +30,7 @@ void main() {
       'login success emits [loading, loggedIn]',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(LoginResult(userId: 'test-user', token: 'test-token')));
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(const LoginResult(userId: 'test-user', token: 'test-token')));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
@@ -43,7 +43,7 @@ void main() {
       'login failure emits [loading, error]',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.failure(NetworkException('登录失败')));
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.failure(const NetworkException('登录失败')));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
@@ -57,7 +57,7 @@ void main() {
       build: () => AuthCubit(mockRepo),
       setUp: () {
         when(() => mockRepo.login('user', 'pass'))
-            .thenAnswer((_) async => Result.failure(NetworkException('network error')));
+            .thenAnswer((_) async => Result.failure(const NetworkException('network error')));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       expect: () => [
@@ -70,7 +70,7 @@ void main() {
       'logout emits [loading, initial] after login',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(LoginResult(userId: 'test-user', token: 'test-token')));
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(const LoginResult(userId: 'test-user', token: 'test-token')));
         when(() => mockRepo.logout()).thenAnswer((_) async => Result.success(null));
       },
       act: (cubit) async {
@@ -81,7 +81,7 @@ void main() {
         const AuthState(status: AuthStatus.loading),
         const AuthState(status: AuthStatus.loggedIn, userId: 'test-user'),
         const AuthState(status: AuthStatus.loading, userId: 'test-user'),
-        const AuthState(status: AuthStatus.initial),
+        const AuthState(),
       ],
     );
 
@@ -89,7 +89,7 @@ void main() {
       'isLoggedIn getter returns true when loggedIn',
       build: () => AuthCubit(mockRepo),
       setUp: () {
-        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(LoginResult(userId: 'test-user', token: 'test-token')));
+        when(() => mockRepo.login('user', 'pass')).thenAnswer((_) async => Result.success(const LoginResult(userId: 'test-user', token: 'test-token')));
       },
       act: (cubit) => cubit.login('user', 'pass'),
       verify: (cubit) {

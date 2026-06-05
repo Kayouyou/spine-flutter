@@ -24,7 +24,6 @@ class CacheConfig {
   /// 快捷构造：先缓存后网络，5 分钟过期
   factory CacheConfig.staleWhileRevalidate({int pageSize = 20}) {
     return CacheConfig(
-      strategy: ListCacheStrategy.cacheFirst,
       staleDuration: const Duration(minutes: 5),
       pageSize: pageSize,
     );

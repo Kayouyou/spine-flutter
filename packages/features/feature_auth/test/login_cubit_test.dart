@@ -27,7 +27,7 @@ void main() {
       'login success',
       build: () {
         when(() => mockRepo.login('user', 'password123'))
-            .thenAnswer((_) async => Result.success(LoginResult(userId: '1', token: 'token')));
+            .thenAnswer((_) async => Result.success(const LoginResult(userId: '1', token: 'token')));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -49,7 +49,7 @@ void main() {
       'login with short password fails',
       build: () {
         when(() => mockRepo.login('user', 'short'))
-            .thenAnswer((_) async => Result.failure(ValidationException('密码长度不足6位')));
+            .thenAnswer((_) async => Result.failure(const ValidationException('密码长度不足6位')));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -70,7 +70,7 @@ void main() {
       'login with empty username fails',
       build: () {
         when(() => mockRepo.login('', 'password123'))
-            .thenAnswer((_) async => Result.failure(ValidationException('用户名不能为空')));
+            .thenAnswer((_) async => Result.failure(const ValidationException('用户名不能为空')));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -91,7 +91,7 @@ void main() {
       'reset returns to initial',
       build: () {
         when(() => mockRepo.login('user', 'password123'))
-            .thenAnswer((_) async => Result.success(LoginResult(userId: '1', token: 'token')));
+            .thenAnswer((_) async => Result.success(const LoginResult(userId: '1', token: 'token')));
         return LoginCubit(mockRepo);
       },
       act: (cubit) async {
@@ -112,7 +112,7 @@ void main() {
       'register success',
       build: () {
         when(() => mockRepo.register('user', 'password123'))
-            .thenAnswer((_) async => Result.success(LoginResult(userId: '1', token: 'token', isNewUser: true)));
+            .thenAnswer((_) async => Result.success(const LoginResult(userId: '1', token: 'token', isNewUser: true)));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {
@@ -133,7 +133,7 @@ void main() {
       'register with short password fails',
       build: () {
         when(() => mockRepo.register('user', 'short'))
-            .thenAnswer((_) async => Result.failure(ValidationException('密码长度不足6位')));
+            .thenAnswer((_) async => Result.failure(const ValidationException('密码长度不足6位')));
         return LoginCubit(mockRepo);
       },
       act: (cubit) {

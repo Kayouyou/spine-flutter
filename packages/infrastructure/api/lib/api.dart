@@ -2,6 +2,7 @@
 ///
 /// 提供 Dio 工厂函数和标准拦截器，不含业务 API 方法。
 /// 业务 API 调用推荐使用 Retrofit 生成的 Api 类（如 HomeApi、DetailApi），
+library;
 export 'src/dio_factory.dart';
 export 'src/http/http_event_bus.dart';
 export 'src/http/http_constant.dart';

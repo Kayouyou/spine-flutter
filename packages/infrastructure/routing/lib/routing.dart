@@ -6,6 +6,7 @@
 /// - RouteContext: Dependency container for route modules
 /// - AuthGuard: Route guard for authentication
 /// - RouteObserver: Route change observer
+library;
 
 export 'src/routes/routes.dart';
 export 'src/routes/route_module.dart';

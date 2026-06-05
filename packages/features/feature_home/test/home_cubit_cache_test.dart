@@ -20,7 +20,7 @@ void main() {
       build: () {
         when(() => mockRepo.getHomeData())
             .thenAnswer((_) async => Result.success<HomeData, DomainException>(
-                const HomeData(title: 'cached')));
+                const HomeData(title: 'cached'),),);
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData(),
@@ -39,7 +39,7 @@ void main() {
       build: () {
         when(() => mockRepo.refreshHomeData())
             .thenAnswer((_) async => Result.success<HomeData, DomainException>(
-                const HomeData(title: 'refreshed')));
+                const HomeData(title: 'refreshed'),),);
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.refreshData(),
@@ -57,7 +57,7 @@ void main() {
       build: () {
         when(() => mockRepo.getHomeData())
             .thenAnswer((_) async => Result.failure<HomeData, DomainException>(
-              NetworkException('server error', statusCode: 500)));
+              const NetworkException('server error', statusCode: 500),),);
         return HomeCubit(mockRepo);
       },
       act: (cubit) => cubit.loadData(),

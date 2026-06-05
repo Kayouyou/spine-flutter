@@ -16,9 +16,7 @@ final getIt = GetIt.instance;
 /// 在 setupDependencies() 中调用 configureDependencies(getIt)
 /// 自动注册所有 @injectable/@singleton/@lazySingleton 注解的类
 @InjectableInit(
-  initializerName: 'init',
   preferRelativeImports: true,
-  asExtension: true,
 )
 void configureDependencies(GetIt getIt) {
   // 基础注册：所有 @injectable/@singleton/@lazySingleton 注解的类

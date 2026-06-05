@@ -35,7 +35,7 @@ void main() {
       build: () {
         when(() => mockRepo.getHomeData()).thenAnswer(
           (_) async => Result.failure<HomeData, DomainException>(
-            NetworkException('连接失败'),
+            const NetworkException('连接失败'),
           ),
         );
         return HomeCubit(mockRepo);

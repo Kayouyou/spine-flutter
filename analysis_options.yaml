@@ -28,3 +28,6 @@ linter:
     - prefer_const_declarations
     - prefer_final_locals
     - prefer_final_in_for_each
+    - avoid_returning_null_for_void
+    - avoid_redundant_argument_values
+    - unnecessary_lambdas

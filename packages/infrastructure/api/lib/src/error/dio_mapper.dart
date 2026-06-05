@@ -25,7 +25,7 @@ extension DioExceptionMapper on DioException {
       case ErrorCode.serverError:
         return NetworkException('服务器错误', statusCode: statusCode);
       case ErrorCode.requestCancelled:
-        return NetworkException('请求已取消');
+        return const NetworkException('请求已取消');
       case ErrorCode.connectionTimeout:
         return NetworkException('连接超时', statusCode: statusCode);
       case ErrorCode.networkError:
@@ -34,7 +34,7 @@ extension DioExceptionMapper on DioException {
       case ErrorCode.tokenInvalid:
         return const UnauthorizedException();
       case ErrorCode.invalidInput:
-        return ValidationException('无效的输入');
+        return const ValidationException('无效的输入');
       case ErrorCode.unknown:
         return NetworkException('未知错误', statusCode: statusCode);
     }

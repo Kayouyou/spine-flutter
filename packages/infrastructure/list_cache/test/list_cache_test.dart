@@ -40,7 +40,7 @@ void main() {
     test('has isFromCache/isFromNetwork flags', () {
       // Test cache result
       final cacheResult = CacheResult<String>.fromCache(
-        ['item1', 'item2'],
+        const ['item1', 'item2'],
         hasMore: false,
       );
       
@@ -50,8 +50,7 @@ void main() {
       
       // Test network result
       final networkResult = CacheResult<String>.fromNetwork(
-        ['item3', 'item4'],
-        hasMore: true,
+        const ['item3', 'item4'],
         totalCount: 100,
       );
       
@@ -62,10 +61,8 @@ void main() {
     });
 
     test('default constructor creates network result', () {
-      final result = CacheResult<int>(
+      const result = CacheResult<int>(
         data: [1, 2, 3],
-        isFromCache: false,
-        hasMore: true,
       );
       
       expect(result.isFromCache, isFalse);
@@ -75,9 +72,9 @@ void main() {
     });
 
     test('supports equality via Equatable', () {
-      final result1 = CacheResult<String>.fromCache(['a', 'b']);
-      final result2 = CacheResult<String>.fromCache(['a', 'b']);
-      final result3 = CacheResult<String>.fromNetwork(['a', 'b']);
+      final result1 = CacheResult<String>.fromCache(const ['a', 'b']);
+      final result2 = CacheResult<String>.fromCache(const ['a', 'b']);
+      final result3 = CacheResult<String>.fromNetwork(const ['a', 'b']);
       
       expect(result1, equals(result2));
       expect(result1, isNot(equals(result3)));

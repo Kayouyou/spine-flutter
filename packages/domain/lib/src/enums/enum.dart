@@ -59,7 +59,7 @@ class EnumMapper {
   };
 
   static ApplicationTypes? applicationTypeFromShortIdentifier(
-      String shortName) {
+      String shortName,) {
     return _byShortName[shortName];
   }
 }

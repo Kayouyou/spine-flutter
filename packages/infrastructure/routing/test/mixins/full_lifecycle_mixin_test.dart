@@ -37,7 +37,7 @@ void main() {
               GoRoute(
                 path: '/',
                 builder: (context, state) => _TestFullLifecyclePage(
-                    onAppPaused: () => pausedCount++),
+                    onAppPaused: () => pausedCount++,),
               ),
             ],
           ),
@@ -58,7 +58,7 @@ void main() {
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) => _TestFullLifecyclePage(),
+                builder: (context, state) => const _TestFullLifecyclePage(),
               ),
             ],
           ),

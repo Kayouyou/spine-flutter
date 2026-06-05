@@ -298,10 +298,10 @@ packages:
     dependency: transitive
     description:
       name: hive
-      sha256: a1f4139652c24d013a509a939eea7897db5e7bd8f64d0d32ef692d6f324d767d
+      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.4"
+    version: "2.2.3"
   http:
     dependency: transitive
     description:

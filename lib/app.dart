@@ -58,7 +58,6 @@ class _MyAppState extends State<MyApp> {
     final options = sl<BootstrapOptions>();
     if (kDebugMode && options.enableDebugTools && !sl.isRegistered<Alice>()) {
       final alice = Alice(
-        showNotification: true,
         showInspectorOnShake: true,
         navigatorKey: _navigatorKey,
       );
@@ -106,7 +105,7 @@ class _MyAppState extends State<MyApp> {
         // 其他非 tab 路由通过注册中心构建
         ...RouteModuleRegistry.instance.get('feature_detail', ctx),
       ],
-      errorBuilder: (context, state) => Scaffold(
+      errorBuilder: (context, state) => const Scaffold(
         body: Center(child: Text('Page not found')),
       ),
     );

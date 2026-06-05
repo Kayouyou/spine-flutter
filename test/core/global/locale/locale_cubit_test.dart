@@ -19,13 +19,13 @@ class MockHydratedStorage extends Mock implements HydratedStorage {}
 void main() {
   group('LocaleState', () {
     test('携带Locale信息', () {
-      final state = LocaleState(locale: Locale('zh'));
+      const state = LocaleState(locale: Locale('zh'));
       expect(state.locale.languageCode, equals('zh'));
     });
 
     test('copyWith可修改locale', () {
-      final state = LocaleState(locale: Locale('zh'));
-      final newState = state.copyWith(locale: Locale('en'));
+      const state = LocaleState(locale: Locale('zh'));
+      final newState = state.copyWith(locale: const Locale('en'));
       expect(newState.locale.languageCode, equals('en'));
     });
   });
@@ -42,7 +42,7 @@ void main() {
 
     blocTest<LocaleCubit, LocaleState>(
       '初始状态为中文',
-      build: () => LocaleCubit(),
+      build: LocaleCubit.new,
       verify: (cubit) {
         expect(cubit.state.locale.languageCode, equals('zh'));
       },
@@ -50,10 +50,10 @@ void main() {
 
     blocTest<LocaleCubit, LocaleState>(
       'setLocale切换语言',
-      build: () => LocaleCubit(),
-      act: (cubit) => cubit.setLocale(Locale('en')),
+      build: LocaleCubit.new,
+      act: (cubit) => cubit.setLocale(const Locale('en')),
       expect: () => [
-        LocaleState(locale: Locale('en')),
+        const LocaleState(locale: Locale('en')),
       ],
     );
 
@@ -71,16 +71,16 @@ void main() {
 
     test('toJson正确序列化语言设置', () {
       final cubit = LocaleCubit();
-      final json = cubit.toJson(LocaleState(locale: Locale('en')));
+      final json = cubit.toJson(const LocaleState(locale: Locale('en')));
       expect(json, equals({'locale': 'en'}));
     });
 
     blocTest<LocaleCubit, LocaleState>(
       'resetToDefault切换回中文',
-      build: () => LocaleCubit(),
+      build: LocaleCubit.new,
       act: (cubit) => cubit.resetToDefault(),
       expect: () => [
-        LocaleState(locale: Locale('zh')),
+        const LocaleState(locale: Locale('zh')),
       ],
     );
   });

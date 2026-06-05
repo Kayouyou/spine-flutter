@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:api/api.dart';
-import 'package:api/src/dio/renewal_token_intercaptor.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 
 /// Token续期拦截器单元测试

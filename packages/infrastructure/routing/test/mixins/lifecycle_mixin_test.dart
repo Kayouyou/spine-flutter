@@ -32,7 +32,7 @@ void main() {
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) => _TestPage(),
+                builder: (context, state) => const _TestPage(),
               ),
             ],
           ),

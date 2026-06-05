@@ -5,7 +5,7 @@ import 'package:routing/routing.dart';
 void main() {
   group('AppLifecycleMixin', () {
     testWidgets('registers WidgetsBindingObserver in initState', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: _TestAppLifecyclePage()));
+      await tester.pumpWidget(const MaterialApp(home: _TestAppLifecyclePage()));
       await tester.pumpAndSettle();
       expect(find.byType(_TestAppLifecyclePage), findsOneWidget);
     });
@@ -29,7 +29,7 @@ void main() {
     });
 
     testWidgets('removes observer in dispose', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: _TestAppLifecyclePage()));
+      await tester.pumpWidget(const MaterialApp(home: _TestAppLifecyclePage()));
       await tester.pumpAndSettle();
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();

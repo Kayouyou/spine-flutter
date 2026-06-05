@@ -15,7 +15,7 @@ void main() {
     });
 
     test('execute returns User from repository', () async {
-      final expectedUser = User(id: '1', name: 'Test User', email: 'test@example.com');
+      const expectedUser = User(id: '1', name: 'Test User', email: 'test@example.com');
       when(() => mockRepo.getCurrentUser()).thenAnswer((_) async => Result.success(expectedUser));
 
       final result = await usecase.execute();
