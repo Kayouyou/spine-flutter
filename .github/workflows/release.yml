@@ -57,7 +57,7 @@ jobs:
 
       - name: 提取 changelog (本版本段)
         run: |
-          awk '/^## \[?v?$VERSION\]?/{flag=1; next} /^## /{flag=0} flag' CHANGELOG.md > release_notes.md
+          awk "/^## \\[?v?$VERSION\\]?/{flag=1; next} /^## /{flag=0} flag" CHANGELOG.md > release_notes.md
           if [ ! -s release_notes.md ]; then
             echo "::warning::CHANGELOG.md 没找到 [$VERSION] 段, 用空 release notes"
             echo "Release $VERSION" > release_notes.md
