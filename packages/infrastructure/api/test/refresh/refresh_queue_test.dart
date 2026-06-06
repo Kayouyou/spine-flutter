@@ -82,4 +82,82 @@ void main() {
       expect(r1, isNot(equals(r2)));
     });
   });
+
+  group('RefreshQueue.add + drain (byte-equivalent to L494-600)', () {
+    test('add 去重: 相同请求只入队 1 次', () {
+      final q = RefreshQueue();
+      final opts = RequestOptions(path: '/a', method: 'GET');
+      q.add(PendingRequest(
+        requestOptions: opts,
+        completer: Completer<Response>(),
+        handler: ResponseInterceptorHandler(),
+        originalResponse: Response<dynamic>(requestOptions: opts),
+      ));
+      q.add(PendingRequest(
+        requestOptions: RequestOptions(path: '/a', method: 'GET'),
+        completer: Completer<Response>(),
+        handler: ResponseInterceptorHandler(),
+        originalResponse: Response<dynamic>(requestOptions: opts),
+      ));
+
+      expect(q.size, equals(1));
+    });
+
+    test('drain batchSize=5, fireAndForget=false, N=12 分 3 批', () async {
+      final q = RefreshQueue();
+      for (var i = 0; i < 12; i++) {
+        final opts = RequestOptions(path: '/p$i', method: 'GET');
+        q.add(PendingRequest(
+          requestOptions: opts,
+          completer: Completer<Response>(),
+          handler: ResponseInterceptorHandler(),
+          originalResponse: Response<dynamic>(requestOptions: opts),
+          timestamp: DateTime.now().add(Duration(milliseconds: i)),
+        ));
+      }
+
+      final timestamps = <DateTime>[];
+      await q.drain<void>(
+        (p) async => timestamps.add(DateTime.now()),
+        batchSize: 5,
+        fireAndForget: false,
+      );
+
+      expect(timestamps.length, equals(12));
+      final gap1 = timestamps[5].difference(timestamps[4]);
+      final gap2 = timestamps[10].difference(timestamps[9]);
+      expect(gap1.inMilliseconds, greaterThanOrEqualTo(45));
+      expect(gap2.inMilliseconds, greaterThanOrEqualTo(45));
+    });
+
+    test('drain fireAndForget=true: caller Future 在 processor 完成前 resolve', () async {
+      final q = RefreshQueue();
+      for (var i = 0; i < 3; i++) {
+        final opts = RequestOptions(path: '/p$i', method: 'GET');
+        q.add(PendingRequest(
+          requestOptions: opts,
+          completer: Completer<Response>(),
+          handler: ResponseInterceptorHandler(),
+          originalResponse: Response<dynamic>(requestOptions: opts),
+        ));
+      }
+
+      final processorStarted = Completer<void>();
+      var processorCompleted = false;
+
+      final drainFuture = q.drain<void>(
+        (p) async {
+          processorStarted.complete();
+          await Future.delayed(const Duration(milliseconds: 200));
+          processorCompleted = true;
+        },
+        batchSize: 5,
+        fireAndForget: true,
+      );
+
+      await drainFuture;
+      expect(processorCompleted, isFalse);
+      await processorStarted.future;
+    });
+  });
 }
