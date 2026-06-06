@@ -16,21 +16,12 @@ export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截
 // Phase 3d新增：日志接口
 export 'src/http/app_logger.dart';
 export 'src/endpoints/api_endpoints.dart';
-export 'src/constants/api_constants.dart';
 
 // Retrofit API 接口
 export 'src/api/home_api.dart';
 export 'src/api/detail_api.dart';
-export 'src/api/auth_api.dart';
-export 'src/api/session_api.dart';
-export 'src/api/vehicle_api.dart';
-export 'src/models/login_request.dart';
-export 'src/models/login_response.dart';
 export 'src/models/user_profile.dart';
 export 'src/models/home_data.dart';
 export 'src/models/detail_data.dart';
-export 'src/models/sign_in_request.dart';
-export 'src/models/session_result.dart';
-export 'src/models/vehicle_data.dart';
 export 'src/models/update_profile_request.dart';
 export 'src/api/user_api.dart';
