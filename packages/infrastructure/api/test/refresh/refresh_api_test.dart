@@ -30,7 +30,6 @@ void main() {
     test('非 JSON / null data 返回 false', () async {
       final r1 = Response<dynamic>(
         requestOptions: RequestOptions(path: '/a'),
-        data: null,
       );
       final r2 = Response<dynamic>(
         requestOptions: RequestOptions(path: '/a'),

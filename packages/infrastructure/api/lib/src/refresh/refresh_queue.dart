@@ -86,14 +86,14 @@ class RefreshQueue {
       final batch = requests.sublist(i, end);
 
       if (fireAndForget) {
-        Future.wait(batch.map(processor));
+        unawaited(Future.wait(batch.map(processor)));
       } else {
         await Future.wait(batch.map(processor));
       }
 
       if (end < requests.length) {
         if (fireAndForget) {
-          Future.delayed(const Duration(milliseconds: 50));
+          unawaited(Future.delayed(const Duration(milliseconds: 50)));
         } else {
           await Future.delayed(const Duration(milliseconds: 50));
         }
