@@ -7,7 +7,3 @@ bricks:
     path: bricks/model
   hive_model:
     path: bricks/hive_model
-  api_gen:
-    path: bricks/api_gen
-  api_gen_spec:
-    path: bricks/api_gen_spec
