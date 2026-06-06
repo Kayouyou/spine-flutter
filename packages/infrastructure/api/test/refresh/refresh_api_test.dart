@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,7 +19,6 @@ void main() {
       final response = Response<dynamic>(
         requestOptions: RequestOptions(path: '/a'),
         data: '{"code": 0, "data": null}',
-        statusCode: 200,
       );
       expect(await shouldRenewToken(response), isFalse);
     });
