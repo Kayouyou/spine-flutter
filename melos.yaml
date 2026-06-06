@@ -31,7 +31,7 @@ scripts:
   check:deps:
     run: |
       ./scripts/check_deps.sh
-    description: 检查依赖方向 - feature 包不得引用 spine_flutter
+    description: "检查依赖方向 (R1: feature 不得引用 spine_flutter / R3: infrastructure 不得依赖 services / R4: services 不得依赖 features)"
 
   check:versions:
     run: dart run scripts/check_workspace_versions.dart
