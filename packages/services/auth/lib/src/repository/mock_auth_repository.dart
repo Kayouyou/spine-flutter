@@ -2,13 +2,14 @@ import 'package:domain/domain.dart';
 
 /// ⚠️ SCAFFOLD MODE: Mock 实现，仅用于脚手架演示和测试。
 ///
-/// 真实项目应替换为:
-/// 1. 在 setupAuth 中使用 UserRepositoryImpl（见同目录 user_repository_impl.dart）
-/// 2. 或通过环境变量切换 mock/real:
-///    sl.registerLazySingleton<AuthRepository>(() {
-///      if (kDebugMode) return MockAuthRepository();
-///      return AuthRepositoryImpl(sl<UserApi>());
-///    });
+/// 生产构建必须:
+/// 1. 在 setupAuth 之前 `sl.registerSingleton<AuthRepository>(RestAuthRepository(...))`
+/// 2. 调 `setupAuth(sl, useMock: false)`（kDebugMode 在 release 已经是 false，
+///    但显式传 false 更明确）
+/// 3. 把本文件移到 `test/` 目录
+///
+/// 上面的 assert + StateError 会保证 release 启动期没真实现时立即崩溃，
+/// 强制你处理。
 ///
 /// 实现 AuthRepository 接口，返回 Result 类型。
 class MockAuthRepository implements AuthRepository {
