@@ -22,16 +22,16 @@ import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
 import 'locator.dart';
+import 'injectable.dart';
 
 /// 依赖注入配置
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
   sl.registerSingleton<BootstrapOptions>(options);
-  // ===== 1. injectable 初始化（自动注册 @injectable 类）=====
-  // 注意：这需要在任何手动注册之前调用
-  // 需要先运行 build_runner 生成 injectable.config.dart 才能启用
-  // getIt.init();
+  // ===== 0. injectable 初始化（自动注册 @injectable 类）=====
+  // 必须在任何手动 sl.registerXxx 之前调用：后续手动注册会覆盖同名自动注册
+  configureDependencies();
 
   // ===== 0. 应用配置（必须在其他依赖之前注册）=====
   sl.registerSingleton<IAppConfig>(EnvAppConfig());
