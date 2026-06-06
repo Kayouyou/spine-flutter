@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 import '../../api.dart';
 import '../dio/header_interceptor.dart';
 
-/// 检查响应是否需要触发 token 续期 (原 L661-671)
+/// 检查响应是否需要触发 token 续期
 Future<bool> shouldRenewToken(Response response) async {
   try {
     final data = response.data is String ? jsonDecode(response.data) : response.data;
@@ -20,7 +20,7 @@ Future<bool> shouldRenewToken(Response response) async {
   }
 }
 
-/// 重试单个请求, 失败时重试一次 (原 L603-620)
+/// 重试单个请求, 失败时重试一次
 Future<Response?> retryRequestWithRetry(
   Dio dio,
   TokenStorage? tokenStorage,
@@ -38,38 +38,8 @@ Future<Response?> retryRequestWithRetry(
   }
 }
 
-/// 重试单个请求 - 测试入口 (14 字段 Options 重建)
-Future<Response> retryRequest(
-  Dio dio,
-  RequestOptions requestOptions, {
-  String? token,
-}) async {
-  final options = Options(
-    method: requestOptions.method,
-    headers: {...requestOptions.headers, 'token': token},
-    sendTimeout: requestOptions.sendTimeout,
-    receiveTimeout: requestOptions.receiveTimeout,
-    extra: requestOptions.extra,
-    responseType: requestOptions.responseType,
-    contentType: requestOptions.contentType,
-    validateStatus: requestOptions.validateStatus,
-    receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
-    followRedirects: requestOptions.followRedirects,
-    maxRedirects: requestOptions.maxRedirects,
-    requestEncoder: requestOptions.requestEncoder,
-    responseDecoder: requestOptions.responseDecoder,
-    listFormat: requestOptions.listFormat,
-  );
-
-  return await dio.request(
-    requestOptions.path,
-    options: options,
-    data: requestOptions.data,
-    queryParameters: requestOptions.queryParameters,
-  );
-}
-
-/// 重试单个请求 - 内部版，保留 L629-631 bug (原 L623-658)
+/// 重试单个请求 — 内部版，保留原 L629-631 行为：
+/// 仅当原 headers 中 token 非空时覆写，避免对无 auth 请求意外注入 token。
 Future<Response> _retryRequest(
   Dio dio,
   TokenStorage? tokenStorage,
@@ -107,13 +77,13 @@ Future<Response> _retryRequest(
   );
 }
 
-/// 执行 token 续期 (原 L399-457)
-/// 修复: L420 `ovsx-app-token` → `''` 字节码等价
+/// 执行 token 续期
 Future<bool> performTokenRenewal(
   Dio dio,
   TokenStorage? tokenStorage,
-  DateTime? lastRenewalTime,
-) async {
+  DateTime? lastRenewalTime, {
+  AppLoggerInterface? logger,
+}) async {
   try {
     if (lastRenewalTime != null) {
       final timeSinceLastRenewal = DateTime.now().difference(lastRenewalTime);
@@ -156,13 +126,16 @@ Future<bool> performTokenRenewal(
     if (response.statusCode == 200) {
       return await processRenewalResponse(response.data, tokenStorage);
     }
+    logger?.warning(
+      '续期请求返回非 200: status=${response.statusCode}, body=${response.data}',
+    );
     return false;
   } catch (e) {
     return false;
   }
 }
 
-/// 处理续期响应数据 (原 L460-492)
+/// 处理续期响应数据
 Future<bool> processRenewalResponse(dynamic responseData, TokenStorage? tokenStorage) async {
   try {
     final data = responseData is String ? jsonDecode(responseData) : responseData;
@@ -187,7 +160,7 @@ Future<bool> processRenewalResponse(dynamic responseData, TokenStorage? tokenSto
   }
 }
 
-/// 执行续期请求 (原 L674-699)
+/// 执行续期请求
 Future<Response> _executeRenewalRequest({
   required String url,
   required Map<String, dynamic> params,
@@ -211,7 +184,7 @@ Future<Response> _executeRenewalRequest({
   return response;
 }
 
-/// 配置代理 (原 L702-715)
+/// 配置代理
 void _configureProxy(Dio dio) {
   if (!HttpConstant.Proxy_Enable) return;
 

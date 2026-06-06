@@ -108,7 +108,12 @@ class TokenRenewalInterceptor extends Interceptor {
         try {
           _logger.info('开始执行token续期流程');
 
-          final success = await performTokenRenewal(_dio, _tokenStorage, _lastRenewalTime);
+          final success = await performTokenRenewal(
+            _dio,
+            _tokenStorage,
+            _lastRenewalTime,
+            logger: _logger,
+          );
 
           if (success) {
             _renewalState = TokenRenewalState.success;
