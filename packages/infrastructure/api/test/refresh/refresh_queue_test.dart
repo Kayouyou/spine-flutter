@@ -6,11 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:api/src/refresh/refresh_queue.dart';
 
 void main() {
-  group('PendingRequest 4-field construction + equality', () {
-    test('requestOptions + completer + handler + originalResponse 4 字段全必填', () {
+  group('PendingRequest 3-field construction + equality', () {
+    test('requestOptions + completer + originalResponse 3 字段全必填', () {
       final opts = RequestOptions(path: '/a', method: 'GET');
       final completer = Completer<Response>();
-      final handler = ResponseInterceptorHandler();
       final originalResponse = Response<dynamic>(
         requestOptions: opts,
         data: 'orig',
@@ -20,13 +19,11 @@ void main() {
       final r = PendingRequest(
         requestOptions: opts,
         completer: completer,
-        handler: handler,
         originalResponse: originalResponse,
       );
 
       expect(r.requestOptions, same(opts));
       expect(r.completer, same(completer));
-      expect(r.handler, same(handler));
       expect(r.originalResponse, same(originalResponse));
       expect(r.timestamp, isA<DateTime>());
     });
@@ -44,18 +41,14 @@ void main() {
         queryParameters: {'k': 'v'},
         data: 'body',
       );
-      final h1 = ResponseInterceptorHandler();
-      final h2 = ResponseInterceptorHandler();
       final r1 = PendingRequest(
         requestOptions: opts1,
         completer: Completer<Response>(),
-        handler: h1,
         originalResponse: Response<dynamic>(requestOptions: opts1),
       );
       final r2 = PendingRequest(
         requestOptions: opts2,
         completer: Completer<Response>(),
-        handler: h2,
         originalResponse: Response<dynamic>(requestOptions: opts2),
       );
 
@@ -69,13 +62,11 @@ void main() {
       final r1 = PendingRequest(
         requestOptions: opts1,
         completer: Completer<Response>(),
-        handler: ResponseInterceptorHandler(),
         originalResponse: Response<dynamic>(requestOptions: opts1),
       );
       final r2 = PendingRequest(
         requestOptions: opts2,
         completer: Completer<Response>(),
-        handler: ResponseInterceptorHandler(),
         originalResponse: Response<dynamic>(requestOptions: opts2),
       );
 
@@ -83,20 +74,18 @@ void main() {
     });
   });
 
-  group('RefreshQueue.add + drain (byte-equivalent to L494-600)', () {
+  group('RefreshQueue.add + drain', () {
     test('add 去重: 相同请求只入队 1 次', () {
       final q = RefreshQueue();
       final opts = RequestOptions(path: '/a', method: 'GET');
       q.add(PendingRequest(
         requestOptions: opts,
         completer: Completer<Response>(),
-        handler: ResponseInterceptorHandler(),
         originalResponse: Response<dynamic>(requestOptions: opts),
       ));
       q.add(PendingRequest(
         requestOptions: RequestOptions(path: '/a', method: 'GET'),
         completer: Completer<Response>(),
-        handler: ResponseInterceptorHandler(),
         originalResponse: Response<dynamic>(requestOptions: opts),
       ));
 
@@ -110,7 +99,6 @@ void main() {
         q.add(PendingRequest(
           requestOptions: opts,
           completer: Completer<Response>(),
-          handler: ResponseInterceptorHandler(),
           originalResponse: Response<dynamic>(requestOptions: opts),
           timestamp: DateTime.now().add(Duration(milliseconds: i)),
         ));
@@ -137,7 +125,6 @@ void main() {
         q.add(PendingRequest(
           requestOptions: opts,
           completer: Completer<Response>(),
-          handler: ResponseInterceptorHandler(),
           originalResponse: Response<dynamic>(requestOptions: opts),
         ));
       }

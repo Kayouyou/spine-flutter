@@ -27,14 +27,12 @@ class PendingRequest {
   PendingRequest({
     required this.requestOptions,
     required this.completer,
-    required this.handler,
     required this.originalResponse,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
   final RequestOptions requestOptions;
   final Completer<Response> completer;
-  final ResponseInterceptorHandler handler;
   final Response originalResponse;
   final DateTime timestamp;
 

@@ -82,7 +82,6 @@ class TokenRenewalInterceptor extends Interceptor {
     _queue.add(PendingRequest(
       requestOptions: response.requestOptions,
       completer: completer,
-      handler: handler,
       originalResponse: response,
     ));
 

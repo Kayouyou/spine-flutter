@@ -18,7 +18,7 @@ abstract final class ApiBase {
       'http${HttpConstant.IsRelease ? 's' : ''}://${HttpConstant.Http_Host}';
 
   /// Token 续期路径（基础设施共享端点，不属于任何业务域）
-  @Deprecated('请使用 ApiConstants.tokenRenewal 替代')
+  @Deprecated('请使用 ApiEndpoints.tokenRenewal 替代')
   static const String tokenRenewal = '/User/Token/Renewal';
 }
 
