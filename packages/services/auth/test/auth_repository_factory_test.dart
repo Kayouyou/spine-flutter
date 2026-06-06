@@ -35,6 +35,9 @@ void main() {
   });
 
   test('useMock: true registers MockAuthRepository', () {
+    // kDebugMode 在 flutter_test 中默认为 true, 显式 useMock: true 冗余但保留
+    // 让测试意图明确.
+    // ignore: avoid_redundant_argument_values
     setupAuth(sl, useMock: true);
     expect(sl<AuthRepository>(), isA<MockAuthRepository>());
   });
