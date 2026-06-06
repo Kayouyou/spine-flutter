@@ -19,4 +19,8 @@ vars:
     description: 绑定的数据模型名称
     prompt: ""
     default: "dynamic"
+  domainInterface:
+    type: string
+    description: 完整的 domain 接口名（含 I 前缀，如 IOrderRepository）
+    prompt: 对应的 domain 接口名是什么？
 
