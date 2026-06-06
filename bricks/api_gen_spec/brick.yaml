@@ -1,9 +1,0 @@
-name: api_gen_spec
-description: 从 JSON spec 文件生成完整的 Retrofit API + Freezed DTO + Hive CM 模型（替代 gen_api.dart）
-version: 1.0.0
-
-vars:
-  spec:
-    type: string
-    description: API spec JSON 文件路径（如 packages/infrastructure/api/spec/auth.json）
-    prompt: API spec 文件路径是什么？

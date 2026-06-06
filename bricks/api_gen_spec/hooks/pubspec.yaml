@@ -1,6 +1,0 @@
-name: api_gen_spec_hooks
-environment:
-  sdk: ^3.0.0
-
-dependencies:
-  mason: ^0.1.0
