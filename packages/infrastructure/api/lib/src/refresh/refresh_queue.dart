@@ -29,7 +29,8 @@ class PendingRequest {
     required this.completer,
     required this.handler,
     required this.originalResponse,
-  }) : timestamp = DateTime.now();
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
 
   final RequestOptions requestOptions;
   final Completer<Response> completer;
@@ -57,4 +58,48 @@ class PendingRequest {
       requestOptions.method.hashCode ^
       requestOptions.queryParameters.toString().hashCode ^
       requestOptions.data.toString().hashCode;
+}
+
+/// Token 续期请求队列
+///
+/// 持有 401 窗口内被拦截的 [PendingRequest] 集合
+class RefreshQueue {
+  final Set<PendingRequest> _pendingRequests = {};
+
+  int get size => _pendingRequests.length;
+
+  void add(PendingRequest request) {
+    _pendingRequests.add(request);
+  }
+
+  Future<void> drain<T>(
+    Future<T> Function(PendingRequest) processor, {
+    required int batchSize,
+    required bool fireAndForget,
+  }) async {
+    if (_pendingRequests.isEmpty) return;
+
+    final requests = List<PendingRequest>.from(_pendingRequests);
+    requests.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    _pendingRequests.clear();
+
+    for (int i = 0; i < requests.length; i += batchSize) {
+      final end = (i + batchSize < requests.length) ? i + batchSize : requests.length;
+      final batch = requests.sublist(i, end);
+
+      if (fireAndForget) {
+        Future.wait(batch.map(processor));
+      } else {
+        await Future.wait(batch.map(processor));
+      }
+
+      if (end < requests.length) {
+        if (fireAndForget) {
+          Future.delayed(const Duration(milliseconds: 50));
+        } else {
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
+      }
+    }
+  }
 }
