@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// routeWrapper：由 app 层提供，用于在路由页面外层包裹通用组件
 /// （如 RequestScope 实现自动请求取消）
 class RouteContext {
-  final GlobalKey<NavigatorState> navigatorKey;
+  final GlobalKey<NavigatorState>? navigatorKey;
   final bool enableAuthGuard;
 
   /// 登录状态检查回调 — 由 app 层从 DI 容器中获取
@@ -17,7 +17,7 @@ class RouteContext {
   final Widget Function(Widget child)? routeWrapper;
 
   const RouteContext({
-    required this.navigatorKey,
+    this.navigatorKey,
     this.enableAuthGuard = true,
     this.isLoggedInChecker,
     this.routeWrapper,

@@ -21,6 +21,7 @@ import 'core/di/locator.dart';
 import 'core/widgets/debug/debug_tools_wrapper.dart';
 import 'core/widgets/network/network_banner.dart';
 import 'core/widgets/request_scope.dart';
+import 'core/routing/go_router_refresh_stream.dart';
 import 'core/widgets/upgrade/upgrade_wrapper.dart';
 import 'src/theme/app_theme.dart';
 
@@ -75,17 +76,32 @@ class _SpineFlutterState extends State<SpineFlutter> {
   ///
   /// Wave 2: 直接在 app.dart 组装路由，不再依赖 routing 包的 router.dart
   GoRouter _buildRouter(RouteContext ctx) {
+    final refreshListenable = ctx.enableAuthGuard && ctx.isLoggedInChecker != null
+        ? GoRouterRefreshStream(sl<AuthCubit>().stream)
+        : null;
+
     return GoRouter(
       navigatorKey: _navigatorKey,
       initialLocation: '/home',
       observers: [AppRouteObserver.instance],
+      refreshListenable: refreshListenable,
       redirect: ctx.enableAuthGuard && ctx.isLoggedInChecker != null
           ? (context, state) {
-              final location = state.matchedLocation;
-              return AuthGuard.check(location, ctx.isLoggedInChecker!);
+              try {
+                final location = state.matchedLocation;
+                return AuthGuard.check(location, ctx.isLoggedInChecker!);
+              } catch (e, st) {
+                if (kDebugMode) {
+                  debugPrint('⚠️ [redirect] threw: $e\n$st');
+                }
+                return '/login?redirect=${state.matchedLocation}';
+              }
             }
           : null,
       routes: [
+        // P0-1: /login /register 顶层注册,不进 StatefulShellRoute,
+        // 避免未登录用户看到底部 NavigationBar
+        ...RouteModuleRegistry.instance.get('feature_auth', ctx),
         StatefulShellRoute.indexedStack(
           pageBuilder: (context, state, navigationShell) {
             return NoTransitionPage(
@@ -97,8 +113,16 @@ class _SpineFlutterState extends State<SpineFlutter> {
             StatefulShellBranch(
               routes: RouteModuleRegistry.instance.get('feature_home', ctx),
             ),
+            // 第二个 tab 暂留空,feature_settings 后续补
             StatefulShellBranch(
-              routes: RouteModuleRegistry.instance.get('feature_auth', ctx),
+              routes: [
+                GoRoute(
+                  path: '/_placeholder',
+                  builder: (_, __) => const Scaffold(
+                    body: Center(child: Text('Settings (TODO)')),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

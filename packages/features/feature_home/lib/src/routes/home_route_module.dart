@@ -27,10 +27,7 @@ class HomeRouteModule extends RouteModule {
               onOpenDebugInspector: onOpenDebugInspector,
             ),
           );
-          if (ctx.routeWrapper != null) {
-            page = ctx.routeWrapper!(page);
-          }
-          return MaterialPage(child: page);
+          return MaterialPage(child: wrap(page));
         },
       ),
     ];

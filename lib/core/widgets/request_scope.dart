@@ -43,20 +43,18 @@ class _RequestScopeState extends State<RequestScope> {
   @override
   void initState() {
     super.initState();
-    // overrideTag 在 initState 即可确定，无需依赖 inherited widget
     if (widget.overrideTag != null) {
       _tag = widget.overrideTag;
-      RequestContext.tag = _tag!;
+      RequestContext.pushTag(_tag!);
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // GoRouterState 依赖 inherited widget，需在 didChangeDependencies 中获取
     if (_tag == null) {
       _tag = _extractPathFromRouter();
-      RequestContext.tag = _tag!;
+      RequestContext.pushTag(_tag!);
     }
   }
 
@@ -72,11 +70,11 @@ class _RequestScopeState extends State<RequestScope> {
 
   @override
   void dispose() {
-    RequestContext.clear();
-    // cleanup() 内部调用 cancelPage() + 移除条目，一次调用即可
     if (_tag != null) {
+      RequestContext.popTag();
       CancelTokenManager.instance.cleanup(_tag!);
     }
+    RequestContext.clear();
     super.dispose();
   }
 

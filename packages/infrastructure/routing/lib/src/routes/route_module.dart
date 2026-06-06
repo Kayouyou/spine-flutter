@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'route_context.dart';
 
@@ -12,6 +13,14 @@ abstract class RouteModule {
   final RouteContext ctx;
   const RouteModule(this.ctx);
 
-  /// 构建路由列表，返回的 RouteBase 列表会被注册到 GoRouter 的 routes 中。
   List<RouteBase> build();
+
+  /// 统一包装模板: routeWrapper 为 null 时返回原 page, 否则包一层
+  ///
+  /// 避免 5 个 RouteModule 各自写 if/?? 模板
+  Widget wrap(Widget page) {
+    final wrapper = ctx.routeWrapper;
+    if (wrapper == null) return page;
+    return wrapper(page);
+  }
 }

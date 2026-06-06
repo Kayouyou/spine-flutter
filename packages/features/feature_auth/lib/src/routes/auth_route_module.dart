@@ -25,8 +25,7 @@ class AuthRouteModule extends RouteModule {
             create: (_) => createCubit(),
             child: LoginPage(redirect: redirect),
           );
-          final wrapped = ctx.routeWrapper?.call(page) ?? page;
-          return MaterialPage(child: wrapped);
+          return MaterialPage(child: wrap(page));
         },
       ),
       GoRoute(
@@ -37,8 +36,7 @@ class AuthRouteModule extends RouteModule {
             create: (_) => createCubit(),
             child: RegisterPage(redirect: redirect),
           );
-          final wrapped = ctx.routeWrapper?.call(page) ?? page;
-          return MaterialPage(child: wrapped);
+          return MaterialPage(child: wrap(page));
         },
       ),
     ];

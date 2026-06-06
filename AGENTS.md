@@ -314,6 +314,11 @@ sl.registerSingleton<IAppConfig>(EnvAppConfig(config));
 2. 看 TokenStorage 是不是被双开 (Hive box 重复 open)
 3. 看 401 是不是被自动续期吞了 (RxDart 流式续期)
 
+### 6.8 排查"登出后 UI 没跳 /login"
+1. 看 app.dart 是否注入了 refreshListenable (P1-3 后必装, `GoRouterRefreshStream`)
+2. 看 AuthCubit 是否 LazySingleton (DI 步骤 3)
+3. 看 AuthManager.logout 是否走 `cubit.setAuthState(AuthState())` — 状态变化才会触发 stream
+
 ---
 
 ## 7. 测试策略 (改完代码必须跑)

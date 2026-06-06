@@ -23,10 +23,7 @@ class DetailRouteModule extends RouteModule {
             create: (_) => createCubit(),
             child: const DetailPage(),
           );
-          if (ctx.routeWrapper != null) {
-            page = ctx.routeWrapper!(page);
-          }
-          return MaterialPage(child: page);
+          return MaterialPage(child: wrap(page));
         },
       ),
       GoRoute(
@@ -37,10 +34,7 @@ class DetailRouteModule extends RouteModule {
             create: (_) => createCubit(),
             child: DetailPage(id: id),
           );
-          if (ctx.routeWrapper != null) {
-            page = ctx.routeWrapper!(page);
-          }
-          return MaterialPage(child: page);
+          return MaterialPage(child: wrap(page));
         },
       ),
     ];
