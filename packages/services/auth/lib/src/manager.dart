@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:domain/domain.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'cubit/auth_cubit.dart';
+import 'cubit/auth_state.dart';
 
 /// 认证管理器
 ///
@@ -43,7 +44,9 @@ class AuthManager {
     await result.when(
       success: (user) async {
         await _tokenStorage.setUserId(user.id);
-        _authCubit.loggedIn(user.id);
+        _authCubit.setAuthState(
+          AuthState(status: AuthStatus.loggedIn, userId: user.id),
+        );
         debugPrint('✅ [AuthManager] handleLogin: Token有效，userId=${user.id}');
       },
       failure: (error) async {
