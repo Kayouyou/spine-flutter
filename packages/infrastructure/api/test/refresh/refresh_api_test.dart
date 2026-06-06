@@ -27,7 +27,6 @@ void main() {
       final r1 = Response<dynamic>(
         requestOptions: RequestOptions(path: '/a'),
         data: null,
-        statusCode: 200,
       );
       final r2 = Response<dynamic>(
         requestOptions: RequestOptions(path: '/a'),
