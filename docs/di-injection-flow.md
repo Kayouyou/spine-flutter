@@ -91,6 +91,36 @@ flowchart TD
     class D1,D2,D3,D4,D5 dataflow
 ```
 
+## 5 步注册顺序 (setupDependencies)
+
+DI 装配严格按下面顺序，违反会触发 GetIt 类型未找到异常:
+
+1. **injectable 自动注册** — `configureDependencies()` (build_runner 生成，当前 0 注解所以空)
+2. **BootstrapOptions** — `sl.registerSingleton(options)`
+3. **IAppConfig** — `sl.registerSingleton<IAppConfig>(EnvAppConfig())` (launcher 启动期也会提前注册, setupDependencies 内部守卫避免冲突)
+4. **基础设施** — Logger / KeyValueStorage / TokenStorage / Dio (含 AutoCancel + TokenSupplier)
+5. **业务服务 + Feature** — setupAuth / setupDataSync (optional) / LocaleCubit / NetworkCubit / `FeatureRegistry.runAll()`
+
+为什么 feature 必须最后?
+- feature cubit/repository 依赖 services 接口
+- services 接口依赖 domain
+- domain 不依赖任何 Flutter 包
+
+## 启动期阶段 (AppLauncher.launch)
+
+`launcher.dart` 4 阶段, 阶段 0.5 Sentry 提前到 AppErrorHandler.setup 之前 (确保启动期错误 100% 上报):
+
+| 阶段 | 做什么 | 为什么 |
+|------|--------|--------|
+| 0.5 | SentryFlutter.init + AppErrorHandler.setReporter | 最早 init, 覆盖后续所有错误 |
+| 1 | binding + HydratedStorage + BlocObserver | 基础设施 |
+| 1.5 | setupDependencies (DI 装配) | 上面阶段都依赖 sl<>() |
+| 2 | SDKInitializer.initPlugins | 阻塞等 native plugin |
+| 3 | AuthManager.handleLogin (await) | 启动期同步验 token, 避免冷启误踢 AuthGuard |
+| 4 | runApp | UI 启动 |
+
+---
+
 ## GetIt 的作用
 
 GetIt 是 **服务定位器 (Service Locator)**，在这个项目中的定位：

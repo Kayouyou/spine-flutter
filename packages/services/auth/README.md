@@ -15,22 +15,25 @@ auth/
 │   └── src/
 │       ├── manager.dart          # AuthManager（isLoggedIn、handleLogin）
 │       ├── cubit/
-│       │   ├── auth_cubit.dart   # AuthCubit（login/logout/isLoggedIn）
+│       │   ├── auth_cubit.dart   # AuthCubit（login/logout/isLoggedIn/setAuthState）
 │       │   └── auth_state.dart   # AuthState（initial/loading/loggedIn/error）
 │       ├── repository/
-│       │   ├── mock_auth_repository.dart  # Mock 实现（脚手架用）
+│       │   ├── mock_auth_repository.dart  # Mock 实现（脚手架用，release 必删）
 │       │   └── auth_repository_impl.dart  # 真实实现（Dio）
 │       └── di/
-│           └── setup.dart        # DI 注册（Singleton）
+│           └── setup.dart        # setupAuth(GetIt, {useMock = kDebugMode})
 └── test/
-    └── auth_cubit_test.dart      # AuthCubit 单元测试
+    ├── auth_cubit_test.dart          # AuthCubit 业务流单元测试
+    ├── auth_test.dart                # AuthManager 集成测试
+    ├── auth_cubit_singleton_test.dart  # AuthCubit lazySingleton 验证
+    └── auth_repository_factory_test.dart  # setupAuth useMock flag + fail-fast
 ```
 
 ## 业务服务特征
 
 - 长期存在（app 生命周期）
 - 有内部状态（isLoggedIn、AuthState）
-- AuthCubit 注册为 **Singleton**（与 AuthManager 共享生命周期）
+- AuthCubit 注册为 **lazySingleton**（与 AuthManager 共享生命周期，懒构造避免启动期副作用）
 
 ## AuthCubit
 
@@ -49,9 +52,10 @@ await cubit.logout();
 
 ## 注册方式
 
-- AuthManager: Singleton（长期存在、有状态）
-- AuthCubit: Singleton（与 AuthManager 共享生命周期）
-- MockAuthRepository: Factory
+- AuthManager: lazySingleton（长期存在、有状态）
+- AuthCubit: lazySingleton（与 AuthManager 共享生命周期，懒构造）
+- MockAuthRepository: Factory（仅 debug 模式自动注册）
+- UserRepository: lazySingleton（Dio 实现）
 
 ## 使用
 
@@ -59,9 +63,17 @@ await cubit.logout();
 import 'package:auth/auth.dart';
 
 // 在主 DI 设置中调用
-setupAuth(sl);
+setupAuth(sl);                          // debug 默认 useMock = kDebugMode
+setupAuth(sl, useMock: false);          // release 模式, 必须先注册真 AuthRepository
+//   sl.registerSingleton<AuthRepository>(RestAuthRepository(sl()));
 
 // 使用
 final authManager = sl<AuthManager>();
 await authManager.handleLogin();
 ```
+
+## AuthCubit 写入权威
+
+`AuthCubit.setAuthState(AuthState)` 是**唯一**外部写入入口（仅 `AuthManager` 可调）。
+`loggedIn(userId)` public mutator 已删除 — 它允许任意模块直接 emit，制造 AuthCubit/AuthManager 双真相源。
+所有状态变化必须经 `AuthManager` 流过来。

@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **injectable 启用**: `lib/core/di/injectable.dart` 暴露 `configureDependencies()` 包装 `getIt.init()`, `setupDependencies` 第一行调, build_runner 重生成 `injectable.config.dart`
+- **setupAuth `useMock` flag**: `setupAuth(GetIt sl, {bool useMock = kDebugMode})`, release 模式无真 AuthRepository 实现时 assert (debug) + StateError (release) fail-fast
+- **scripts/check_deps.sh R3/R4 校验**: 验 infrastructure 不依赖 services / services 不依赖 features, 仅扫 `*.dart` 排除 `.dart_tool` 二进制
+- **AuthCubit.setAuthState(AuthState) public API**: 唯一外部写入入口 (仅 AuthManager 可调)
+- **AuthGuard 路径归一化**: `?query` 和 `#fragment` 在白名单匹配前剥掉, `/home?from=push` 不再被误踢
+- **3 个新测试套件**: `auth_cubit_singleton_test` (3 tests) + `auth_repository_factory_test` (3 tests) + `auth_guard_path_test` (7 tests)
+
+### Changed
+
+- **AuthCubit 注册**: `registerSingleton` → `registerLazySingleton` (避免启动期立即构造, 触发 AuthRepository 解析副作用)
+- **AuthCubit public mutator**: 删除 `loggedIn(String userId)`, 改 private `_loggedIn` + 新 public `setAuthState(AuthState)` 单一权威入口
+- **AGENTS.md 版本对齐**: `injectable: 4.x` → `^2.5.0` (匹配实际 pubspec), `setupDependencies 7 步` → `5 步` (匹配实际代码)
+- **melos.yaml check:deps 描述**: 同步 R1-R4 全部规则
+- **lib/core/di/locator.dart**: 注释简化, sl = getIt 别名 + 提醒
+- **lib/core/di/README.md**: 加 di-injection-flow.md 引用
+- **docs/di-injection-flow.md**: 加 "5 步注册顺序" + "启动期 4 阶段" prose, 配合原 mermaid 图
+- **Sentry 时序**: `SentryFlutter.init` 从 setupDependencies 之后前移到阶段 0.5, 早于 `AppErrorHandler.setup`, 启动期错误 100% 上报. `setup.dart` 的 IAppConfig 注册加 `isRegistered` 守卫避免 launcher 提前注册后冲突
+- **packages/services/auth/README.md**: 同步 lazySingleton + setAuthState + useMock flag
+- **packages/infrastructure/routing/README.md**: 同步 AuthGuard 真实签名 + 路径归一化说明 + 新测试路径
+
+### Fixed
+
+- **Sentry 启动期盲区**: AppErrorHandler.setup 早于 SentryFlutter.init 时, setup 阶段抛错上报失败 (Task 7)
+- **AuthGuard 白名单精确匹配 bug**: `/home?from=push` 被当成未知路径踢到 /login (Task 8)
+
 ## [0.2.0] - 2026-06-06
 
 ### Added
