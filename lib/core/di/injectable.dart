@@ -2,7 +2,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
-part 'injectable.config.dart';
+import 'injectable.config.dart';
 
 /// 全局 Service Locator
 ///
@@ -11,15 +11,9 @@ part 'injectable.config.dart';
 /// - 推荐通过构造函数注入依赖
 final getIt = GetIt.instance;
 
-/// Injectable 初始化配置
+/// Injectable 初始化入口
 ///
-/// 在 setupDependencies() 中调用 configureDependencies(getIt)
-/// 自动注册所有 @injectable/@singleton/@lazySingleton 注解的类
-@InjectableInit(
-  preferRelativeImports: true,
-)
-void configureDependencies(GetIt getIt) {
-  // 基础注册：所有 @injectable/@singleton/@lazySingleton 注解的类
-  // 将在生成文件 injectable.config.dart 中自动注册
-  // 运行: flutter pub run build_runner build --delete-conflicting-outputs
-}
+/// 必须在 setupDependencies() 第一行调用，且此时 GetIt 尚未注册任何实例
+/// 后续手动 sl.registerSingleton(...) 会覆盖自动生成的同名注册
+@InjectableInit()
+void configureDependencies() => getIt.init();
