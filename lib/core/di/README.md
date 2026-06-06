@@ -21,6 +21,7 @@ final apiService = di.get<ApiService>();
 
 ## 依赖关系
 - 无外部模块依赖，作为基础设施模块
+- 调用方见 `docs/di-injection-flow.md`（5 步注册）
 
 ## 性能警告
 - 避免在循环中频繁获取实例，建议缓存引用

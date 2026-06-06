@@ -48,7 +48,7 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 |---|---|---|
 | 状态管理 | flutter_bloc | 9.x (HydratedBloc 走 hydrated_bloc) |
 | 路由 | go_router | 14.x |
-| DI | get_it + injectable | 7.x / 4.x |
+| DI | get_it + injectable | 7.x / 2.x |
 | 网络 | dio + retrofit | 5.x / 4.x |
 | 本地存储 | hive + hive_flutter | 2.x |
 | 错误上报 | sentry_flutter | 7.x |
@@ -72,7 +72,7 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 │   ├── app.dart                  # StatefulShellRoute + RouteModuleRegistry 装配
 │   └── core/
 │       ├── bootstrap/            # BootstrapOptions (enable* flag)
-│       ├── di/                   # setup.dart 显式 7 步注册
+│       ├── di/                   # setup.dart 显式 5 步注册
 │       └── startup/              # launcher.dart 4 阶段启动
 │
 ├── packages/
