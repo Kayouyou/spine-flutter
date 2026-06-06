@@ -17,6 +17,9 @@ export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截
 export 'src/http/app_logger.dart';
 export 'src/endpoints/api_endpoints.dart';
 export 'src/constants/api_constants.dart';
+// 刷新: 新增 refresh_queue + refresh_api
+export 'src/refresh/refresh_api.dart';
+export 'src/refresh/refresh_queue.dart';
 
 // Retrofit API 接口
 export 'src/api/home_api.dart';
