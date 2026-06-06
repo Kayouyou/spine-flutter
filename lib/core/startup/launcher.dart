@@ -18,6 +18,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 // Project imports:
 import 'package:domain/domain.dart';
 import '../bootstrap/bootstrap_options.dart';
+import '../config/app_config.dart';
 import '../di/locator.dart';
 import '../di/setup.dart';
 import '../utils/logger.dart';
@@ -61,30 +62,37 @@ class AppLauncher {
     Bloc.observer = AppBlocObserver();
     StartupProfiler.mark('BlocObserver 注册');
 
-    // 全局错误边界 — 在任何可能出错的代码之前安装
+    // 全局错误边界 — 任何可能出错的代码之前安装
+    // 错误处理器需在 Sentry 之后 setup, 这样 setup() 抛错也能被 Sentry 捕获
+    // (Sentry 提前到阶段 0.5 init, 见下面)
+
+    // ===== 阶段 0.5: Sentry 必须最早初始化（早于任何可能 throw 的代码）=====
+    // 极简 IAppConfig 注册, 仅供 Sentry 读 DSN. setupDependencies 内部
+    // 检测到已注册会跳过, 避免冲突.
+    sl.registerSingleton<IAppConfig>(EnvAppConfig());
+    final sentryDsn = sl<IAppConfig>().sentryDsn;
+    if (sentryDsn.isNotEmpty) {
+      await SentryFlutter.init(
+        (options) {
+          options.dsn = sentryDsn;
+          options.tracesSampleRate = 0.1;
+        },
+      );
+      StartupProfiler.mark('Sentry 初始化完成');
+    }
+
+    // Sentry 之后立即安装错误边界 + 绑定 Sentry reporter
     AppErrorHandler.instance.setup(
       onError: (error, stack) {
         sl<AppLogger>().error('未处理错误', error);
       },
     );
-    StartupProfiler.mark('错误处理器安装');
+    AppErrorHandler.instance.setReporter(SentryReporter());
+    StartupProfiler.mark('错误处理器 + Sentry reporter 绑定');
 
-    // 依赖注入配置
+    // 依赖注入配置（会跳过 IAppConfig 注册因上面已注册）
     setupDependencies(options: bootstrapOptions);
     StartupProfiler.mark('依赖注入完成');
-
-    // ===== Sentry 初始化（依赖 IAppConfig 配置）=====
-    final config = sl<IAppConfig>();
-    if (config.sentryDsn.isNotEmpty) {
-      await SentryFlutter.init(
-        (options) {
-          options.dsn = config.sentryDsn;
-          options.tracesSampleRate = 0.1;
-        },
-      );
-      AppErrorHandler.instance.setReporter(SentryReporter());
-    }
-    StartupProfiler.mark('Sentry 初始化完成');
 
     // 屏幕方向
     await SystemChrome.setPreferredOrientations([

@@ -34,7 +34,10 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
   configureDependencies();
 
   // ===== 0. 应用配置（必须在其他依赖之前注册）=====
-  sl.registerSingleton<IAppConfig>(EnvAppConfig());
+  // 允许 launcher 提前注册 IAppConfig 给 Sentry 读取 DSN
+  if (!sl.isRegistered<IAppConfig>()) {
+    sl.registerSingleton<IAppConfig>(EnvAppConfig());
+  }
 
   // ===== Step 1: 基础设施层 =====
   sl.registerSingleton<AppLogger>(AppLogger());
