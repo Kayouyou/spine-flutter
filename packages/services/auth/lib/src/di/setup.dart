@@ -17,7 +17,7 @@ void setupAuth(GetIt sl) {
 
   sl.registerFactory<AuthRepository>(MockAuthRepository.new); // ⚠️ SCAFFOLD MODE — 见 mock_auth_repository.dart 注释
 
-  sl.registerSingleton<AuthCubit>(AuthCubit(sl<AuthRepository>()));
+  sl.registerLazySingleton<AuthCubit>(() => AuthCubit(sl<AuthRepository>()));
 
   sl.registerLazySingleton<AuthManager>(
     () => AuthManager(
