@@ -5,19 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-06-06
+
+### Added
+
+- **api 包 RefreshApi 模块**: `shouldRenewToken` / `retryRequestWithRetry` / `_retryRequest` (14 字段 Options 重建) / `performTokenRenewal` / `processRenewalResponse` / `_executeRenewalRequest` / `_configureProxy`, 拆出后每个函数单一职责
+- **api 包 RefreshQueue 模块**: `TokenRenewalState` 4 态枚举 (idle / renewing / success / failed) + `PendingRequest` 3 字段封装 + `drain(batchSize, fireAndForget)` 合并原 2 个 90% 重复排空方法
+- **api 包单测覆盖**: RefreshQueue add 去重 / 12 条目分 3 批 / fireAndForget 时机, RefreshApi shouldRenewToken 3 个 code 路径, PendingRequest 4 字段构造 + 路径/方法/参数相等性, TokenRenewalInterceptor 注入与状态枚举
+- **bricks/api domainInterface 必填变量**: 强制 `implements` domain 接口 + 改用 `toDomainException` + DI 注册键改为接口, 避免砖块产物又重新 leak 实现类型
 
 ### Changed
 
-- **api 包重构**: Token 续期拦截器从 716 行单文件拆为 3 个职责清晰文件 (refresh_queue + refresh_api + 主胶水), 2 个 90% 重复排空方法合并为字节码等价的 `_drain`, 修 `ovsx-app-token` 命名错误, 新增 11 个单测
-- **api 包死代码清理**: 删除 32 项零引用产物 (3 个 zero-call api 类 + 5 个死 DTO + 3 个死 spec + 2 个死砖块 + 1 个残废脚本 + tracking/ 空目录等), 同步清理 mason.yaml/makefile 引用
-- **bricks/api 契约升级**: 新增 `domainInterface` 必填变量, 强制 `implements` domain 接口 + 改用 `toDomainException` + DI 注册键改为接口
+- **api 包 Token 续期拦截器重构**: 716 行单文件拆为 3 个职责清晰文件 (`renewal_token_intercaptor.dart` 状态机+编排 / `refresh_api.dart` HTTP / `refresh_queue.dart` 队列), 2 个 90% 重复排空方法合并为字节码等价的 `_drain`, 修 `ovsx-app-token` 命名错误
+- **api 包 barrel 收紧**: `api.dart` 删零引用 export, `component_library.dart` 同步清理
+- **api 包死代码清理**: 删除 32 项零引用产物 (3 个 zero-call api 类 + 5 个死 DTO + 3 个死 spec + 2 个 README + 1 个残废脚本 + tracking/ 空目录等), 同步清理 mason.yaml/makefile 引用
+- **bricks/api 契约升级**: 强制砖块产物实现 domain 接口而非暴露实现类型
 
 ### Removed
 
 - **bricks/api_gen + bricks/api_gen_spec**: 2 个死砖块已删除 (被 bricks/api 替代)
 - **scripts/gen_api.dart**: 残废脚本已删除
 - **makefile 6 个 gen-* target**: gen-api / gen-all-apis / refresh-api / gen-api-mason / gen-all-apis-mason / refresh-api-mason 已清理
+- **api 包 3 个死依赖**: `pretty_dio_logger` / `connectivity_plus` (network service 保留自己的 dep) / `queue` 从 `pubspec.yaml` 移除
+- **api 包公开 `retryRequest`**: 零生产调用方, 与私有 `_retryRequest` 重复, 统一为唯一私有原语
+- **api 包 `PendingRequest.handler` 死字段**: 主流程用 `completer.future` 链式回调, 字段从未被 drain 读取
+- **api 包 `ApiConstants` 笔误**: `api_endpoints.dart` deprecation 消息指向不存在的 `ApiConstants`, 改为 `ApiEndpoints`
+
+### Fixed
+
+- **api 包续期静默失败**: `_executeRenewalRequest` 用 `validateStatus: (s) => true` 吞掉所有 4xx/5xx, 加 `logger.warning` 输出非 2xx 状态码和 body
+- **api 包 `processRenewalResponse` 测试覆盖**: 5 个 case 覆盖 reLoginCode (logout 事件) / 成功 token 写入 / 缺 token / null storage / 异常 JSON
 
 ## [0.1.0] - 2026-06-05
 
@@ -58,3 +75,4 @@ CI/工具链/AI 守则全部定型。
 - 邮箱去敏降低垃圾邮件风险
 
 [0.1.0]: https://github.com/Kayouyou/spine-flutter/releases/tag/v0.1.0
+[0.2.0]: https://github.com/Kayouyou/spine-flutter/releases/tag/v0.2.0
