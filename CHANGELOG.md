@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **api 包重构**: Token 续期拦截器从 716 行单文件拆为 3 个职责清晰文件 (refresh_queue + refresh_api + 主胶水), 2 个 90% 重复排空方法合并为字节码等价的 `_drain`, 修 `ovsx-app-token` 命名错误, 新增 11 个单测
+- **api 包死代码清理**: 删除 32 项零引用产物 (3 个 zero-call api 类 + 5 个死 DTO + 3 个死 spec + 2 个死砖块 + 1 个残废脚本 + tracking/ 空目录等), 同步清理 mason.yaml/makefile 引用
+- **bricks/api 契约升级**: 新增 `domainInterface` 必填变量, 强制 `implements` domain 接口 + 改用 `toDomainException` + DI 注册键改为接口
+
+### Removed
+
+- **bricks/api_gen + bricks/api_gen_spec**: 2 个死砖块已删除 (被 bricks/api 替代)
+- **scripts/gen_api.dart**: 残废脚本已删除
+- **makefile 6 个 gen-* target**: gen-api / gen-all-apis / refresh-api / gen-api-mason / gen-all-apis-mason / refresh-api-mason 已清理
+
 ## [0.1.0] - 2026-06-05
 
 首个公开版本。项目从 internal scaffold → 公开 GitHub 仓库,

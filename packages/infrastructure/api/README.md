@@ -7,14 +7,17 @@ HTTP 网络请求层 — 基于 Dio 的 HTTP 客户端封装。
 ```
 api/
 ├── lib/
-│   ├── api.dart                              # 导出入口（11 个活跃导出）
+│   ├── api.dart                              # 导出入口
 │   └── src/
 │       ├── dio_factory.dart                  # Dio 工厂函数 createDio()
 │       ├── endpoints/
-│       │   └── api_endpoints.dart            # 🆕 集中式 API 端点注册表
+│       │   └── api_endpoints.dart            # 集中式 API 端点注册表
 │       ├── dio/
 │       │   ├── header_interceptor.dart        # 请求签名拦截器
-│       │   └── renewal_token_intercaptor.dart # Token 自动续期（状态机）
+│       │   └── renewal_token_intercaptor.dart # Token 自动续期（状态机, 编排层）
+│       ├── refresh/
+│       │   ├── refresh_queue.dart            # 续期请求队列 + PendingRequest + drain
+│       │   └── refresh_api.dart              # 续期 HTTP 调用 + Token 处理 + 代理
 │       ├── http/
 │       │   ├── http_constant.dart            # HTTP 常量（超时、主机、错误码）
 │       │   ├── http_event_bus.dart           # 事件总线（logout、hasToken）
@@ -50,9 +53,7 @@ api/
 │       ├── api/
 │       │   ├── home_api.dart        # 首页 API
 │       │   ├── detail_api.dart      # 详情 API
-│       │   ├── auth_api.dart        # 认证 API
-│       │   ├── session_api.dart     # Session API
-│       │   └── vehicle_api.dart     # 车辆 API
+│       │   └── user_api.dart        # 用户 API
 │       └── error/
 │           ├── dio_mapper.dart      # DioException → DomainException
 │           └── future_result.dart   # Future.toResult() 扩展
@@ -107,4 +108,5 @@ try {
 
 ## 重构历史
 
+- 2026-06-06: Token 续期拦截器拆分为 3 文件 (refresh_queue + refresh_api + 主胶水), 死代码清理 32 项, 砖块契约升级 (domainInterface 强制)
 - 2026-05-06: 端点集中管理 + 死代码删除（~900行）+ 错误处理统一 + 业务泄露清理。文件数 19→13，Clean Architecture 评分 5/10→8.8/10。

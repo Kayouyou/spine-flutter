@@ -438,12 +438,8 @@ melos test:coverage
 | `make prod` | 生产环境运行（env/.env.prod） |
 | `make build-prod` | 生产环境构建 APK（env/.env.prod） |
 | `make bs` | 仅安装依赖（= melos bs） |
-| `make gen-api-mason spec=xxx` | 从 JSON spec 生成 API 代码（Mason ✨） |
-| `make gen-all-apis-mason` | 批量生成所有 spec 代码（Mason ✨） |
-| `make refresh-api-mason` | 完整刷新：生成 + 依赖 + build_runner + 校验（内部调用 `melos run analyze`） |
-| `make gen-api spec=xxx` | 从 JSON spec 生成 API 代码（Dart 脚本备用） |
 
-> 📌 2026-05-10 修复：domain 包已添加 build_runner/freezed/json_serializable，create-model 现已可用；create-api 支持 `--modelName dynamic` 跳过交互式输入；lint/refresh-api-mason 已改用 `melos run analyze`。
+> 📌 2026-05-10 修复：domain 包已添加 build_runner/freezed/json_serializable，create-model 现已可用；create-api 支持 `--modelName dynamic` 跳过交互式输入。
 
 ---
 
@@ -770,11 +766,10 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 - 新增 `hive_model` 砖：一键创建 @HiveType 本地存储模型
 - 新增 `create-api` / `create-model` / `create-hive-model` make 命令
 
-### API 生成 Mason 化（2026-05-10）
-- 新增 `api_gen_spec` 砖：从 JSON spec 自动生成完整 API 代码（替代 `gen_api.dart` 入口）
-- `post_gen.dart` 钩子读取 JSON spec → 生成 Freezed DTO + Retrofit API + Hive CM → 更新 barrel
-- 新增 `make gen-api-mason` / `gen-all-apis-mason` / `refresh-api-mason` 目标
-- 输出与 `gen_api.dart` **完全一致**，Dart 脚本保留为备用
+### API 生成简化（2026-06-06）
+- `bricks/api_gen` / `bricks/api_gen_spec` / `scripts/gen_api.dart` 已删除，统一走 `bricks/api` 砖块 (`make create-api`)
+- `make gen-api*` / `refresh-api*` 等 6 个 target 已清理
+- `bricks/api` 新增 `domainInterface` 必填变量，强制 `implements` domain 接口
 
 ### AuthRepository 返回类型增强 + Usecase 补齐（2026-05-12）
 - `AuthRepository.login()/register()` 返回 `Result<LoginResult>` 携带 `userId` + `token`，替代裸 `bool`，消除调用方 hardcode
@@ -927,8 +922,6 @@ cd packages/features/feature_settings && dart run build_runner build --delete-co
 | `api` | 一键创建 Retrofit API 模块（含 RepositoryImpl、DI 注册） | `make create-api name=xxx baseUrl=/api/v1` |
 | `model` | 一键创建 @freezed 数据模型 | `make create-model name=xxx` |
 | `hive_model` | 一键创建 @HiveType 本地存储模型 | `make create-hive-model name=xxx typeId=N` |
-| `api_gen` | 从砖块 vars 生成单个 Retrofit API 文件（模板级） | `mason make api_gen --domain xxx ...` |
-| `api_gen_spec` ⭐ | 从 JSON spec 文件自动生成全部 API 代码（推荐） | `make gen-api-mason spec=auth.json` |
 
 ### 自动化对齐方案（单入口：根目录）
 
@@ -959,12 +952,10 @@ cd packages/features/feature_settings && dart run build_runner build --delete-co
 - 新增 API：`make create-api name=xxx baseUrl=/api/v1 [model=xxx]`
 - 新增共享模型：`make create-model name=xxx`
 - 新增 Hive 模型：`make create-hive-model name=xxx typeId=N`
-- 批量 API 刷新：`make refresh-api-mason`
 
 #### 可选但建议（一次配置，长期收益）
 
 - 联合生成：`make scaffold-api name=xxx baseUrl=/api/v1`
-- 单 spec 生成：`make gen-api-mason spec=auth.json`
 - 本地覆盖率报告：`make coverage-local`
 
 #### 无需新增自动化（当前阶段）
@@ -986,33 +977,14 @@ cd packages/features/feature_settings && dart run build_runner build --delete-co
 
 
 
-JSON spec 文件位于 `packages/infrastructure/api/spec/`（如 `auth.json`、`user.json` 等）。
+JSON spec 文件位于 `packages/infrastructure/api/spec/`（如 `detail.json`、`home.json`、`user.json`）。
 
-**一键生成（Mason ✨）**：
+**一键生成（Mason）**：
 ```bash
-# 单个 spec
-make gen-api-mason spec=auth.json
-
-# 批量所有 spec
-make gen-all-apis-mason
-
-# 完整刷新（生成 + 依赖 + build_runner + 校验）
-make refresh-api-mason
+make create-api name=xxx baseUrl=/api/v1 [model=xxx]
 ```
 
-**备用方式（Dart 脚本）**：
-```bash
-# 单文件
-make gen-api spec=auth.json
-
-# 批量
-make gen-all-apis
-
-# 完整刷新
-make refresh-api
-```
-
-两种方式输出**完全一致**，`scripts/gen_api.dart` 保留为备用。
+> 📌 `bricks/api` 升级后新增 `domainInterface` 必填变量，强制生成代码 `implements` domain 接口（AGENTS.md R3）并使用 `toDomainException`（AGENTS.md R8）。详见 `bricks/api/README.md`。
 
 ---
 
