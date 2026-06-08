@@ -6,6 +6,7 @@ import 'package:api/api.dart';
 import 'package:auth/auth.dart';
 import 'package:data_sync/data_sync.dart';
 import 'package:dio/dio.dart';
+import 'package:error/error.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_home/feature_home.dart';
@@ -77,6 +78,14 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
     userTokenSupplier: () => sl<TokenStorage>().getToken(),
     onNetworkDisconnected: () {
       sl<AppLogger>().warning('网络连接已断开');
+    },
+    onDioError: (err, stack, {context = const {}}) {
+      AppErrorHandler.instance.reportError(
+        err,
+        stack,
+        isFatal: true,
+        context: context,
+      );
     },
     logger: sl<AppLogger>(),
     autoCancelInterceptor: autoCancelInterceptor,
