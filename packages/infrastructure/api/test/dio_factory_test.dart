@@ -1,7 +1,6 @@
 // packages/infrastructure/api/test/dio_factory_test.dart
 
 import 'package:api/api.dart';
-import 'package:api/src/dio/error_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -59,7 +58,7 @@ void main() {
         onDioError: (_, __, {context = const {}}) {},
       );
 
-      // ErrorInterceptor 必须在 TokenRenewal 之后、Log 之前(因 Log 是 [4])
+      // ErrorInterceptor 在链中(不要求具体位置,位置由 dio_factory docstring 约束)
       final errorIdx = dio.interceptors.indexWhere((i) => i is ErrorInterceptor);
       expect(errorIdx, greaterThan(0),
           reason: 'ErrorInterceptor should be in the chain');
