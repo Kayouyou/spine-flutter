@@ -112,7 +112,11 @@ void main() {
       expect(ctx['source'], 'dio');
     });
 
-    test('reports 5xx even when stackTrace is null', () {
+    test('reports 5xx and forwards stack trace', () {
+      // dio 5.8+ 的 DioException 构造器会把缺省的 stackTrace 兜底成
+      // requestOptions.sourceStackTrace ?? StackTrace.current,
+      // 所以 cap.stacks.first 不可能为 null。这里验证拦截器在 5xx
+      // 路径不崩溃,并且确实把 stack 透传给了回调。
       final cap = _Capture();
       final interceptor = ErrorInterceptor(onError: cap.call);
 
@@ -123,12 +127,11 @@ void main() {
           statusCode: 503,
         ),
         type: DioExceptionType.badResponse,
-        // stackTrace 默认 null
       );
       interceptor.onError(err, _StubHandler());
 
       expect(cap.contexts, hasLength(1));
-      expect(cap.stacks.first, isNull);
+      expect(cap.stacks.first, isA<StackTrace>());
     });
   });
 }

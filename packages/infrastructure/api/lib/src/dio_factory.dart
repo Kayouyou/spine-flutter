@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'cancel/auto_cancel_interceptor.dart';
+import 'dio/error_interceptor.dart';
 import 'dio/renewal_token_intercaptor.dart';
 import 'http/app_logger.dart';
 
@@ -11,24 +12,33 @@ import 'http/app_logger.dart';
 /// 拦截器链顺序（请求方向）:
 ///   [0] AutoCancelInterceptor    → 读 tag，生成 CancelToken
 ///   [1] TokenRenewalInterceptor  → 检测 code=1000102，排队续期
-///   [2] InterceptorsWrapper    → 注入 Authorization header
-///   [3] LogInterceptor          → 记录日志（仅 Debug）
-///   [4] AliceInterceptor        → HTTP Inspector（仅 Debug）
+///   [2] InterceptorsWrapper    → 注入 Authorization header + 网络断开 callback
+///   [3] ErrorInterceptor        → 5xx/网络错误上报(传入 onDioError 回调)
+///   [4] LogInterceptor          → 记录日志（仅 Debug）
+///   [5] AliceInterceptor        → HTTP Inspector（仅 Debug）
 ///
 /// 使用方式：
 /// ```dart
 /// final dio = createDio(
 ///   userTokenSupplier: () async => token,
 ///   onNetworkDisconnected: () => logger.warning('网络断开'),
-///   logger: appLogger,                        // 注入主应用 AppLogger
-///   autoCancelInterceptor: myInterceptor,      // 从外部注入 AutoCancelInterceptor
-///   tokenStorage: sl<TokenStorage>(),          // 用于 Token 续期成功后写入 Hive
-///   alice: sl<Alice>(),                        // Alice HTTP Inspector（可选，仅 Debug）
+///   onDioError: (err, stack) => AppErrorHandler.instance.reportError(
+///     err, stack, isFatal: true, context: {'source': 'dio', ...},
+///   ),
+///   logger: appLogger,
+///   autoCancelInterceptor: myInterceptor,
+///   tokenStorage: sl<TokenStorage>(),
+///   alice: sl<Alice>(),
 /// );
 /// ```
 Dio createDio({
   required Future<String?> Function() userTokenSupplier,
   required void Function() onNetworkDisconnected,
+  void Function(
+    Object error,
+    StackTrace? stack, {
+    Map<String, dynamic> context,
+  })? onDioError,
   AppLoggerInterface? logger,
   AutoCancelInterceptor? autoCancelInterceptor,
   TokenStorage? tokenStorage,
@@ -71,7 +81,12 @@ Dio createDio({
     },
   ),);
 
-  // [3] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
+  // [3] Error — 5xx/网络错误上报(4xx 业务期望错误不上报)
+  if (onDioError != null) {
+    dio.interceptors.add(ErrorInterceptor(onError: onDioError));
+  }
+
+  // [4] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
   if (kDebugMode) {
     dio.interceptors.add(
       LogInterceptor(
@@ -81,7 +96,7 @@ Dio createDio({
     );
   }
 
-  // [4] Alice — HTTP Inspector（仅 Debug 模式，可选）
+  // [5] Alice — HTTP Inspector（仅 Debug 模式，可选）
   if (kDebugMode && alice != null) {
     dio.interceptors.add(alice.getDioInterceptor());
   }

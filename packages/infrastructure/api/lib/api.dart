@@ -13,6 +13,7 @@ export 'src/error/dio_mapper.dart';
 export 'src/cancel/cancel_manager.dart';
 export 'src/cancel/auto_cancel_interceptor.dart';
 export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截器
+export 'src/dio/error_interceptor.dart';  // Phase x: Dio 错误拦截器(上报到 AppErrorHandler)
 // Phase 3d新增：日志接口
 export 'src/http/app_logger.dart';
 export 'src/endpoints/api_endpoints.dart';
