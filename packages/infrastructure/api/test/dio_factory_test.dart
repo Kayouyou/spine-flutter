@@ -1,6 +1,7 @@
 // packages/infrastructure/api/test/dio_factory_test.dart
 
 import 'package:api/api.dart';
+import 'package:api/src/dio/error_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -49,6 +50,31 @@ void main() {
       final hasRenewal =
           dio.interceptors.any((i) => i is TokenRenewalInterceptor);
       expect(hasRenewal, isTrue);
+    });
+
+    test('adds ErrorInterceptor when onDioError is provided', () {
+      final dio = createDio(
+        userTokenSupplier: () async => null,
+        onNetworkDisconnected: () {},
+        onDioError: (_, __, {context = const {}}) {},
+      );
+
+      // ErrorInterceptor 必须在 TokenRenewal 之后、Log 之前(因 Log 是 [4])
+      final errorIdx = dio.interceptors.indexWhere((i) => i is ErrorInterceptor);
+      expect(errorIdx, greaterThan(0),
+          reason: 'ErrorInterceptor should be in the chain');
+    });
+
+    test('omits ErrorInterceptor when onDioError is null', () {
+      final dio = createDio(
+        userTokenSupplier: () async => null,
+        onNetworkDisconnected: () {},
+      );
+
+      final hasError =
+          dio.interceptors.any((i) => i is ErrorInterceptor);
+      expect(hasError, isFalse,
+          reason: 'No callback → no ErrorInterceptor (R3 friendly)');
     });
   });
 }
