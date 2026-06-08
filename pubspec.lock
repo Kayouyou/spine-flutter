@@ -1152,14 +1152,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.5.0"
-  pretty_dio_logger:
-    dependency: transitive
-    description:
-      name: pretty_dio_logger
-      sha256: "36f2101299786d567869493e2f5731de61ce130faa14679473b26905a92b6407"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.4.0"
   process:
     dependency: transitive
     description:
@@ -1216,14 +1208,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.7.4"
-  queue:
-    dependency: transitive
-    description:
-      name: queue
-      sha256: "9bc29632072f4dac6cd0056acbb63361f654e2def9ceb4b08cfe0f9cf5618409"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.4.0"
   recase:
     dependency: transitive
     description:
