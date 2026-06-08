@@ -812,13 +812,13 @@ cacheKey: 'search_${keyword}'         // 搜索结果（按关键词隔离）
 | 存储安全 | 9/10 | PreferenceKey enum 类型化，48 key 无魔法字符串 |
 | 组件库 | 8.5/10 | AppScaffold/CustomAppBar + LoadingButton/EmptyState/ErrorCard |
 | 可测性 | 8.5/10 | 三层测试 + bloc_test + RTL 测试 |
-| 错误处理 | 9/10 | sealed 异常 + Dio 映射 + ErrorReporter 接口（Sentry 就绪） |
+| 错误处理 | 9.5/10 | sealed 异常 + Dio 映射 + ErrorReporter 接口 + 业务层串联（AppBlocObserver / ErrorInterceptor → AppErrorHandler，LRU 16×1s 去重） |
 | 网络监控 | 9/10 | connectivity_plus + NetworkQualityMonitor（弱网检测） |
 | 启动可靠性 | 9/10 | 分阶段 await + 性能分析 |
 | 环境配置 | 9/10 | dev/staging/prod flavor 系统 |
 | 开发工具链 | 9.5/10 | Melos 多包管理 + Mason 代码模板 + validate 一键验收 |
 | 资源管理 | 9/10 | 一键图标/启动页 |
-| 监控体系 | 9/10 | Sentry 崩溃监控（DSN 空时自动禁用） |
+| 监控体系 | 9.5/10 | Sentry 崩溃监控（DSN 空时自动禁用）+ 业务层错误主动上报（Bloc / Dio 5xx / 网络错） |
 | 版本管理 | 9/10 | upgrader 强制更新检查 |
 
 ## 标准脚手架通过条件
@@ -995,6 +995,19 @@ make create-api name=xxx baseUrl=/api/v1 [model=xxx]
 - 通过 `SENTRY_DSN` 环境变量启用
 - DSN 为空时自动禁用，不影响开发
 - `SentryReporter` 实现 `ErrorReporter` 接口
+
+### 业务层错误上报链
+
+应用启动后，三条独立路径统一收敛到 `AppErrorHandler`：
+
+| 入口 | 来源 | 过滤规则 |
+|------|------|----------|
+| `FlutterError.onError` | 框架同步错误 | 全部 |
+| `PlatformDispatcher.onError` | 异步未捕获 | 全部 |
+| `AppBlocObserver.onError` | Cubit/Bloc 抛错 | 全部，context 含 `bloc` 名 |
+| `ErrorInterceptor`（Dio） | Dio 5xx / 网络错 | 4xx 业务期望错误跳过 |
+
+`AppErrorHandler.reportError` 内部 LRU 去重（16 项 × 1 秒），防止短时间重复风暴。`packages/infrastructure/api` 走 `onDioError` 回调桥接，符合 R3（infrastructure 不依赖 services）。详见 `packages/services/error/README.md`。
 
 ### Upgrader 强制更新
 
