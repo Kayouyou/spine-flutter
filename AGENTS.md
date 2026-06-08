@@ -409,14 +409,14 @@ UI (page) → Cubit → Repository → Dio
                   SentryReporter (prod) | ConsoleReporter (dev)
 ```
 
-### 9.2 强制走 ErrorReporter
+### 9.2 强制走 AppErrorHandler
 
 ```dart
-// ✅ 正确
+// ✅ 正确: 通过单例上报，内部走 ErrorReporter 抽象
 try {
   await api.fetch();
 } catch (e, st) {
-  await sl<IErrorReporter>().report(e, stackTrace: st);
+  AppErrorHandler.instance.reportError(e, st);
   rethrow;  // 让 cubit 决定 UI 怎么显示
 }
 
@@ -425,6 +425,10 @@ try {
   print(e);
 }
 ```
+
+> 说明: 实际上报实现由 `ErrorReporter` 接口承载，生产用 `SentryReporter`，开发用 `ConsoleReporter`。
+> `AppErrorHandler` 是统一入口（内含 LRU 去重），**不**通过 GetIt DI 注入，直接 `AppErrorHandler.instance` 调用。
+> Dio 层和 BlocObserver 已自动接入，业务层通常无需手动上报。详见 `packages/services/error/README.md`。
 
 ### 9.3 Sentry 必开配置
 
