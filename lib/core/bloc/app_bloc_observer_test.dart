@@ -1,13 +1,13 @@
 // lib/core/bloc/app_bloc_observer_test.dart
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:bloc/bloc.dart';
-import 'package:bloc_test/bloc_test.dart';
 import 'package:error/error.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'app_bloc_observer.dart';
 
 class _TestCubit extends Cubit<int> {
   _TestCubit() : super(0);
-  void bang() => throw StateError('boom from cubit');
 }
 
 class _NullReporter implements ErrorReporter {
