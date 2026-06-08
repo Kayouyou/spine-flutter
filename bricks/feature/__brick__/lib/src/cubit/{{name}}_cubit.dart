@@ -9,6 +9,7 @@ class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
   {{name.pascalCase()}}Cubit(this._repository) : super(const {{name.pascalCase()}}State.initial());
 
   Future<void> loadData() async {
+    if (state is {{name.pascalCase()}}Loading) return;
     emit(const {{name.pascalCase()}}State.loading());
 
     final result = await _repository.get{{name.pascalCase()}}Data();
@@ -19,6 +20,7 @@ class {{name.pascalCase()}}Cubit extends Cubit<{{name.pascalCase()}}State> {
   }
 
   Future<void> refreshData() async {
+    if (state is {{name.pascalCase()}}Loading) return;
     emit(const {{name.pascalCase()}}State.loading());
 
     final result = await _repository.refresh{{name.pascalCase()}}Data();

@@ -81,7 +81,7 @@ dependencies:
   go_router: ^14.2.7
   path_provider: ^2.0.2
   rxdart: ^0.27.1
-  dio: ^5.2.0+1
+  dio: ^5.4.0
   cupertino_icons: ^1.0.2
   
   # 错误监控与强制更新
@@ -93,6 +93,8 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^4.0.0
   melos: ^6.2.0

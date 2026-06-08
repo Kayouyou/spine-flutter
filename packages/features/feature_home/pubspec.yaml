@@ -26,7 +26,7 @@ dependencies:
   auth:
     path: ../../services/auth
 
-  alice: ^0.4.0
+  alice: ^0.4.2
 
   # 强制更新检查
   upgrader: ^10.3.0

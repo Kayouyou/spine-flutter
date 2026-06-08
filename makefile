@@ -1,4 +1,4 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model help scaffold-check
+.PHONY: get clean debug debug-simulator release lint test coverage-local integration-test create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model create-usecase help scaffold-check
 
 # ============================================================================
 # 基础命令
@@ -24,6 +24,10 @@ test:
 coverage-local:
 	@chmod +x scripts/coverage_local.sh
 	@./scripts/coverage_local.sh
+
+# 集成测试 (需要连接设备/模拟器)
+integration-test:
+	fvm flutter test integration_test/
 
 # ============================================================================
 # 开发环境
@@ -152,6 +156,21 @@ create-hive-model:
 	fi
 	@echo "=== 4/4 生成 Adapter 代码 ==="
 	cd packages/infrastructure/key_value_storage && dart run build_runner build --delete-conflicting-outputs
+	@echo "=== 完成 ==="
+
+# 生成 Domain 层 UseCase
+create-usecase:
+	@if [ -z "$(name)" ] || [ -z "$(repo)" ]; then \
+		echo "用法: make create-usecase name=getUser repo=User"; \
+		echo "  name: UseCase 名称 (不含 UseCase 后缀)"; \
+		echo "  repo: Repository 名称 (不含 I 前缀)"; \
+		exit 1; \
+	fi
+	@echo "=== 1/2 生成 UseCase ==="
+	mason make usecase --name $(name) --repository $(repo) --output-dir packages/domain --on-conflict overwrite
+	@echo "=== 2/2 提醒 ==="
+	@echo "⚠️  确认 packages/domain/lib/src/repositories/ 已有 I$(repo)Repository 接口"
+	@echo "⚠️  在 packages/domain/lib/domain.dart 中导出新 UseCase"
 	@echo "=== 完成 ==="
 
 # ============================================================================

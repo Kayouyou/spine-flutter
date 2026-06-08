@@ -20,6 +20,8 @@ jobs:
       - run: melos bs
       - name: Run tests with coverage
         run: melos test:coverage
+      - name: Check coverage threshold
+        run: ./scripts/check_coverage.sh 80
       - name: Upload to codecov
         uses: codecov/codecov-action@v4
         with:

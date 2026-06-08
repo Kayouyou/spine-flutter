@@ -59,3 +59,8 @@ scripts:
         fi
       done
     description: 运行测试并检查覆盖率存在
+
+  check:coverage:threshold:
+    run: |
+      ./scripts/check_coverage.sh 80
+    description: 检查合并覆盖率是否达到 80% 门槛

@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.2.0+1
+  dio: ^5.4.0
   domain:
     path: ../../domain
   api:
@@ -24,6 +24,6 @@ dev_dependencies:
     sdk: flutter
   bloc_test: ^10.0.0
   flutter_lints: ^4.0.0
-  mocktail: ^1.0.0
+  mocktail: ^1.0.5
   build_runner: ^2.4.9
   freezed: ^2.5.2

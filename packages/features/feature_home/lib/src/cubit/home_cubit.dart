@@ -21,12 +21,10 @@ class HomeCubit extends Cubit<HomeState> {
   /// 从Repository获取数据，更新状态
   /// 状态流转：Initial/Error → Loading → Loaded/Error
   Future<void> loadData() async {
-    // 开始加载
+    if (state is HomeLoading) return;
     emit(const HomeState.loading());
 
-    // 获取数据（返回Result类型）
     final result = await _repository.getHomeData();
-    // 穷尽匹配处理结果
     result.when(
       success: (data) => emit(HomeState.loaded(data: data)),
       failure: (error) => emit(HomeState.error(errorCode: error.message)),
@@ -37,11 +35,10 @@ class HomeCubit extends Cubit<HomeState> {
   ///
   /// 强制从服务器获取最新数据
   Future<void> refreshData() async {
+    if (state is HomeLoading) return;
     emit(const HomeState.loading());
-    
-    // 获取数据（返回Result类型）
+
     final result = await _repository.refreshHomeData();
-    // 穷尽匹配处理结果
     result.when(
       success: (data) => emit(HomeState.loaded(data: data)),
       failure: (error) => emit(HomeState.error(errorCode: error.message)),

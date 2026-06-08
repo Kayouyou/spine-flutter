@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.2.0+1
+  dio: ^5.4.0
   rxdart: ^0.27.1
   key_value_storage:
     path: ../key_value_storage

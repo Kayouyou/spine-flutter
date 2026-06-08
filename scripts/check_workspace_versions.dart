@@ -8,10 +8,18 @@ const trackedPackages = [
   'freezed_annotation',
   'freezed',
   'build_runner',
+  'mocktail',
+  'dio',
+  'alice',
+  'hive_generator',
+  'bloc_test',
+  'retrofit',
+  'json_annotation',
+  'json_serializable',
 ];
 
 void main() {
-  final skipDirs = ['/.worktrees/', '/ios/.symlinks/', '/macos/'];
+  final skipDirs = ['.worktrees', '.fvm', 'ios/.symlinks', '.pub-cache', '/build/'];
 
   final pubspecs = Directory('.')
       .listSync(recursive: true)

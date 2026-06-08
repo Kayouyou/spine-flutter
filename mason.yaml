@@ -7,3 +7,5 @@ bricks:
     path: bricks/model
   hive_model:
     path: bricks/hive_model
+  usecase:
+    path: bricks/usecase

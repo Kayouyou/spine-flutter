@@ -63,3 +63,7 @@ packages/services/auth/build/
 .mason/
 mason-lock.json
 **/bricks.json
+
+# Backup files
+*.bak
+*.bak.*

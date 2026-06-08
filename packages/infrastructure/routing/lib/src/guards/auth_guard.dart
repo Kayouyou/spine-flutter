@@ -28,7 +28,8 @@ class AuthGuard {
       isLoggedIn = false;
     }
 
-    final isPublic = publicRoutes.contains(path);
+    final isPublic = publicRoutes.contains(path) ||
+        publicRoutePrefixes.any((prefix) => path.startsWith(prefix));
     if (kDebugMode) {
       debugPrint(
         '🛡️ [AuthGuard] path=$path isLoggedIn=$isLoggedIn isPublic=$isPublic → '
