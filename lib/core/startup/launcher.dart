@@ -4,6 +4,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,6 +18,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 // Project imports:
 import 'package:domain/domain.dart';
+import '../../config.dart';
 import '../bootstrap/bootstrap_options.dart';
 import '../config/app_config.dart';
 import '../di/locator.dart';
@@ -76,6 +78,8 @@ class AppLauncher {
         (options) {
           options.dsn = sentryDsn;
           options.tracesSampleRate = 0.1;
+          options.release = 'spine_flutter@${EnvironmentConfig.appVersion}+${EnvironmentConfig.buildNumber}';
+          options.environment = EnvironmentConfig.current.name;
         },
       );
       StartupProfiler.mark('Sentry 初始化完成');
@@ -87,7 +91,9 @@ class AppLauncher {
         sl<AppLogger>().error('未处理错误', error);
       },
     );
-    AppErrorHandler.instance.setReporter(SentryReporter());
+    AppErrorHandler.instance.setReporter(
+      kDebugMode ? ConsoleReporter() : SentryReporter(),
+    );
     StartupProfiler.mark('错误处理器 + Sentry reporter 绑定');
 
     // 依赖注入配置（会跳过 IAppConfig 注册因上面已注册）

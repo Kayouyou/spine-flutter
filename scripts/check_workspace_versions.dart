@@ -16,6 +16,9 @@ const trackedPackages = [
   'retrofit',
   'json_annotation',
   'json_serializable',
+  'lints',
+  'sentry_flutter',
+  'flutter_lints',
 ];
 
 void main() {

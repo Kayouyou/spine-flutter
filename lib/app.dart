@@ -113,16 +113,8 @@ class _SpineFlutterState extends State<SpineFlutter> {
             StatefulShellBranch(
               routes: RouteModuleRegistry.instance.get('feature_home', ctx),
             ),
-            // 第二个 tab 暂留空,feature_settings 后续补
             StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/_placeholder',
-                  builder: (_, __) => const Scaffold(
-                    body: Center(child: Text('Settings (TODO)')),
-                  ),
-                ),
-              ],
+              routes: RouteModuleRegistry.instance.get('feature_settings', ctx),
             ),
           ],
         ),

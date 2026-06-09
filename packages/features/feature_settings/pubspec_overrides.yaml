@@ -1,0 +1,16 @@
+# melos_managed_dependency_overrides: api,auth,component_library,domain,key_value_storage,locale,routing
+dependency_overrides:
+  api:
+    path: ../../infrastructure/api
+  auth:
+    path: ../../services/auth
+  component_library:
+    path: ../../infrastructure/component_library
+  domain:
+    path: ../../domain
+  key_value_storage:
+    path: ../../infrastructure/key_value_storage
+  locale:
+    path: ../../services/locale
+  routing:
+    path: ../../infrastructure/routing

@@ -30,7 +30,7 @@ class FakeAuthManager extends AuthManager {
 class _NoopUserRepository implements UserRepository {
   @override
   Future<Result<User, DomainException>> getCurrentUser() async =>
-      const Result.failure(DomainException('noop'));
+      Failure<User, DomainException>(UnauthorizedException());
 
   @override
   noSuchMethod(Invocation invocation) =>
@@ -69,16 +69,16 @@ class _NoopAuthRepository implements AuthRepository {
   @override
   Future<Result<LoginResult, DomainException>> login(
           String username, String password) async =>
-      const Result.failure(DomainException('noop'));
+      Failure<LoginResult, DomainException>(UnauthorizedException());
 
   @override
   Future<Result<LoginResult, DomainException>> register(
           String username, String password) async =>
-      const Result.failure(DomainException('noop'));
+      Failure<LoginResult, DomainException>(UnauthorizedException());
 
   @override
   Future<Result<void, DomainException>> logout() async =>
-      const Result.success(null);
+      Success<void, DomainException>(null);
 
   @override
   noSuchMethod(Invocation invocation) =>

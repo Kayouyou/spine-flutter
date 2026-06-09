@@ -29,6 +29,12 @@ class EnvironmentConfig {
   /// App Store ID（从环境文件读取，生产环境需要配置）
   static const appStoreId = String.fromEnvironment('APP_STORE_ID');
 
+  /// 应用版本号（从环境文件读取）
+  static const appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '0.0.0');
+
+  /// 构建号（从环境文件读取）
+  static const buildNumber = String.fromEnvironment('BUILD_NUMBER', defaultValue: '0');
+
   /// 当前环境
   static AppEnvironment get current {
     switch (_envName) {

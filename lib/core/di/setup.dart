@@ -10,6 +10,7 @@ import 'package:error/error.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_detail/feature_detail.dart';
 import 'package:feature_home/feature_home.dart';
+import 'package:feature_settings/feature_settings.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'package:locale/locale.dart';
@@ -23,16 +24,12 @@ import '../config/app_config.dart';
 import '../utils/logger.dart';
 import '../middleware/request_context.dart'; // 请求上下文（用于自动取消标记）
 import 'locator.dart';
-import 'injectable.dart';
 
 /// 依赖注入配置
 ///
 /// 职责：注册所有应用依赖
 void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
   sl.registerSingleton<BootstrapOptions>(options);
-  // ===== 0. injectable 初始化（自动注册 @injectable 类）=====
-  // 必须在任何手动 sl.registerXxx 之前调用：后续手动注册会覆盖同名自动注册
-  configureDependencies();
 
   // ===== 0. 应用配置（必须在其他依赖之前注册）=====
   // 允许 launcher 提前注册 IAppConfig 给 Sentry 读取 DSN
@@ -112,6 +109,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
   FeatureRegistry.instance.register('feature_home', setupFeatureHome);
   FeatureRegistry.instance.register('feature_detail', setupFeatureDetail);
   FeatureRegistry.instance.register('feature_auth', setupFeatureAuth);
+  FeatureRegistry.instance.register('feature_settings', setupFeatureSettings);
   FeatureRegistry.instance.runAll(sl);
 
   configureEasyLoading();
