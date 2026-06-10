@@ -10,8 +10,9 @@ component_library/
 │   ├── component_library.dart             # 导出入口
 │   └── src/
 │       ├── theme/
-│       │   ├── ovs_theme.dart             # OVSTheme Widget（InheritedWidget）
-│       │   ├── ovs_theme_data.dart        # 主题数据（颜色、文本样式）
+│       │   ├── app_colors.dart            # 颜色 Token（支持暗色主题）
+│       │   ├── radius.dart                # 圆角 Token（6 级）
+│       │   ├── shadows.dart               # 阴影 Token（4 级）
 │       │   ├── font_size.dart             # 字体大小常量
 │       │   └── spacing.dart               # 间距常量
 │       ├── constants/
@@ -22,8 +23,17 @@ component_library/
 │       │   ├── component_library_localizations.dart        # 国际化生成文件
 │       │   └── component_library_localizations_zh.dart     # 中文本地化
 │       └── widgets/
-│           ├── custom_app_bar.dart   # 统一导航栏 widget
-│           └── app_scaffold.dart      # 统一页面结构 widget
+│           ├── app_button.dart            # 统一按钮（5 变体 × 4 尺寸 × 4 图标位置）
+│           ├── app_card.dart              # 卡片容器
+│           ├── app_dialog.dart            # 对话框
+│           ├── app_scaffold.dart          # 统一页面结构
+│           ├── app_section.dart           # 内容区块
+│           ├── app_text_field.dart        # 统一输入框
+│           ├── app_toast.dart             # Toast 提示（EasyLoading 封装）
+│           ├── custom_app_bar.dart        # 统一导航栏
+│           ├── empty_state.dart           # 空状态页面
+│           ├── error_card.dart            # 错误卡片
+│           └── loading_button.dart        # 加载按钮（legacy）
 ├── l10n.yaml                              # 国际化配置
 └── pubspec.yaml
 ```
@@ -35,6 +45,7 @@ component_library/
 | `flutter_screenutil` | 屏幕适配（rpx 单位） |
 | `flutter_localizations` | 国际化支持 |
 | `intl` | 日期/数字格式化 |
+| `flutter_easyloading` | Toast/Loading 提示 |
 
 ## 主题系统
 
