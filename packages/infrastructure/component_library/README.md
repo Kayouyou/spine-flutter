@@ -176,3 +176,235 @@ AppScaffold(
 - 简单页面：传 title（80% 页面）
 - 复杂页面：传 appBar + BlocBuilder（动态 AppBar）
 - 需生命周期：叠加 LifecycleMixin（单独 mixin）
+
+---
+
+## 按钮系统
+
+### AppButton
+
+统一按钮组件，支持多种变体、尺寸和自定义样式。
+
+#### 基础用法
+
+```dart
+// 主按钮（填充色）
+AppButton.primary(label: '提交', onPressed: _submit)
+
+// 次要按钮（描边）
+AppButton.secondary(label: '取消', onPressed: _cancel)
+
+// 危险按钮（红色）
+AppButton.danger(label: '删除', onPressed: _delete)
+
+// 纯文本按钮
+AppButton.text(label: '了解更多', onPressed: _learnMore)
+```
+
+#### 变体类型
+
+| 变体 | 工厂方法 | 用途 |
+|------|----------|------|
+| 填充色 | `AppButton.primary()` | 主要操作（提交、确认） |
+| 描边 | `AppButton.secondary()` | 次要操作（取消、返回） |
+| 红色填充 | `AppButton.danger()` | 危险操作（删除、退出） |
+| 纯文本 | `AppButton.text()` | 轻量操作（链接、更多） |
+| 渐变 | `AppButton.gradient()` | 视觉强调（促销、VIP） |
+| 自定义 | `AppButton.custom()` | 完全自定义样式 |
+
+#### 尺寸
+
+```dart
+AppButton.primary(
+  label: '紧凑',
+  size: AppButtonSize.compact,  // 高度 32
+  onPressed: _fn,
+)
+
+AppButton.primary(
+  label: '中等',
+  size: AppButtonSize.medium,  // 高度 44（默认）
+  onPressed: _fn,
+)
+
+AppButton.primary(
+  label: '大号',
+  size: AppButtonSize.large,  // 高度 52
+  onPressed: _fn,
+)
+
+AppButton.primary(
+  label: '超大',
+  size: AppButtonSize.expanded,  // 高度 56
+  onPressed: _fn,
+)
+```
+
+#### 图标位置
+
+```dart
+// 图标在左（默认）
+AppButton.primary(
+  label: '提交',
+  icon: Icons.check,
+  iconPosition: AppButtonIconPosition.left,
+  onPressed: _submit,
+)
+
+// 图标在右
+AppButton.primary(
+  label: '下一步',
+  icon: Icons.arrow_forward,
+  iconPosition: AppButtonIconPosition.right,
+  onPressed: _next,
+)
+
+// 图标在上
+AppButton.primary(
+  label: '上传',
+  icon: Icons.upload,
+  iconPosition: AppButtonIconPosition.top,
+  onPressed: _upload,
+)
+
+// 图标在下
+AppButton.primary(
+  label: '下载',
+  icon: Icons.download,
+  iconPosition: AppButtonIconPosition.bottom,
+  onPressed: _download,
+)
+```
+
+#### 宽度模式
+
+```dart
+// 自适应内容（默认）
+AppButton.primary(
+  label: '自适应',
+  width: AppButtonWidth.flexible,
+  onPressed: _fn,
+)
+
+// 固定宽度
+AppButton.primary(
+  label: '固定 200',
+  width: AppButtonWidth.fixed,
+  widthValue: 200,
+  onPressed: _fn,
+)
+
+// 撑满父容器
+AppButton.primary(
+  label: '撑满',
+  width: AppButtonWidth.expanded,
+  onPressed: _fn,
+)
+
+// 响应式（平板 400，手机撑满）
+AppButton.primary(
+  label: '响应式',
+  width: AppButtonWidth.responsive,
+  onPressed: _fn,
+)
+```
+
+#### 渐变背景
+
+```dart
+AppButton.gradient(
+  label: '立即购买',
+  gradient: LinearGradient(
+    colors: [Colors.blue, Colors.purple],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  ),
+  onPressed: _buy,
+)
+```
+
+#### 完全自定义
+
+```dart
+AppButton.custom(
+  label: '自定义样式',
+  backgroundColor: Colors.orange,
+  foregroundColor: Colors.white,
+  borderRadius: 20,
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+  borderColor: Colors.deepOrange,
+  borderWidth: 2,
+  shadow: [
+    BoxShadow(
+      color: Colors.orange.withOpacity(0.3),
+      blurRadius: 8,
+      offset: Offset(0, 4),
+    ),
+  ],
+  onPressed: _custom,
+)
+```
+
+#### 交互增强
+
+```dart
+// 触觉反馈
+AppButton.primary(
+  label: '确认',
+  enableHapticFeedback: true,
+  onPressed: _confirm,
+)
+
+// 防重复点击（500ms 内只能点击一次）
+AppButton.primary(
+  label: '提交订单',
+  debounceDuration: Duration(milliseconds: 500),
+  onPressed: _submitOrder,
+)
+
+// 长按回调
+AppButton.primary(
+  label: '删除',
+  onLongPress: () => _showDeleteConfirmation(),
+  onPressed: _delete,
+)
+```
+
+#### 加载状态
+
+```dart
+AppButton.primary(
+  label: '提交',
+  isLoading: isSubmitting,
+  onPressed: isSubmitting ? null : _submit,
+)
+```
+
+#### 完整参数列表
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `label` | `String?` | - | 按钮文本 |
+| `onPressed` | `VoidCallback?` | - | 点击回调 |
+| `isLoading` | `bool` | `false` | 加载状态 |
+| `size` | `AppButtonSize` | `medium` | 尺寸 |
+| `icon` | `IconData?` | - | 图标 |
+| `iconPosition` | `AppButtonIconPosition` | `left` | 图标位置 |
+| `iconSize` | `double?` | - | 图标大小 |
+| `width` | `AppButtonWidth` | `flexible` | 宽度模式 |
+| `widthValue` | `double?` | - | 固定宽度值 |
+| `backgroundColor` | `Color?` | - | 背景色 |
+| `foregroundColor` | `Color?` | - | 前景色（文字/图标） |
+| `borderRadius` | `double?` | - | 圆角半径 |
+| `fontSize` | `double?` | - | 字体大小 |
+| `fontWeight` | `FontWeight?` | - | 字体粗细 |
+| `padding` | `EdgeInsets?` | - | 内边距 |
+| `gradient` | `Gradient?` | - | 渐变背景 |
+| `borderColor` | `Color?` | - | 边框颜色 |
+| `borderWidth` | `double?` | - | 边框宽度 |
+| `shadow` | `List<BoxShadow>?` | - | 阴影效果 |
+| `enableHapticFeedback` | `bool` | `false` | 触觉反馈 |
+| `debounceDuration` | `Duration?` | - | 防抖时长 |
+| `onLongPress` | `VoidCallback?` | - | 长按回调 |
