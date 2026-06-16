@@ -9,6 +9,7 @@ MIN="${1:-80}"
 
 # 合并所有 lcov.info
 MERGED="/tmp/lcov_merged.info"
+FILTERED="/tmp/lcov_filtered.info"
 > "$MERGED"
 
 found=0
@@ -24,9 +25,18 @@ fi
 
 echo "📊 合并了 $found 个 lcov.info 文件"
 
-# 用 lcov 计算行覆盖率
-TOTAL=$(grep "^DA:" "$MERGED" | wc -l | tr -d ' ')
-HIT=$(grep "^DA:" "$MERGED" | awk -F, '$2 > 0' | wc -l | tr -d ' ')
+# 过滤生成代码（.g.dart, .freezed.dart）
+echo "🔧 过滤生成代码..."
+lcov --remove "$MERGED" \
+  "*.g.dart" \
+  "*.freezed.dart" \
+  "*/*.g.dart" \
+  "*/*.freezed.dart" \
+  -o "$FILTERED" 2>/dev/null || cp "$MERGED" "$FILTERED"
+
+# 用 lcov 计算行覆盖率（使用过滤后的数据）
+TOTAL=$(grep "^DA:" "$FILTERED" | wc -l | tr -d ' ')
+HIT=$(grep "^DA:" "$FILTERED" | awk -F, '$2 > 0' | wc -l | tr -d ' ')
 
 if [ "$TOTAL" -eq 0 ]; then
   echo "❌ lcov 中无 DA: 行数据"
