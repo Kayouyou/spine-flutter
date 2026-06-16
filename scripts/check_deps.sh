@@ -15,6 +15,15 @@ else
   echo "✅ [R1] No forbidden spine_flutter imports in feature packages"
 fi
 
+# R2: domain must not import flutter
+if grep -rqE "^import 'package:flutter" packages/domain/ --include="*.dart"; then
+  echo "❌ [R2] Domain packages must not import flutter"
+  grep -rnE "^import 'package:flutter" packages/domain/ --include="*.dart"
+  FAILED=1
+else
+  echo "✅ [R2] Domain packages have no flutter imports"
+fi
+
 # R3: infrastructure must not depend on services
 if grep -rE "^import 'package:[a-z_]+/services/" packages/infrastructure/ --include="*.dart" 2>/dev/null; then
   echo "❌ [R3] Infrastructure packages must not depend on services"
