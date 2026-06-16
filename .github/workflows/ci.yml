@@ -25,6 +25,8 @@ jobs:
         run: ./scripts/check_deps.sh
       - name: 检查 ARB 翻译一致性
         run: ./scripts/check_l10n.sh
+      - name: 检查版本漂移
+        run: dart run scripts/check_workspace_versions.dart
       - name: Scaffold health check
         run: make scaffold-check
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
