@@ -70,6 +70,9 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
     registerFn: CancelTokenManager.instance.register,
   );
 
+  // 提前创建 NetworkCubit（延迟 startListening）
+  final networkCubit = NetworkCubit();
+
   final config = sl<IAppConfig>();
   final dio = createDio(
     userTokenSupplier: () => sl<TokenStorage>().getToken(),
@@ -84,6 +87,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
         context: context,
       );
     },
+    onLatencyRecord: networkCubit.recordLatency,
     logger: sl<AppLogger>(),
     autoCancelInterceptor: autoCancelInterceptor,
     tokenStorage: sl<TokenStorage>(),
@@ -101,7 +105,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
 
   // ===== Step 4: 应用状态 =====
   sl.registerSingleton<LocaleCubit>(LocaleCubit());
-  sl.registerSingleton<NetworkCubit>(NetworkCubit()..startListening());
+  sl.registerSingleton<NetworkCubit>(networkCubit..startListening());
 
   // ===== Step 5: 业务功能层 =====
   // 显式注册后 runAll 统一执行。

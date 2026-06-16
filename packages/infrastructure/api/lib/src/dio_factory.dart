@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'cancel/auto_cancel_interceptor.dart';
 import 'dio/error_interceptor.dart';
+import 'dio/latency_monitor_interceptor.dart';
 import 'dio/renewal_token_intercaptor.dart';
 import 'http/app_logger.dart';
 
@@ -14,8 +15,9 @@ import 'http/app_logger.dart';
 ///   [1] TokenRenewalInterceptor  → 检测 code=1000102，排队续期
 ///   [2] InterceptorsWrapper    → 注入 Authorization header + 网络断开 callback
 ///   [3] ErrorInterceptor        → 5xx/网络错误上报(传入 onDioError 回调)
-///   [4] LogInterceptor          → 记录日志（仅 Debug）
-///   [5] AliceInterceptor        → HTTP Inspector（仅 Debug）
+///   [4] LatencyMonitorInterceptor → 记录请求延迟（用于网络质量监控）
+///   [5] LogInterceptor          → 记录日志（仅 Debug）
+///   [6] AliceInterceptor        → HTTP Inspector（仅 Debug）
 ///
 /// 使用方式：
 /// ```dart
@@ -25,6 +27,7 @@ import 'http/app_logger.dart';
 ///   onDioError: (err, stack) => AppErrorHandler.instance.reportError(
 ///     err, stack, isFatal: true, context: {'source': 'dio', ...},
 ///   ),
+///   onLatencyRecord: (latencyMs) => networkCubit.recordLatency(latencyMs),
 ///   logger: appLogger,
 ///   autoCancelInterceptor: myInterceptor,
 ///   tokenStorage: sl<TokenStorage>(),
@@ -39,6 +42,7 @@ Dio createDio({
     StackTrace? stack, {
     Map<String, dynamic> context,
   })? onDioError,
+  void Function(int latencyMs)? onLatencyRecord,
   AppLoggerInterface? logger,
   AutoCancelInterceptor? autoCancelInterceptor,
   TokenStorage? tokenStorage,
@@ -86,7 +90,12 @@ Dio createDio({
     dio.interceptors.add(ErrorInterceptor(onError: onDioError));
   }
 
-  // [4] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
+  // [4] Latency Monitor — 记录请求延迟（用于网络质量监控）
+  if (onLatencyRecord != null) {
+    dio.interceptors.add(LatencyMonitorInterceptor(onLatencyRecord: onLatencyRecord));
+  }
+
+  // [5] Log — 最后执行，记录完整请求/响应（仅 Debug 模式）
   if (kDebugMode) {
     dio.interceptors.add(
       LogInterceptor(

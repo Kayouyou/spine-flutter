@@ -24,12 +24,24 @@ void main() {
       expect(ex.fieldErrors['email'], '格式错误');
     });
 
+    test('ConflictException has default message', () {
+      const ex = ConflictException();
+      expect(ex.message, '资源冲突');
+    });
+
+    test('RateLimitedException has default message', () {
+      const ex = RateLimitedException();
+      expect(ex.message, '请求过于频繁，请稍后再试');
+    });
+
     test('sealed class allows exhaustive matching', () {
       final exceptions = <DomainException>[
         const NetworkException('net'),
         const UnauthorizedException(),
         const NotFoundException(),
         const ValidationException('val'),
+        const ConflictException(),
+        const RateLimitedException(),
       ];
 
       for (final ex in exceptions) {
@@ -38,6 +50,8 @@ void main() {
           UnauthorizedException() => 'unauthorized',
           NotFoundException() => 'notfound',
           ValidationException() => 'validation',
+          ConflictException() => 'conflict',
+          RateLimitedException() => 'rate_limited',
         };
         expect(result, isNotEmpty);
       }
