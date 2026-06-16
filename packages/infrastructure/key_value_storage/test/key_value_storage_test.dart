@@ -23,6 +23,18 @@ void main() {
       expect(PreferenceKey.authUserId.rawKey, 'auth_user_id');
     });
 
+    test('authToken has string valueType', () {
+      expect(PreferenceKey.authToken.valueType, StorageValueType.string);
+    });
+
+    test('agreePrivacyAndProtocol has bool valueType', () {
+      expect(PreferenceKey.agreePrivacyAndProtocol.valueType, StorageValueType.bool);
+    });
+
+    test('carEventInputLimit has int valueType', () {
+      expect(PreferenceKey.carEventInputLimit.valueType, StorageValueType.int);
+    });
+
     test('all keys have non-empty rawKey', () {
       for (final key in PreferenceKey.values) {
         expect(key.rawKey, isNotEmpty);
