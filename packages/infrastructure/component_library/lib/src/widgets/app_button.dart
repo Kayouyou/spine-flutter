@@ -108,8 +108,10 @@ class AppButton extends StatefulWidget {
     this.variant = AppButtonVariant.filled,
     this.icon,
     this.iconPosition = AppButtonIconPosition.left,
+    // ignore: unused_element_parameter - Reserved for future customization
     this.iconSize,
     this.width = AppButtonWidth.flexible,
+    // ignore: unused_element_parameter - Reserved for future customization
     this.widthValue,
     this.backgroundColor,
     this.foregroundColor,
