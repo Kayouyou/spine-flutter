@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -75,6 +77,31 @@ void main() {
       ],
       verify: (cubit) {
         expect((cubit.state as DetailLoaded).data.id, '42');
+      },
+    );
+
+    blocTest<DetailCubit, DetailState>(
+      'loadData does not trigger duplicate requests when already loading',
+      build: () {
+        final completer = Completer<Result<DetailData, DomainException>>();
+        when(() => mockRepo.getDetailData('1'))
+            .thenAnswer((_) => completer.future);
+        return DetailCubit(mockRepo);
+      },
+      act: (cubit) async {
+        // 第一次调用（会进入 loading 状态）
+        cubit.loadData('1');
+        // 等待状态变为 loading
+        await Future.delayed(const Duration(milliseconds: 10));
+        // 在 loading 状态下再次调用（应该被拦截）
+        cubit.loadData('1');
+      },
+      expect: () => [
+        isA<DetailLoading>(),
+      ],
+      verify: (_) {
+        // 验证 repository 只被调用一次（第二次被 loading 守卫拦截）
+        verify(() => mockRepo.getDetailData('1')).called(1);
       },
     );
   });

@@ -14,6 +14,9 @@ class DetailCubit extends Cubit<DetailState> {
   ///
   /// 根据ID获取详情内容
   Future<void> loadData(String id) async {
+    // Loading 守卫：防止重复请求
+    if (state is DetailLoading) return;
+
     emit(const DetailState.loading());
     
     // 获取数据（返回Result类型）
