@@ -51,7 +51,7 @@ class AuthManager {
       },
       failure: (error) async {
         debugPrint('⚠️ [AuthManager] handleLogin: 自动登录失败 - ${error.message}');
-        await _authCubit.logout();
+        _authCubit.setAuthState(const AuthState());
       },
     );
   }
@@ -60,6 +60,24 @@ class AuthManager {
   Future<void> saveToken(String token, String userId) async {
     await _tokenStorage.setToken(token);
     await _tokenStorage.setUserId(userId);
+  }
+
+  /// 处理登录成功后的状态更新
+  ///
+  /// 职责：
+  /// 1. 保存 token 到 TokenStorage
+  /// 2. 保存 userId 到 TokenStorage
+  /// 3. 触发 AuthCubit 状态变化（AuthStatus.loggedIn）
+  ///
+  /// 由 LoginCubit 在 login/register 成功后调用。
+  Future<void> handleLoginSuccess(LoginResult loginResult) async {
+    await saveToken(loginResult.token, loginResult.userId);
+    _authCubit.setAuthState(
+      AuthState(status: AuthStatus.loggedIn, userId: loginResult.userId),
+    );
+    if (kDebugMode) {
+      debugPrint('✅ [AuthManager] handleLoginSuccess: userId=${loginResult.userId}');
+    }
   }
 
   /// 清除认证信息（登出或Token失效时调用）
@@ -73,7 +91,7 @@ class AuthManager {
       debugPrint('🚪 [AuthManager] logout: 清理认证信息...');
     }
     await clearAuth();
-    await _authCubit.logout();
+    _authCubit.setAuthState(const AuthState());
   }
 
   /// 获取保存的用户ID

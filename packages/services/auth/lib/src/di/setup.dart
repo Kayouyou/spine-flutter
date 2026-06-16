@@ -36,7 +36,7 @@ void setupAuth(GetIt sl, {bool useMock = kDebugMode}) {
     }
   }
 
-  sl.registerLazySingleton<AuthCubit>(() => AuthCubit(sl<AuthRepository>()));
+  sl.registerLazySingleton<AuthCubit>(() => AuthCubit());
 
   sl.registerLazySingleton<AuthManager>(
     () => AuthManager(

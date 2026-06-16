@@ -5,18 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:auth/auth.dart';
-import 'package:domain/domain.dart';
 import 'package:routing/routing.dart';
 import 'package:spine_flutter/core/routing/go_router_refresh_stream.dart';
-import 'package:mocktail/mocktail.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
   late AuthCubit authCubit;
 
   setUp(() {
-    authCubit = AuthCubit(_MockAuthRepository());
+    authCubit = AuthCubit();
   });
 
   testWidgets('登出后 GoRouter 自动跳到 /login (P1-3)', (tester) async {

@@ -2,8 +2,6 @@
 import 'package:auth/auth.dart';
 import 'package:domain/domain.dart';
 import 'package:key_value_storage/key_value_storage.dart';
-import 'package:auth/src/cubit/auth_cubit.dart';
-import 'package:auth/src/cubit/auth_state.dart';
 
 /// Test-only AuthManager that controls `isLoggedIn` deterministically.
 ///
@@ -59,28 +57,8 @@ class _NoopTokenStorage implements TokenStorage {
 }
 
 class _NoopAuthCubit extends AuthCubit {
-  _NoopAuthCubit() : super(_NoopAuthRepository());
+  _NoopAuthCubit() : super();
 
   @override
   bool get isLoggedIn => false;
-}
-
-class _NoopAuthRepository implements AuthRepository {
-  @override
-  Future<Result<LoginResult, DomainException>> login(
-          String username, String password) async =>
-      Failure<LoginResult, DomainException>(UnauthorizedException());
-
-  @override
-  Future<Result<LoginResult, DomainException>> register(
-          String username, String password) async =>
-      Failure<LoginResult, DomainException>(UnauthorizedException());
-
-  @override
-  Future<Result<void, DomainException>> logout() async =>
-      Success<void, DomainException>(null);
-
-  @override
-  noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('NoopAuthRepository.${invocation.memberName}');
 }
