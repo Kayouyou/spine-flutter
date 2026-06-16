@@ -25,8 +25,12 @@ mixin _$DetailData {
   List<dynamic> get relatedItems => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
+  /// Serializes this DetailData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of DetailData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $DetailDataCopyWith<DetailData> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -54,6 +58,8 @@ class _$DetailDataCopyWithImpl<$Res, $Val extends DetailData>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of DetailData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -106,6 +112,8 @@ class __$$DetailDataImplCopyWithImpl<$Res>
       _$DetailDataImpl _value, $Res Function(_$DetailDataImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of DetailData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -189,7 +197,7 @@ class _$DetailDataImpl implements _DetailData {
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -198,7 +206,9 @@ class _$DetailDataImpl implements _DetailData {
       const DeepCollectionEquality().hash(_relatedItems),
       const DeepCollectionEquality().hash(_metadata));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of DetailData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$DetailDataImplCopyWith<_$DetailDataImpl> get copyWith =>
@@ -230,8 +240,11 @@ abstract class _DetailData implements DetailData {
   List<dynamic> get relatedItems;
   @override
   Map<String, dynamic>? get metadata;
+
+  /// Create a copy of DetailData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DetailDataImplCopyWith<_$DetailDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

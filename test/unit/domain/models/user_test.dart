@@ -40,9 +40,12 @@ void main() {
       expect(user1, isNot(user3));
     });
 
-    test('props includes all fields', () {
-      const user = User(id: '1', name: 'Test', avatar: 'url', email: 'test@example.com');
-      expect(user.props, ['1', 'Test', 'url', 'test@example.com']);
+    test('copyWith creates modified copy', () {
+      const user = User(id: '1', name: 'Test');
+      final modified = user.copyWith(name: 'Modified');
+
+      expect(modified.id, '1');
+      expect(modified.name, 'Modified');
     });
   });
 }

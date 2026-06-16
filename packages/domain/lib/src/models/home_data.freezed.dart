@@ -24,8 +24,12 @@ mixin _$HomeData {
   List<dynamic> get items => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
+  /// Serializes this HomeData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of HomeData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $HomeDataCopyWith<HomeData> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -49,6 +53,8 @@ class _$HomeDataCopyWithImpl<$Res, $Val extends HomeData>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of HomeData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -93,6 +99,8 @@ class __$$HomeDataImplCopyWithImpl<$Res>
       _$HomeDataImpl _value, $Res Function(_$HomeDataImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of HomeData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -166,7 +174,7 @@ class _$HomeDataImpl implements _HomeData {
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -174,7 +182,9 @@ class _$HomeDataImpl implements _HomeData {
       const DeepCollectionEquality().hash(_items),
       const DeepCollectionEquality().hash(_metadata));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of HomeData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$HomeDataImplCopyWith<_$HomeDataImpl> get copyWith =>
@@ -203,8 +213,11 @@ abstract class _HomeData implements HomeData {
   List<dynamic> get items;
   @override
   Map<String, dynamic>? get metadata;
+
+  /// Create a copy of HomeData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$HomeDataImplCopyWith<_$HomeDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
