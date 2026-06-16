@@ -65,3 +65,39 @@ cacheKey: 'home_feed'                 // 首页动态
 cacheKey: 'user_posts_${userId}'      // 按用户隔离
 cacheKey: 'search_${keyword}'         // 按关键词隔离
 ```
+
+## 存储结构
+
+**单 box 多 key 模式**：每个 cacheKey 对应一个 Hive box，page 数据以 `p1`/`p2`/... 为内部 key。
+
+```
+cacheKey: 'home_feed'
+  → box 名: 'list_cache_home_feed'
+    → p1: [item1, item2, ..., item20]
+    → p2: [item21, item22, ..., item40]
+    → t1: 1718500000000  (时间戳，用于过期判断)
+    → t2: 1718500005000
+```
+
+**资源安全**：一个 cacheKey 只开一个 box，即使浏览 50 页也只占 1 个 box。
+
+## 缓存过期 (staleDuration)
+
+`CacheConfig.staleWhileRevalidate()` 和 `CacheConfig.networkFirst()` 默认配置了 `staleDuration`：
+
+- `staleWhileRevalidate`: 5 分钟过期
+- `networkFirst`: 1 小时过期
+- `networkOnly`: 无过期（不使用缓存）
+
+缓存过期后，下次读取会触发重新拉取网络数据。
+
+## 数据迁移 (v1 → v2)
+
+旧版本（v1）每个 page 开一个独立 box，新版本（v2）每个 cacheKey 一个 box。首次升级时调用一次迁移方法：
+
+```dart
+final cacheManager = ListCacheManager<String>(config: config);
+await cacheManager.migrateFromV1(); // 清理旧格式 box
+```
+
+迁移方法会扫描所有 Hive box，删除匹配 `*_p\d+$` 的旧格式 box。

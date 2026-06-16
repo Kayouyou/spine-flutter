@@ -8,6 +8,9 @@ import 'cache_result.dart';
 /// 泛型 T — 列表中存储的数据类型。
 /// 每个列表用 [cacheKey] 隔离，不同 key 的缓存互不影响。
 ///
+/// 设计：每个 cacheKey 对应一个独立的 Hive box，page 数据以 'p1'/'p2'/...
+/// 为内部 key 存储，避免为每一页单独开 box 导致文件句柄耗尽。
+///
 /// 使用方式：
 /// ```dart
 /// final cacheManager = ListCacheManager<FeedItem>(
@@ -33,15 +36,18 @@ class ListCacheManager<T> {
   })  : _config = config,
         _boxPrefix = boxPrefix;
 
-  /// 生成缓存键格式
-  String _pageKey(String cacheKey, int page) =>
-      '${_boxPrefix}_${cacheKey}_p$page';
-
-  /// 生成分页元数据键
-  String _metaKey(String cacheKey) => '${_boxPrefix}_${cacheKey}_meta';
+  /// 生成 box 名称
+  ///
+  /// 每个 cacheKey 对应一个独立的 Hive box，box 内部以 page 编号为 key 存储数据。
+  /// 例如：cacheKey='home_feed' → box 名='list_cache_home_feed'
+  String _boxName(String cacheKey) => '${_boxPrefix}_$cacheKey';
 
   /// 获取或打开 Box
-  Future<Box> _getBox(String boxName) async {
+  ///
+  /// [cacheKey] — 列表唯一标识，决定 box 名称
+  /// 每个 cacheKey 只开一个 box，内部存储多页数据。
+  Future<Box> _getBox(String cacheKey) async {
+    final boxName = _boxName(cacheKey);
     if (_openedBoxes.containsKey(boxName)) {
       return _openedBoxes[boxName]!;
     }
@@ -153,10 +159,18 @@ class ListCacheManager<T> {
   }
 
   /// 读取一页缓存
+  ///
+  /// 从 cacheKey 对应的 box 中，以 'p$page' 为 key 读取该页数据。
+  /// 如果配置了 staleDuration 且缓存已过期，返回空列表（触发网络重新获取）。
   Future<List<T>> _readPage(String cacheKey, int page) async {
-    final key = _pageKey(cacheKey, page);
-    final box = await _getBox(key);
-    final dynamic raw = box.get('data');
+    // 检查缓存是否过期
+    if (await _isStale(cacheKey, page)) {
+      await _deletePage(cacheKey, page);
+      return [];
+    }
+
+    final box = await _getBox(cacheKey);
+    final dynamic raw = box.get('p$page');
     if (raw == null) return [];
     if (raw is List) {
       return raw.cast<T>();
@@ -165,10 +179,13 @@ class ListCacheManager<T> {
   }
 
   /// 写入一页缓存
+  ///
+  /// 将数据写入 cacheKey 对应的 box，以 'p$page' 为内部 key。
+  /// 同时写入时间戳 't$page' 用于缓存过期判断。
   Future<void> _writePage(String cacheKey, int page, List<T> data) async {
-    final key = _pageKey(cacheKey, page);
-    final box = await _getBox(key);
-    await box.put('data', data);
+    final box = await _getBox(cacheKey);
+    await box.put('p$page', data);
+    await box.put('t$page', DateTime.now().millisecondsSinceEpoch);
 
     // page=1 时清空后续页缓存（防止新旧数据混合）
     if (page == 1) {
@@ -177,31 +194,56 @@ class ListCacheManager<T> {
   }
 
   /// page=1 时清空后续页的缓存
+  ///
+  /// 在同一个 box 内，逐个删除 'p2'、'p3'... 等内部 key 和对应的 't2'、't3'... 时间戳。
   Future<void> _clearSubsequentPages(String cacheKey) async {
-    for (int p = 2; p <= _config.maxCachedPages; p++) {
-      final key = _pageKey(cacheKey, p);
-      try {
-        final box = await _getBox(key);
-        await box.delete('data');
-      } catch (_) {}
-    }
+    try {
+      final box = await _getBox(cacheKey);
+      for (int p = 2; p <= _config.maxCachedPages; p++) {
+        await box.delete('p$p');
+        await box.delete('t$p');
+      }
+    } catch (_) {}
+  }
+
+  /// 删除指定页的缓存数据和时间戳
+  Future<void> _deletePage(String cacheKey, int page) async {
+    try {
+      final box = await _getBox(cacheKey);
+      await box.delete('p$page');
+      await box.delete('t$page');
+    } catch (_) {}
+  }
+
+  /// 检查缓存是否过期
+  ///
+  /// 如果配置了 staleDuration，比较当前时间与缓存时间戳。
+  /// 返回 true 表示缓存已过期，需要重新从网络获取。
+  Future<bool> _isStale(String cacheKey, int page) async {
+    if (_config.staleDuration == null) return false;
+
+    final box = await _getBox(cacheKey);
+    final dynamic timestamp = box.get('t$page');
+    if (timestamp == null) return false;
+
+    final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp as int);
+    final age = DateTime.now().difference(cacheTime);
+    return age > _config.staleDuration!;
   }
 
   /// 清空某个列表的所有缓存
+  ///
+  /// 删除 cacheKey 对应的整个 box（从磁盘删除）。
   Future<void> clear(String cacheKey) async {
-    for (int p = 1; p <= _config.maxCachedPages; p++) {
-      final key = _pageKey(cacheKey, p);
-      try {
-        final box = await _getBox(key);
-        await box.clear();
-        _openedBoxes.remove(key);
-      } catch (_) {}
-    }
-    // 清空元数据
+    final boxName = _boxName(cacheKey);
     try {
-      final metaBox = await _getBox(_metaKey(cacheKey));
-      await metaBox.clear();
-      _openedBoxes.remove(_metaKey(cacheKey));
+      // 关闭 box（如果已打开）
+      if (_openedBoxes.containsKey(boxName)) {
+        final box = _openedBoxes.remove(boxName)!;
+        await box.close();
+      }
+      // 从磁盘删除 box
+      await Hive.deleteBoxFromDisk(boxName);
     } catch (_) {}
   }
 
