@@ -35,6 +35,25 @@ void main() {
       expect(PreferenceKey.carEventInputLimit.valueType, StorageValueType.int);
     });
 
+    test('authToken has auth group', () {
+      expect(PreferenceKey.authToken.group, PreferenceKeyGroup.auth);
+    });
+
+    test('locationCityName has location group', () {
+      expect(PreferenceKey.locationCityName.group, PreferenceKeyGroup.location);
+    });
+
+    test('agreePrivacyAndProtocol has privacy group', () {
+      expect(PreferenceKey.agreePrivacyAndProtocol.group, PreferenceKeyGroup.privacy);
+    });
+
+    test('keysInGroup returns correct keys', () {
+      final authKeys = PreferenceKey.keysInGroup(PreferenceKeyGroup.auth);
+      expect(authKeys, contains(PreferenceKey.authToken));
+      expect(authKeys, contains(PreferenceKey.authUserId));
+      expect(authKeys, contains(PreferenceKey.loginByUserName));
+    });
+
     test('all keys have non-empty rawKey', () {
       for (final key in PreferenceKey.values) {
         expect(key.rawKey, isNotEmpty);
