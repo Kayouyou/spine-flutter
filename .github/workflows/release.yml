@@ -89,27 +89,16 @@ jobs:
       - name: 构建 Android APK (debug)
         run: flutter build apk --debug
 
-      - name: 构建 iOS (无签名, 仅校验编译)
-        if: runner.os == 'macOS'
-        run: |
-          if [ -d "ios" ]; then
-            cd ios && pod install --repo-update && cd ..
-            flutter build ios --debug --no-codesign
-          else
-            echo "(跳过 iOS, ios 目录不存在)"
-          fi
-
-      - name: 收集构建产物
+      - name: 收集 Android 产物
         run: |
           mkdir -p release-artifacts
           [ -f build/app/outputs/flutter-apk/app-debug.apk ] && cp build/app/outputs/flutter-apk/app-debug.apk release-artifacts/
-          [ -d build/ios/iphoneos/Runner.app ] && cp -r build/ios/iphoneos/Runner.app release-artifacts/
           ls -la release-artifacts/
 
-      - name: 上传 release 产物
+      - name: 上传 Android release 产物
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ steps.tag.outputs.name }}
+          name: release-android-${{ steps.tag.outputs.name }}
           path: release-artifacts/
           retention-days: 30
 
@@ -130,3 +119,55 @@ jobs:
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-ios:
+    name: iOS 构建 (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 取 tag 名
+        id: tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            echo "name=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 安装 Flutter (锁版本)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.10'
+          channel: 'stable'
+
+      - name: 激活 melos
+        run: dart pub global activate melos
+
+      - name: monorepo 准备
+        run: melos bs
+
+      - name: 构建 iOS (无签名, 仅校验编译)
+        run: |
+          if [ -d "ios" ]; then
+            cd ios && pod install --repo-update && cd ..
+            flutter build ios --debug --no-codesign
+          else
+            echo "(跳过 iOS, ios 目录不存在)"
+          fi
+
+      - name: 收集 iOS 产物
+        run: |
+          mkdir -p release-artifacts
+          [ -d build/ios/iphoneos/Runner.app ] && cp -r build/ios/iphoneos/Runner.app release-artifacts/
+          ls -la release-artifacts/
+
+      - name: 上传 iOS release 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-ios-${{ steps.tag.outputs.name }}
+          path: release-artifacts/
+          retention-days: 30

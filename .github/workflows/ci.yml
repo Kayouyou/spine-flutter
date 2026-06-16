@@ -53,3 +53,17 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk --debug
+
+  build-ios:
+    name: iOS 调试构建
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.10'
+          channel: 'stable'
+      - run: flutter pub get
+      - name: iOS 构建（无签名）
+        run: flutter build ios --debug --no-codesign
+        working-directory: .
