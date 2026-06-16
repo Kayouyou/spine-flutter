@@ -22,6 +22,12 @@ extension DioExceptionMapper on DioException {
         return NetworkException('禁止访问', statusCode: statusCode);
       case ErrorCode.notFound:
         return const NotFoundException();
+      case ErrorCode.invalidInput:
+        return const ValidationException('无效的输入');
+      case ErrorCode.conflict:
+        return const ConflictException();
+      case ErrorCode.rateLimited:
+        return const RateLimitedException();
       case ErrorCode.serverError:
         return NetworkException('服务器错误', statusCode: statusCode);
       case ErrorCode.requestCancelled:
@@ -33,8 +39,6 @@ extension DioExceptionMapper on DioException {
       case ErrorCode.tokenExpired:
       case ErrorCode.tokenInvalid:
         return const UnauthorizedException();
-      case ErrorCode.invalidInput:
-        return const ValidationException('无效的输入');
       case ErrorCode.unknown:
         return NetworkException('未知错误', statusCode: statusCode);
     }
@@ -56,10 +60,20 @@ extension DioExceptionMapper on DioException {
   ///
   /// 常见HTTP错误码对应业务ErrorCode
   static const Map<int, ErrorCode> _statusCodeMap = {
-    401: ErrorCode.unauthorized,
-    403: ErrorCode.forbidden,
-    404: ErrorCode.notFound,
-    500: ErrorCode.serverError,
+    // 4xx 客户端错误
+    400: ErrorCode.invalidInput, // Bad Request - 请求参数错误
+    401: ErrorCode.unauthorized, // Unauthorized - 未认证
+    403: ErrorCode.forbidden, // Forbidden - 无权限
+    404: ErrorCode.notFound, // Not Found - 资源不存在
+    409: ErrorCode.conflict, // Conflict - 资源冲突
+    422: ErrorCode.invalidInput, // Unprocessable Entity - 请求格式正确但语义错误
+    429: ErrorCode.rateLimited, // Too Many Requests - 请求频率超限
+    
+    // 5xx 服务端错误
+    500: ErrorCode.serverError, // Internal Server Error
+    502: ErrorCode.serverError, // Bad Gateway
+    503: ErrorCode.serverError, // Service Unavailable
+    504: ErrorCode.serverError, // Gateway Timeout
   };
 
   /// DioException类型映射表

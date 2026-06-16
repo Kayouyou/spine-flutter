@@ -31,8 +31,14 @@ enum ErrorCode {
   /// 服务器错误（500）
   serverError,
 
-  /// 输入参数无效
+  /// 输入参数无效（400/422）
   invalidInput,
+
+  /// 资源冲突（409）
+  conflict,
+
+  /// 请求频率超限（429）
+  rateLimited,
 
   /// 未知错误
   unknown,
@@ -76,4 +82,18 @@ class ValidationException extends DomainException {
   final Map<String, String> fieldErrors;
 
   const ValidationException(super.message, {this.fieldErrors = const {}});
+}
+
+/// 资源冲突 — 对应 HTTP 409
+///
+/// 典型场景：用户名已存在、订单状态冲突等
+class ConflictException extends DomainException {
+  const ConflictException() : super('资源冲突');
+}
+
+/// 请求频率超限 — 对应 HTTP 429
+///
+/// 典型场景：短时间内请求过多，触发限流
+class RateLimitedException extends DomainException {
+  const RateLimitedException() : super('请求过于频繁，请稍后再试');
 }

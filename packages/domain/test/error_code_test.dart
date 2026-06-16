@@ -55,6 +55,8 @@ void main() {
       expect(const UnauthorizedException(), isA<Exception>());
       expect(const NotFoundException(), isA<Exception>());
       expect(const ValidationException('x'), isA<Exception>());
+      expect(const ConflictException(), isA<Exception>());
+      expect(const RateLimitedException(), isA<Exception>());
     });
 
     test('sealed class 穷尽性模式匹配', () {
@@ -64,12 +66,16 @@ void main() {
             UnauthorizedException _ => 'auth',
             NotFoundException _ => 'not found',
             ValidationException _ => 'validation',
+            ConflictException _ => 'conflict',
+            RateLimitedException _ => 'rate limited',
           };
 
       expect(describe(const NetworkException('x')), equals('network'));
       expect(describe(const UnauthorizedException()), equals('auth'));
       expect(describe(const NotFoundException()), equals('not found'));
       expect(describe(const ValidationException('x')), equals('validation'));
+      expect(describe(const ConflictException()), equals('conflict'));
+      expect(describe(const RateLimitedException()), equals('rate limited'));
     });
   });
 }
