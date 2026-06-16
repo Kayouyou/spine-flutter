@@ -264,6 +264,58 @@ final config = EnvironmentConfig.fromEnv();  // 校验 .env 字段齐全
 sl.registerSingleton<IAppConfig>(EnvAppConfig(config));
 ```
 
+### 5.6 认证流程 (LoginCubit → AuthManager → AuthCubit)
+
+```dart
+// ✅ feature_auth 层: LoginCubit 驱动 UI 状态
+class LoginCubit extends Cubit<LoginState> {
+  final AuthRepository _authRepository;
+  final AuthManager _authManager;  // ← 注入 AuthManager
+  
+  Future<void> login() async {
+    emit(state.copyWith(status: LoginStatus.loading));
+    final result = await _authRepository.login(username, password);
+    result.when(
+      success: (loginResult) async {
+        await _authManager.handleLoginSuccess(loginResult);  // ← 协调 token 保存
+        emit(state.copyWith(status: LoginStatus.success));
+      },
+      failure: (error) => emit(state.copyWith(status: LoginStatus.error)),
+    );
+  }
+}
+
+// ✅ services 层: AuthManager 协调 token 保存和状态更新
+class AuthManager {
+  Future<void> handleLoginSuccess(LoginResult loginResult) async {
+    await saveToken(loginResult.token, loginResult.userId);
+    _authCubit.setAuthState(
+      AuthState(status: AuthStatus.loggedIn, userId: loginResult.userId),
+    );
+  }
+  
+  Future<void> logout() async {
+    await clearAuth();
+    _authCubit.setAuthState(const AuthState());  // ← 直接 setAuthState
+  }
+}
+
+// ✅ services 层: AuthCubit 只管理状态，不做业务逻辑
+class AuthCubit extends Cubit<AuthState> {
+  AuthCubit() : super(const AuthState());  // ← 无参构造
+  bool get isLoggedIn => state.status == AuthStatus.loggedIn;
+  void setAuthState(AuthState newState) => emit(newState);
+  // ❌ 不要加 login()/logout() — 那是 AuthManager 的职责
+}
+```
+
+**职责分离**:
+- `LoginCubit` (feature_auth): 只关心 UI 状态 (loading/success/error)
+- `AuthManager` (services/auth): 协调 token 持久化 + AuthCubit 状态更新
+- `AuthCubit` (services/auth): 纯状态容器，setAuthState 是唯一写入入口
+
+**为什么不能跳过 AuthManager**: AuthGuard 检查 `AuthCubit.isLoggedIn`，LoginCubit 必须通过 AuthManager 更新状态，否则 AuthGuard 会踢回 /login。
+
 ---
 
 ## 6. 常见修改场景 (改之前先查这里)
@@ -317,7 +369,14 @@ sl.registerSingleton<IAppConfig>(EnvAppConfig(config));
 ### 6.8 排查"登出后 UI 没跳 /login"
 1. 看 app.dart 是否注入了 refreshListenable (P1-3 后必装, `GoRouterRefreshStream`)
 2. 看 AuthCubit 是否 LazySingleton (DI 步骤 3)
-3. 看 AuthManager.logout 是否走 `cubit.setAuthState(AuthState())` — 状态变化才会触发 stream
+3. 看 AuthManager.logout 是否走 `_authCubit.setAuthState(AuthState())` — 状态变化才会触发 stream
+4. 看 feature 层登出逻辑是否调用了 `AuthManager.logout()` 而不是直接改 UI 状态
+
+### 6.9 排查"登录后被踢回 /login"
+1. 看 LoginCubit.login() 是否调用了 `AuthManager.handleLoginSuccess(loginResult)` — 这是关键
+2. 看 AuthManager 是否正确保存 token 到 TokenStorage
+3. 看 AuthCubit 状态是否变为 loggedIn — 可通过 AuthCubit.stream 观察
+4. 看 AuthGuard 的 publicRoutes 配置 — /login 必须在公开路由列表里
 
 ---
 
