@@ -190,8 +190,8 @@ class AppButton extends StatefulWidget {
         label: label,
         onPressed: onPressed,
         variant: AppButtonVariant.filled,
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF44336), // Material Red 500
+        foregroundColor: const Color(0xFFFFFFFF), // White
         isLoading: isLoading,
         size: size,
         icon: icon,
@@ -241,7 +241,7 @@ class AppButton extends StatefulWidget {
         onPressed: onPressed,
         variant: AppButtonVariant.filled,
         gradient: gradient,
-        foregroundColor: foregroundColor ?? Colors.white,
+        foregroundColor: foregroundColor,
         isLoading: isLoading,
         size: size,
         icon: icon,
@@ -634,7 +634,6 @@ class _AppButtonState extends State<AppButton> {
 
     switch (widget.variant) {
       case AppButtonVariant.filled:
-        if (widget.backgroundColor == Colors.red) return Colors.white;
         return Theme.of(context).colorScheme.onPrimary;
       case AppButtonVariant.outlined:
       case AppButtonVariant.text:
