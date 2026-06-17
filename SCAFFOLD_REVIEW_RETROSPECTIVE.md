@@ -469,7 +469,7 @@ setup:
 
 | # | 问题 | 影响 | 建议 |
 |---|------|------|------|
-| **L-4** | Widget 测试仍只有 1 个 | UI 层无保障 | 为 feature_auth/home/detail 各加至少 1 个 widget 测试 |
+| **L-4** | ~~Widget 测试仍只有 1 个~~ | ~~UI 层无保障~~ | ✅ **部分完成 (2026-06-17)**: feature_home 5 个 widget 测试, commit `cfd22bd`. feature_auth/detail/settings 未补 (后续 sprint). 详见 8.13 |
 | **L-5** | HomeData.items 仍是 `List<dynamic>` | 强类型退化 | 定义 `HomeItem` 类, items 改为 `List<HomeItem>` |
 | **L-6** | AppButton 颜色未走 ThemeExtension | 不支持暗色主题的 danger 按钮 | danger 按钮从 `context.colors.error` 取色 |
 | **L-7** | ~~R2 校验只检查 flutter, 没检查 dio/services~~ | ~~校验面不全~~ | ✅ **已解决 (2026-06-17)**: `check_deps.sh` 扩展, 拦截 13 个非纯 dart 包, commit `113b58b` |
@@ -1396,3 +1396,75 @@ if grep -rqE "^import 'package:(flutter|dio|retrofit|alice|sentry_flutter|hive|h
 ### 8.12.7 一句话总结
 
 3 个零风险项一次完成: 校验面扩大 13 倍 + 文档可发现性提升 + 删 1.2KB 技术债, 1 个 commit, 总改动 6 文件. 0 风险, 0 回归.
+
+---
+
+## 8.13 L-4 Widget 测试补全日志 (2026-06-17)
+
+> 用户决策: 脚手架工程, HomePage 是示例, 但 L-4 立竿见影仍值得做. L-5 (HomeItem 强类型) 跳过.
+> 完成日期: 2026-06-17 (1 个 commit)
+
+### 8.13.1 Commit 清单
+
+| Commit | Hash | 类型 | 行数 | 风险 | 验证 |
+|--------|------|------|------|:---:|------|
+| **T2** | `cfd22bd` | test(feature_home) | +155 / -0 | 零 | pre-commit ✅ |
+
+### 8.13.2 测试覆盖映射
+
+`HomeState` 是 freezed sealed class, 4 个 case, 现 5 个 widget 测试覆盖:
+
+| 测试 | 状态 case | 验证点 |
+|------|----------|--------|
+| #1 初始 | HomeInitial | '点击加载首页数据' 文案 + 加载按钮 + 刷新按钮 (AppBar) + 调试按钮条件渲染 |
+| #2 loading | HomeLoading | 点击加载后显示 CircularProgressIndicator + '加载中...' |
+| #3 loaded | HomeLoaded | title + 'N 项已加载' + '打开详情页' + 成功图标 |
+| #4 error | HomeError | '加载失败:NETWORK_FAIL' + '重试' + 错误图标 |
+| #5 跳转 | HomeLoaded → Detail | context.push(AppRoutes.detail) 真实路由集成 |
+
+### 8.13.3 设计要点
+
+#### 测试架构
+```
+HomePage (real)
+  ↑ BlocProvider
+HomeCubit (real)
+  ↑ constructor inject
+_StubHomeRepository / _PendingRepository (fake)
+```
+
+- **不预 emit 状态**: 走真实 Repository → Cubit → UI 整条链
+- **_StubHomeRepository**: 构造时指定 success 数据或 failure 异常, 计数调用次数
+- **_PendingRepository**: 用 `Completer().future` 永远不完成, 用于测试 loading 状态无竞态
+- **GoRouter 包装**: HomePage 用了 `context.push(AppRoutes.detail)`, 需最小路由壳
+
+#### 踩过的坑
+- `FilledButton.icon` 在 Flutter 内部用 `_FilledButtonWithIcon` 包裹, **不是 `FilledButton` 子类** — 用 `find.text('打开详情页')` 而非 `find.widgetWithText(FilledButton, ...)`
+- AppRoutes 在 `routing` 包, 需 import `package:routing/routing.dart`
+
+#### 顺带修复
+- 提交时 melos test:affected 生成了 `packages/features/feature_home/pubspec.lock` (与项目惯例一致, 其他 9 个包都已有). 这是修复缺失 lock, 不是意外.
+
+### 8.13.4 验证结果
+
+| 项 | 结果 |
+|----|------|
+| `flutter test` (feature_home) | **7/7 passed** (1 existing + 1 cache + 5 new) |
+| `flutter analyze` | 0 new issues |
+| `bash .githooks/pre-commit` | ✅ SUCCESS |
+
+### 8.13.5 范围限制 (用户决策)
+
+L-4 原建议是 "为 feature_auth/home/detail/settings 各加至少 1 个 widget 测试". 本次只完成 feature_home. 其余 3 个 feature 未做:
+
+| Feature | 工作量 | 风险 |
+|---------|:-----:|:---:|
+| feature_auth | ~1 天 | 低 |
+| feature_detail | ~4h | 零 |
+| feature_settings | ~4h | 零 |
+
+**理由**: feature_home 是状态机最完整的示例 (4 个 sealed case), 验证了模式可复用. 其他 3 个 feature 模式相同, 但 1 天工作量, 留给后续 sprint.
+
+### 8.13.6 一句话总结
+
+L-4 部分完成: feature_home 5 个 widget 测试覆盖全部 sealed state, 1 个 commit, 1563 行 (含顺带修复 pubspec.lock). 验证 UI 层有回归保护. 其他 feature 留给后续.
