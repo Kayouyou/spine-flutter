@@ -23,7 +23,7 @@ jobs:
       - name: Check coverage threshold
         run: ./scripts/check_coverage.sh 80
       - name: Upload to codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
