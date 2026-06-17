@@ -40,7 +40,6 @@ class TokenRenewalInterceptor extends Interceptor {
 
   TokenRenewalState _renewalState = TokenRenewalState.idle;
   DateTime? _lastRenewalTime;
-  Completer<bool>? _renewalCompleter;
 
   @override
   Future<void> onResponse(
@@ -95,7 +94,6 @@ class TokenRenewalInterceptor extends Interceptor {
       }
 
       _renewalState = TokenRenewalState.renewing;
-      _renewalCompleter = Completer<bool>();
 
       unawaited(Future.microtask(() async {
         try {
@@ -118,16 +116,9 @@ class TokenRenewalInterceptor extends Interceptor {
             _logger.warning('续期失败，完成所有等待的请求（使用原始响应）');
             _drainFallback();
           }
-
-          if (!_renewalCompleter!.isCompleted) {
-            _renewalCompleter!.complete(success);
-          }
         } catch (e) {
           _logger.error('续期过程中出错: $e');
           _drainFallback();
-          if (!_renewalCompleter!.isCompleted) {
-            _renewalCompleter!.complete(false);
-          }
           _renewalState = TokenRenewalState.failed;
         } finally {
           Future.delayed(const Duration(seconds: 3), () {
