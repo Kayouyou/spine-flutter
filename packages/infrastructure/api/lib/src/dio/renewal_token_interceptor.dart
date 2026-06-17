@@ -120,12 +120,6 @@ class TokenRenewalInterceptor extends Interceptor {
           _logger.error('续期过程中出错: $e');
           _drainFallback();
           _renewalState = TokenRenewalState.failed;
-        } finally {
-          Future.delayed(const Duration(seconds: 3), () {
-            if (_renewalState != TokenRenewalState.renewing) {
-              _renewalState = TokenRenewalState.idle;
-            }
-          });
         }
       }));
     });
