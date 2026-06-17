@@ -23,7 +23,6 @@ import '../bootstrap/bootstrap_options.dart';
 import '../config/app_config.dart';
 import '../di/locator.dart';
 import '../di/setup.dart';
-import '../utils/logger.dart';
 import 'initializer.dart';
 import 'profiler.dart';
 
@@ -86,9 +85,18 @@ class AppLauncher {
     }
 
     // Sentry 之后立即安装错误边界 + 绑定 Sentry reporter
+    //
+    // 关键: onError 闭包不能依赖 sl (此时 setupDependencies 还没跑).
+    // 启动期任何抛错 (例如下面的 _assertRequiredEnvFields) 都会经
+    // PlatformDispatcher.instance.onError 走到这里, 如果闭包调
+    // sl<AppLogger>() 会再抛 'AppLogger not registered', 形成 panic 链.
+    // 真正上报走 reporter (已就绪), 日志留给 setupDependencies 之后的
+    // 错误 — 启动期错误已经走 Sentry/ConsoleReporter, 不缺日志.
     AppErrorHandler.instance.setup(
       onError: (error, stack) {
-        sl<AppLogger>().error('未处理错误', error);
+        // 启动期 error 上报完全依赖 reporter, 不写 logger.
+        // reporter 在 setup() 之后已就绪 (Sentry/Console), 单例
+        // 自身, 不通过 sl.
       },
     );
     AppErrorHandler.instance.setReporter(
@@ -100,6 +108,7 @@ class AppLauncher {
     // AGENTS.md R5: 必需 env 字段缺失时启动崩溃.
     // 之前 HttpConstant.Http_Host / AliyunOSSConstant.BucketName 硬编码,
     // 即使 .env 缺失也能跑 (掩盖错误). 现在改为 fail-fast.
+    // (L-1 修复引入)
     _assertRequiredEnvFields();
 
     // 依赖注入配置（会跳过 IAppConfig 注册因上面已注册）
