@@ -1468,3 +1468,101 @@ L-4 原建议是 "为 feature_auth/home/detail/settings 各加至少 1 个 widge
 ### 8.13.6 一句话总结
 
 L-4 部分完成: feature_home 5 个 widget 测试覆盖全部 sealed state, 1 个 commit, 1563 行 (含顺带修复 pubspec.lock). 验证 UI 层有回归保护. 其他 feature 留给后续.
+
+---
+
+## 8.14 L-1 启动期 panic 链修复 (2026-06-17)
+
+> 用户报告: `flutter run lib/main.dart` (不传 env) 时连续抛两个错, 看起来 panic 链.
+> 修复日期: 2026-06-17, commit `e89d39b`
+
+### 8.14.1 错误日志 (用户原始报告)
+
+```
+[ERROR] Unhandled Exception: Bad state: GetIt: Object/factory with type
+        AppLogger is not registered inside GetIt.
+#4  AppLauncher.launch.<anonymous closure> (launcher.dart:91:11)
+#5  AppErrorHandler.setup.<anonymous closure> (error_handler.dart:77:14)
+#6  PlatformDispatcher._dispatchError (dart:ui)
+
+[ERROR] Unhandled Exception: Bad state: EnvironmentConfig: 必需字段
+        API_HOST 未配置. 请通过 --dart-define-from-file=env/.env.{...}
+#2  EnvironmentConfig.apiHost (config.dart:86:32)
+#3  AppLauncher._assertRequiredEnvFields (launcher.dart:150:27)
+#4  AppLauncher.launch (launcher.dart:103:5)
+#5  main (main.dart:12:3)
+```
+
+### 8.14.2 根因 (Phase 1 调查)
+
+**L-1 修复** (commit `9d78b35`) 在 launcher 加了 `_assertRequiredEnvFields()` 阶段 0.7, 位于 `AppErrorHandler.setup()` 之后 / `setupDependencies()` 之前。这打乱了隐式约束: **onError callback 不能依赖 sl 注册的服务**。
+
+**时序**:
+1. setupDependencies 还没跑, sl<AppLogger> 未注册
+2. 用户漏传 `--dart-define-from-file` → API_HOST 空
+3. `_assertRequiredEnvFields()` 抛 StateError
+4. PlatformDispatcher.instance.onError 触发 → 调 onError callback
+5. callback 调 `sl<AppLogger>().error(...)` → sl 抛 "AppLogger not registered"
+6. **panic 链**: error 1 → error 2 → 又是 onError → 又是 sl → 递归
+
+### 8.14.3 错误 2 (用户操作) vs 错误 1 (代码 bug) 区分
+
+| 错误 | 性质 | 修复 |
+|------|------|------|
+| **API_HOST 未配置** | **正确行为** | 用户需 `flutter run --dart-define-from-file=env/.env.dev` (AGENTS.md §4.3) |
+| **AppLogger not registered** | **真 bug** | 启动期 onError 不应依赖 sl |
+
+错误 2 是 fail-fast 守卫正常工作, 误传参理应崩溃 (比静默用错 host 安全)。
+错误 1 是 panic 链, 必须修。
+
+### 8.14.4 Phase 4 修复 (commit `e89d39b`)
+
+```dart
+// 之前
+AppErrorHandler.instance.setup(
+  onError: (error, stack) {
+    sl<AppLogger>().error('未处理错误', error);  // ← sl 还没注册
+  },
+);
+
+// 之后
+AppErrorHandler.instance.setup(
+  onError: (error, stack) {
+    // 启动期 error 上报完全依赖 reporter, 不写 logger.
+    // reporter 在 setup() 之后已就绪 (Sentry/Console), 单例
+    // 自身, 不通过 sl.
+  },
+);
+```
+
+**理由**:
+- 启动期错误**已经**走 `reporter` 上报 (Sentry/Console), 不缺日志
+- `AppLogger` 是 DI 注册, 启动期不可用
+- 让 onError 真正"装好错误边界", 即使后面抛错也不会再 panic
+
+**额外**: 删了 `import '../utils/logger.dart'` (不再用)
+
+### 8.14.5 验证
+
+| 项 | 结果 |
+|----|------|
+| `flutter analyze` (lib/) | **No issues found** |
+| `bash .githooks/pre-commit` | ✅ SUCCESS |
+
+### 8.14.6 用户正确启动命令 (供测试)
+
+```bash
+# 推荐: 用 Makefile (锁了正确 env 路径)
+make run-dev          # 等价于:
+fvm flutter run --dart-define-from-file=env/.env.dev --debug
+
+# 也可手动
+fvm flutter run --dart-define-from-file=env/.env.dev --debug
+
+# iOS 设备
+fvm flutter run --dart-define-from-file=env/.env.dev -d <device-id>
+```
+
+### 8.14.7 一句话总结
+
+L-1 引入的 `_assertRequiredEnvFields` 是正确设计, 但暴露了原 launcher 的隐藏 bug (onError 依赖未注册的 sl). 修复后启动期 fail-fast 仍工作, 但不再 panic 链. 用户只要按 `make run-dev` 启动就 OK.
