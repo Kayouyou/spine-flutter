@@ -15,13 +15,17 @@ else
   echo "✅ [R1] No forbidden spine_flutter imports in feature packages"
 fi
 
-# R2: domain must not import flutter
-if grep -rqE "^import 'package:flutter" packages/domain/ --include="*.dart"; then
-  echo "❌ [R2] Domain packages must not import flutter"
-  grep -rnE "^import 'package:flutter" packages/domain/ --include="*.dart"
+# R2: domain must remain pure Dart (no framework / infrastructure deps)
+# Domain is the innermost layer — should not import flutter, dio, retrofit,
+# or any UI/IO/infra package. Allowed: dart:* and pure pub.dev packages.
+#
+# (L-7 扩展: 之前只检查 flutter, 现覆盖更多非纯 dart 包)
+if grep -rqE "^import 'package:(flutter|dio|retrofit|alice|sentry_flutter|hive|hive_flutter|hydrated_bloc|shared_preferences|path_provider|get_it|flutter_bloc)" packages/domain/ --include="*.dart"; then
+  echo "❌ [R2] Domain packages must not import framework / infrastructure"
+  grep -rnE "^import 'package:(flutter|dio|retrofit|alice|sentry_flutter|hive|hive_flutter|hydrated_bloc|shared_preferences|path_provider|get_it|flutter_bloc)" packages/domain/ --include="*.dart"
   FAILED=1
 else
-  echo "✅ [R2] Domain packages have no flutter imports"
+  echo "✅ [R2] Domain packages have no framework / infrastructure imports"
 fi
 
 # R3: infrastructure must not depend on services

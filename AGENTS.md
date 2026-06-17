@@ -113,17 +113,16 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 │   ├── .env.staging
 │   └── .env.prod
 │
-├── docs/                         # 10 篇指南 (架构/测试/路由 等)
+├── docs/                         # 11 篇指南 + 1 个 README 索引 (架构/测试/路由 等)
 │   ├── architecture-analysis.md
 │   ├── di-discipline.md
 │   ├── auth-route-guard.md
 │   ├── coverage-guide.md
 │   ├── di-injection-flow.md
-│   ├── domain-testing-guide.md
 │   ├── hydrated_bloc-migration-guide.md
-│   ├── solo-ai-scaffold-guide.md
 │   ├── ui-lifecycle-patterns-guide.md
-│   └── deep-link-guide.md
+│   ├── deep-link-guide.md
+│   └── README.md             # 文档地图 (按主题分组)
 │
 ├── openspec/changes/             # 4 个规范变更 (设计决策历史)
 ├── .sisyphus/notepads/           # AI 学习笔记 (本骨架作者的学习轨迹)
@@ -517,12 +516,11 @@ try {
 | 了解 DI 注入流程 | `docs/di-injection-flow.md` |
 | 了解路由守卫 | `docs/auth-route-guard.md` |
 | 了解 DI 纪律 (为什么不能 barrel) | `docs/di-discipline.md` |
-| 写 domain 单测 | `docs/domain-testing-guide.md` |
 | 跑覆盖率 | `docs/coverage-guide.md` |
 | HydratedBloc 迁移 | `docs/hydrated_bloc-migration-guide.md` |
-| 1 人 + AI 工作流 | `docs/solo-ai-scaffold-guide.md` |
 | UI 生命周期 mixin | `docs/ui-lifecycle-patterns-guide.md` |
 | 深链接处理 | `docs/deep-link-guide.md` |
+| 文档地图 (按主题分组) | `docs/README.md` |
 | 看设计决策历史 | `openspec/changes/` |
 | 看 AI 学习笔记 | `.sisyphus/notepads/` |
 

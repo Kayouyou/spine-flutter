@@ -532,4 +532,3 @@ AppScaffold(
 - [component_library 组件库](../infrastructure/component_library/README.md)
 - [routing 路由模块](../infrastructure/routing/README.md)
 - [路由守卫文档](./auth-route-guard.md)
-- [Domain 测试指南](./domain-testing-guide.md)
