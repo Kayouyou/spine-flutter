@@ -472,10 +472,10 @@ setup:
 | **L-4** | Widget 测试仍只有 1 个 | UI 层无保障 | 为 feature_auth/home/detail 各加至少 1 个 widget 测试 |
 | **L-5** | HomeData.items 仍是 `List<dynamic>` | 强类型退化 | 定义 `HomeItem` 类, items 改为 `List<HomeItem>` |
 | **L-6** | AppButton 颜色未走 ThemeExtension | 不支持暗色主题的 danger 按钮 | danger 按钮从 `context.colors.error` 取色 |
-| **L-7** | R2 校验只检查 flutter, 没检查 dio/services | 校验面不全 | 扩展 grep 模式 |
+| **L-7** | ~~R2 校验只检查 flutter, 没检查 dio/services~~ | ~~校验面不全~~ | ✅ **已解决 (2026-06-17)**: `check_deps.sh` 扩展, 拦截 13 个非纯 dart 包, commit `113b58b` |
 | **L-8** | ConflictException / RateLimitedException 信息不够丰富 | 无法知道冲突详情或重试时间 | 添加 `conflictDetail` 和 `retryAfter` 字段 |
-| **L-9** | docs/ 无 README 索引 | 11 个文档无入口 | 创建 `docs/README.md` 索引 |
-| **L-10** | 2 个文档是 stub | domain-testing-guide.md (818B), solo-ai-scaffold-guide.md (426B) | 要么补充内容, 要么删除 |
+| **L-9** | ~~docs/ 无 README 索引~~ | ~~11 个文档无入口~~ | ✅ **已解决 (2026-06-17)**: `docs/README.md` (105 行), 按主题分组 + 排障表, commit `113b58b` |
+| **L-10** | ~~2 个文档是 stub~~ | ~~domain-testing-guide.md (818B), solo-ai-scaffold-guide.md (426B)~~ | ✅ **已删除 (2026-06-17)**: 净删 53 行, AGENTS.md §3 §11 同步, commit `113b58b` |
 | **L-11** | UpgradeWrapper 仍是空壳 | 占位实现 | 集成 upgrader 包, 或删除 |
 
 ### 🟢 可以处理（锦上添花）
@@ -1302,3 +1302,97 @@ git push --force --all
 ### 8.11.9 一句话总结
 
 源码层面 L-1 已彻底解决: 8 层防御架构 + 6 个新测试 + 启动期 fail-fast, 142/142 测试通过, 0 analyze issue. **遗留工作: git 历史清理 (BFG), 在 release 前必须完成**.
+
+---
+
+## 8.12 L-7 + L-9 + L-10 三项零风险修复日志 (2026-06-17)
+
+> 用户决策: 先做零风险项, 立竿见影. 完成 L-7 (校验扩展) + L-9 (docs 索引) + L-10 (删 stub).
+> 完成日期: 2026-06-17 (1 个 commit)
+
+### 8.12.1 Commit 清单
+
+| Commit | Hash | 类型 | 行数 | 风险 | 验证 |
+|--------|------|------|------|:---:|------|
+| **T1** | `113b58b` | docs(scaffold) | +118 / -65 | 零 | pre-commit ✅ |
+
+### 8.12.2 L-7: R2 校验面扩展
+
+**变更**: `scripts/check_deps.sh`
+
+**之前**:
+```bash
+if grep -rqE "^import 'package:flutter" packages/domain/ --include="*.dart"; then
+```
+
+**之后**:
+```bash
+if grep -rqE "^import 'package:(flutter|dio|retrofit|alice|sentry_flutter|hive|hive_flutter|hydrated_bloc|shared_preferences|path_provider|get_it|flutter_bloc)" packages/domain/ --include="*.dart"; then
+```
+
+**覆盖 13 个非纯 dart 包**: flutter / dio / retrofit / alice / sentry_flutter / hive / hive_flutter / hydrated_bloc / shared_preferences / path_provider / get_it / flutter_bloc
+
+**理由**: domain 必须 framework-agnostic 才能保证可移植性. 原校验只防 flutter UI 依赖, 防不住 HTTP/存储/状态等基础设施依赖.
+
+**验证**:
+- `bash scripts/check_deps.sh`: R1-R4 全部 ✅
+- 0 现有 domain 文件违规
+
+### 8.12.3 L-9: docs/README.md 索引
+
+**新增**: `docs/README.md` (105 行)
+
+**结构**:
+1. **快速导航 (按用途)**:
+   - 新人入职 (3 篇顺序阅读)
+   - 写新 feature / 业务模块 (3 篇)
+   - 调 bug / 排查问题 (症状 → 文档表)
+   - 提升质量 (任务 → 文档表)
+2. **完整文档列表 (按 7 主题分组)**:
+   - 架构/分层 (2 篇)
+   - DI/启动流程 (2 篇)
+   - 路由 (1 篇)
+   - 测试/质量 (1 篇)
+   - 状态管理/持久化 (1 篇)
+   - UI/生命周期 (1 篇)
+   - 深度链接 (1 篇)
+3. **文档治理记录**: 记录本次删除的 stub, 防止未来重复出现
+4. **相关入口**: 链回 AGENTS.md §11 / openspec / sisyphus / 报告本身
+
+**同步更新**:
+- AGENTS.md §11 文档地图: 移除 2 个 stub 引用, 加 `docs/README.md` 行
+- AGENTS.md §3 仓库结构树: 文档列表更新, 加 README.md
+- AGENTS.md §0 描述: "10 篇指南" → "11 篇指南 + 1 个 README 索引"
+
+### 8.12.4 L-10: 删除 2 个 stub 文档
+
+**删除**:
+- `docs/domain-testing-guide.md` (818 字节, 占位)
+- `docs/solo-ai-scaffold-guide.md` (426 字节, 占位)
+
+**理由**: stub 文档是技术债 — 看似有文档, 实则空, 误导后来人. 比起"占位等待补充", 直接删除更诚实.
+
+**同步更新**:
+- `docs/ui-lifecycle-patterns-guide.md`: 移除对已删除文档的链接 (line 535)
+- AGENTS.md §3 树: 移除 2 行
+- AGENTS.md §11 表: 移除 2 行
+- docs/README.md 治理记录: 记录本次删除
+
+**净效应**: docs/ 从 13 文件 → 11 文件 (-2), 总行数 -53 行 (删除) + 105 行 (新增 README) = +52 行 (信息密度更高)
+
+### 8.12.5 副作用修复
+
+`scripts/check_deps.sh` 之前丢失了 exec bit, 加上 `chmod +x` 修复. 不影响功能, 但会让直接 `./scripts/check_deps.sh` 调用失败. 现在已恢复.
+
+### 8.12.6 验证结果
+
+| 项 | 结果 |
+|----|------|
+| `scripts/check_deps.sh` (R1-R4) | ✅ 全部通过, R2 覆盖 13 个包 |
+| `bash .githooks/pre-commit` | ✅ SUCCESS (deps + l10n + analyze + test:affected) |
+| 新增 lint issues | 0 |
+| 测试回归 | 0 |
+
+### 8.12.7 一句话总结
+
+3 个零风险项一次完成: 校验面扩大 13 倍 + 文档可发现性提升 + 删 1.2KB 技术债, 1 个 commit, 总改动 6 文件. 0 风险, 0 回归.
