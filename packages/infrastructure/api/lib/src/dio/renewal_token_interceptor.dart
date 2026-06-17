@@ -85,6 +85,14 @@ class TokenRenewalInterceptor extends Interceptor {
         return;
       }
 
+      // 失败守卫: 上一次续期已失败, 当前请求直接走 fallback,
+      // 避免雪崩重试用旧 token。
+      if (_renewalState == TokenRenewalState.failed) {
+        _logger.warning('上一次续期失败, 当前请求直接走 fallback: ${response.requestOptions.path}');
+        _drainFallback();
+        return;
+      }
+
       if (_renewalState == TokenRenewalState.success &&
           _lastRenewalTime != null &&
           DateTime.now().difference(_lastRenewalTime!) < const Duration(seconds: 5)) {
@@ -95,33 +103,31 @@ class TokenRenewalInterceptor extends Interceptor {
 
       _renewalState = TokenRenewalState.renewing;
 
-      unawaited(Future.microtask(() async {
-        try {
-          _logger.info('开始执行token续期流程');
+      try {
+        _logger.info('开始执行token续期流程');
 
-          final success = await performTokenRenewal(
-            _dio,
-            _tokenStorage,
-            _lastRenewalTime,
-            logger: _logger,
-          );
+        final success = await performTokenRenewal(
+          _dio,
+          _tokenStorage,
+          _lastRenewalTime,
+          logger: _logger,
+        );
 
-          if (success) {
-            _renewalState = TokenRenewalState.success;
-            _lastRenewalTime = DateTime.now();
-            _logger.info('续期成功，开始重试队列中的请求');
-            await _drainRetry();
-          } else {
-            _renewalState = TokenRenewalState.failed;
-            _logger.warning('续期失败，完成所有等待的请求（使用原始响应）');
-            _drainFallback();
-          }
-        } catch (e) {
-          _logger.error('续期过程中出错: $e');
-          _drainFallback();
+        if (success) {
+          _renewalState = TokenRenewalState.success;
+          _lastRenewalTime = DateTime.now();
+          _logger.info('续期成功，开始重试队列中的请求');
+          await _drainRetry();
+        } else {
           _renewalState = TokenRenewalState.failed;
+          _logger.warning('续期失败，完成所有等待的请求（使用原始响应）');
+          _drainFallback();
         }
-      }));
+      } catch (e) {
+        _logger.error('续期过程中出错: $e');
+        _drainFallback();
+        _renewalState = TokenRenewalState.failed;
+      }
     });
   }
 
