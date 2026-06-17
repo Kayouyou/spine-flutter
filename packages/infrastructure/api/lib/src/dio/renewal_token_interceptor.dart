@@ -39,7 +39,6 @@ class TokenRenewalInterceptor extends Interceptor {
   final RefreshQueue _queue = RefreshQueue();
 
   TokenRenewalState _renewalState = TokenRenewalState.idle;
-  static const String _tokenRenewalPath = 'User/Token/Renewal';
   DateTime? _lastRenewalTime;
   Completer<bool>? _renewalCompleter;
 
@@ -48,12 +47,7 @@ class TokenRenewalInterceptor extends Interceptor {
     Response response,
     ResponseInterceptorHandler handler,
   ) async {
-    // 1. 处理续期请求本身
-    if (response.requestOptions.path.contains(_tokenRenewalPath)) {
-      return _handleRenewalResponse(response, handler);
-    }
-
-    // 2. 检查是否需要续期
+    // 1. 检查是否需要续期
     bool needsRenewal = false;
     try {
       needsRenewal = await shouldRenewToken(response);
@@ -169,83 +163,5 @@ class TokenRenewalInterceptor extends Interceptor {
       fireAndForget: true,
     );
     _logger.info('所有等待的请求完成');
-  }
-
-  Future<void> _handleRenewalResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) async {
-    if (_renewalState == TokenRenewalState.renewing && _renewalCompleter != null) {
-      _logger.debug('已有被动续期请求在执行，等待被动续期完成: ${response.requestOptions.path}');
-
-      try {
-        final success = await _renewalCompleter!.future.timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            _logger.warning('等待被动续期超时');
-            return false;
-          },
-        );
-
-        if (success) {
-          if (_tokenStorage != null) {
-            final token = await _tokenStorage!.getToken();
-            if (token != null && token.isNotEmpty) {
-              final successResponse = Response(
-                requestOptions: response.requestOptions,
-                statusCode: 200,
-                data: {
-                  'code': 0,
-                  'message': 'Token renewal successful',
-                  'data': {'token': token, 'expires': 7200},
-                },
-              );
-              return handler.next(successResponse);
-            }
-          }
-        }
-      } catch (e) {
-        _logger.error('等待被动续期出错: $e');
-      }
-
-      return handler.next(response);
-    }
-
-    try {
-      _logger.info('处理续期请求: ${response.requestOptions.path}');
-
-      _renewalState = TokenRenewalState.renewing;
-      _renewalCompleter = Completer<bool>();
-
-      final success = await processRenewalResponse(response.data, _tokenStorage);
-
-      if (success) {
-        _renewalState = TokenRenewalState.success;
-        _lastRenewalTime = DateTime.now();
-        await _drainRetry();
-      } else {
-        _renewalState = TokenRenewalState.failed;
-        _drainFallback();
-      }
-
-      if (!_renewalCompleter!.isCompleted) {
-        _renewalCompleter!.complete(success);
-      }
-
-      Future.delayed(const Duration(seconds: 3), () {
-        _renewalState = TokenRenewalState.idle;
-      });
-
-      return handler.next(response);
-    } catch (e) {
-      _logger.error('处理续期请求出错: $e');
-      _renewalState = TokenRenewalState.failed;
-
-      if (_renewalCompleter != null && !_renewalCompleter!.isCompleted) {
-        _renewalCompleter!.complete(false);
-      }
-
-      return handler.next(response);
-    }
   }
 }
