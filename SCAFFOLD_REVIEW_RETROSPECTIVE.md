@@ -1566,3 +1566,91 @@ fvm flutter run --dart-define-from-file=env/.env.dev -d <device-id>
 ### 8.14.7 一句话总结
 
 L-1 引入的 `_assertRequiredEnvFields` 是正确设计, 但暴露了原 launcher 的隐藏 bug (onError 依赖未注册的 sl). 修复后启动期 fail-fast 仍工作, 但不再 panic 链. 用户只要按 `make run-dev` 启动就 OK.
+
+---
+
+## 8.15 IDE 启动场景 dev 兜底 (2026-06-17)
+
+> 用户报告: 8.14 修了 panic 链后, hot restart 仍报 "API_HOST 未配置".
+> 用户场景: IDE (VS Code / Xcode) 点 Run 启动, 没法传 --dart-define-from-file.
+> 修复日期: 2026-06-17, commit `8d51cfd`
+
+### 8.15.1 根因
+
+8.14 只解决了 panic 链, 没解决根因: **用户漏传 env 参数**。
+- CLI: `fvm flutter run --dart-define-from-file=env/.env.dev` ← Makefile 锁了正确路径
+- IDE Run 按钮: 不传任何 dart-define → API_HOST/OSS_BUCKET 等为空 → fail-fast 抛错
+
+### 8.15.2 设计原则
+
+- **dev/staging**: 用占位符 + 显眼警告, 允许运行 (IDE 启动场景)
+- **prod**: 立即抛 StateError (fail-fast, 不退让)
+- 两条路径用**同一个 getter API** — 调用方代码零修改
+
+### 8.15.3 改动
+
+#### `lib/config.dart`
+
+| 字段 | dev default | prod 行为 |
+|------|-------------|-----------|
+| `API_HOST` | `dev-host.placeholder.invalid` | 非空 (无 placeholder) |
+| `OSS_BUCKET` | `dev-bucket.placeholder.invalid` | 非空 (无 placeholder) |
+| `OSS_ENDPOINT` | `https://oss-cn-zhangjiakou.aliyuncs.com` | 非空 |
+| `API_ACCESS_KEY_ID` | 空 (签名关闭) | 必须非空 |
+| `OSS_ACCESS_KEY` | 空 (签名关闭) | 必须非空 |
+
+**新方法**:
+- `_isPlaceholder()` — 检测 `placeholder.invalid` / 空字符串
+- `_warnPlaceholder()` — 启动时打 13 行 ASCII box 警告, 单次打印
+- `_require(value, name, allowEmpty)` — prod 必填, dev 可空
+
+#### `lib/core/startup/launcher.dart`
+
+`_assertRequiredEnvFields()` 简化为:
+1. 调用 5 个 getter (触发 dev 警告 + prod 抛错)
+2. isProd 路径再汇总检查, 抛聚合 StateError
+
+### 8.15.4 用户体验对比
+
+#### ❌ 8.14 (panic 链修了, 但 IDE 仍崩)
+
+```
+flutter: === ERROR REPORT ===
+flutter: API_HOST 未配置
+[app dies]
+```
+
+#### ✅ 8.15 (dev)
+
+```
+flutter: ╔══════════════════════════════════════════╗
+flutter: ║  ⚠️  EnvironmentConfig: API_HOST 使用占位符  ║
+flutter: ║     推荐: make run-dev                    ║
+flutter: ║     或: fvm flutter run --dart-define...   ║
+flutter: ╚══════════════════════════════════════════╝
+[app continues, 占位符 host]
+[真发 API 会失败, 错误信息清晰 (非 panic)]
+```
+
+#### ✅ 8.15 (prod)
+
+```
+flutter: === ERROR REPORT ===
+flutter: StateError: API_HOST 未配置 (生产环境)
+[app dies — fail-fast 保持]
+```
+
+### 8.15.5 验证
+
+| 项 | 结果 |
+|----|------|
+| `flutter analyze` (lib/) | **No issues found** |
+| `bash .githooks/pre-commit` | ✅ SUCCESS |
+| 新依赖 | 0 |
+| R5 (env 必填) | ✅ prod 路径保留 |
+| IDE dev workflow | ✅ 不再阻塞 |
+| Prod fail-fast | ✅ 仍生效 |
+
+### 8.15.6 一句话总结
+
+8.14 修了 panic 链, 8.15 修了根因 (IDE 启动无法传 env). 设计上严格区分 dev 警告 vs prod fail-fast — 两个场景都正常工作, 公共 API 零破坏. CLI 用户走 `make run-dev` 仍是推荐路径 (避免占位符 host 调真接口), 但 IDE 用户也能跑起来 debug UI.
