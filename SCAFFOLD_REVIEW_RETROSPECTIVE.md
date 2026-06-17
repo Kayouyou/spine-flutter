@@ -461,7 +461,7 @@ setup:
 
 | # | 问题 | 风险 | 建议 |
 |---|------|------|------|
-| **L-1** | P0-1: HttpConstant 硬编码凭证仍未迁移 | 生产域名、内网 IP、OSS bucket 名公开可查 | **立即迁移到 env/.env.\***, 并用 BFG 清理 git 历史 |
+| **L-1** | ~~P0-1: HttpConstant 硬编码凭证仍未迁移~~ | ~~生产域名、内网 IP、OSS bucket 名公开可查~~ | ✅ **源码已解决 (2026-06-17)**, commit `9d78b35`, 详见 8.11. ⚠️ **git 历史仍含旧值**, 上线前需 BFG 清理 |
 | **L-2** | ~~P0-2: Token 续期代码整体健康度差~~ | ~~76 行死代码 + 死变量 + 文件名 typo + 竞态~~ | ✅ **已解决 (2026-06-17)**: 4 个 commit, 见 8.6 节, 详见 8.10 |
 | **L-3** | ~~`renewal_token_intercaptor.dart` 文件名 typo~~ | ~~intercaptor → interceptor~~ | ✅ **已解决 (2026-06-17)**: `git mv` + 2 处 import 更新, `flutter analyze` 0 issues, 40 tests passed |
 
@@ -1130,3 +1130,175 @@ if (_renewalState == TokenRenewalState.failed) {
 ### 8.10.9 一句话总结
 
 P0-2 整体健康度从"76 行死代码 + 死变量 + 文件名 typo + 竞态"修复为"165 行干净代码 + 显式状态机 + 5 个 e2e 覆盖"。4 个 commit 全部独立可回滚, 验证 100% 通过。
+
+---
+
+## 8.11 P0-1 修复完成日志 (2026-06-17)
+
+> 用户决策: 仅迁移"主机/凭证/代理/OSS", 保留业务常量. 通过 DI 注入, 不删除. 业务常量不迁移.
+> 完成日期: 2026-06-17 (1 个大 commit, 含 8 层防御)
+
+### 8.11.1 Commit 清单
+
+| Commit | Hash | 类型 | 行数 | 风险 | 验证 |
+|--------|------|------|------|:---:|------|
+| **L1** | `9d78b35` | fix(security) | +504 / -64 | 中 | analyze 0, test 142/142 |
+
+### 8.11.2 修复范围 (用户决策)
+
+| 决策项 | 选择 | 理由 |
+|--------|------|------|
+| 范围 | 仅迁移主机/凭证 | 业务常量 (reTokenCode, Version 等) 是协议级, 保留源码 |
+| 架构 | IAppConfig DI 注入 | 符合现有 DI 模式, 测试可隔离 |
+| 内部 IP | 删除 (CompanyIp/HomeIp/IphoneIp) | 属于个人联调环境, 不应进脚手架 |
+| 代理 IP | 从 dart-define 读 (PROXY_IP) | Charles 调试是个人行为, 不进默认值 |
+
+### 8.11.3 8 层防御架构
+
+```
+Layer 1: env/.env.{dev,staging,prod}  ← 模板, 密钥由 CI 注入
+   ↓
+Layer 2: lib/config.dart EnvironmentConfig
+   ↓ String.fromEnvironment + _require() assert
+Layer 3: IAppConfig (domain)            ← 抽象契约
+   ↓
+Layer 4: EnvAppConfig (lib)              ← DI 实现
+   ↓
+Layer 5: ApiConfig (api 包)              ← 包内抽象, 解耦 IAppConfig
+   ↓ EnvApiConfig 桥接
+Layer 6: HttpConstant 清理               ← 仅保留业务/技术常量
+   ↓
+Layer 7: refresh_api / api_endpoints / dio_factory  ← 消费 ApiConfig
+   ↓
+Layer 8: launcher _assertRequiredEnvFields()  ← 启动期 fail-fast
+```
+
+### 8.11.4 详细改动
+
+#### 删除的硬编码 (源码)
+
+| 原字段 | 旧值 | 迁移到 |
+|--------|------|--------|
+| `HttpConstant.Http_Host` | `'fn.jzfeng.com'` / `'47.92.151.39:5216'` | `ApiConfig.host` ← `IAppConfig.apiHost` ← `API_HOST` |
+| `HttpConstant.AccessKeyId` | `String.fromEnvironment('OVSX_APP_TOKEN')` | `ApiConfig.accessKeyId` ← `API_ACCESS_KEY_ID` |
+| `HttpConstant.CompanyIp` | `'192.168.1.181'` | **删除** (个人联调) |
+| `HttpConstant.HomeIp` | `'192.168.66.176'` | **删除** |
+| `HttpConstant.IphoneIp` | `'172.20.10.11'` | **删除** |
+| `HttpConstant.proxyIp` | `static var = CompanyIp` | `String.fromEnvironment('PROXY_IP')` (默认空) |
+| `AliyunOSSConstant.BucketName` | `'ovsx-usr'` | `ApiConfig.ossBucket` ← `OSS_BUCKET` |
+| `AliyunOSSConstant.Endpoint` | `'https://oss-cn-zhangjiakou.aliyuncs.com'` | `ApiConfig.ossEndpoint` ← `OSS_ENDPOINT` |
+| `AliyunOSSConstant.OSSUrl` | `'https://ovsx-usr.oss-cn-zhangjiakou.aliyuncs.com'` | `ApiConfig.ossPublicUrl` (动态拼接) |
+| `AliyunOSSConstant.FeedBack*` | `'feedback2'` | 同 ossBucket, 由部署环境决定 |
+| `AliyunOSSConstant.Subject1Score*` | `'feedback2'` | 同上 |
+| `AliyunOSSConstant.SignIn*` | `'feedback2'` | 同上 |
+
+#### 保留的常量 (业务/技术, 不属于凭证)
+
+- `HttpConstant.Version` (`'v1.0'`)
+- `HttpConstant.SignType` (`101`)
+- `HttpConstant.Client` (`10`)
+- `HttpConstant.ReceiveTimeout/ConnectTimeout/SendTimeout` (`15000`)
+- `HttpConstant.Retry_Max_Count` (`3`)
+- `HttpConstant.Proxy_Enable/Proxy_Port` (`false/8888`)
+- `HttpConstant.reTokenCode` (`1000102`)
+- `HttpConstant.reLoginCode` (`1000103`)
+- `HttpConstant.NetworkErrorCode/UnknownErrorCode/OssTokenErrorCode`
+- `AliyunOSSConstant.AccessKey` (`String.fromEnvironment('OVSX_OSS_TOKEN')`) — 保留作为签名密钥注入点
+
+### 8.11.5 启动期 fail-fast
+
+新增 `AppLauncher._assertRequiredEnvFields()`, 在 Sentry init 之后 / setupDependencies 之前运行:
+
+```dart
+// 启动崩溃 (StateError) 而不是运行时模糊错误:
+// 1. dev/staging: API_HOST + OSS_BUCKET + OSS_ENDPOINT 必需
+// 2. prod: 上述 + API_ACCESS_KEY_ID + OSS_ACCESS_KEY 额外必需
+// 错误信息明确指出缺失字段 + 修复方式
+```
+
+### 8.11.6 测试覆盖
+
+| 文件 | 改动 | 测试数 |
+|------|------|:-----:|
+| `test/http/http_constant_test.dart` | 删除 `AccessKeyId` 断言, 加 proxyIp / 业务常量稳定性测试 | +2 → 5 |
+| `test/http/api_config_test.dart` (新) | EnvApiConfig 字段映射 / ossPublicUrl 拼接 / isRelease 语义 / 容错解析 | 6 |
+| `test/token_renewal_interceptor_test.dart` | 构造函数命名参数适配 | 不变 |
+
+### 8.11.7 验证结果
+
+| 项 | 结果 |
+|----|------|
+| `flutter analyze` (全仓) | **0 errors**, 37 pre-existing infos (其他包, 无关) |
+| `flutter analyze` (本次改动文件) | **0 issues** |
+| `flutter test` (api 包) | **54/54 passed** (45 prior + 3 http_constant + 6 api_config) |
+| `flutter test` (root) | **88/88 passed** |
+| `pre-commit hooks` | **SUCCESS** (deps + l10n + analyze + test:affected) |
+| 公共 API 破坏 | `TokenRenewalInterceptor` 构造函数 (positional → named), 已在 commit message 标明 |
+| 新依赖 | 无 |
+
+### 8.11.8 ⚠️ 重要: git 历史仍含旧值
+
+源码已清理, 但 git 历史中仍然存在 `fn.jzfeng.com` / `192.168.1.181` / `ovsx-usr` 等.
+
+**release 前必须清理历史**, 否则 `git clone` + `git log -p` 仍能看到.
+
+#### 方案 A: BFG Repo-Cleaner (推荐)
+
+```bash
+# 1. 下载 BFG (单 jar 文件)
+brew install bfg  # 或 https://rtyley.github.io/bfg-repo-cleaner/
+
+# 2. 创建替换文件
+cat > /tmp/secret-replacements.txt <<'EOF'
+fn.jzfeng.com==>REDACTED-HOST
+47.92.151.39==>REDACTED-IP
+192.168.1.181==>REDACTED-INTERNAL-IP
+192.168.66.176==>REDACTED-INTERNAL-IP
+172.20.10.11==>REDACTED-INTERNAL-IP
+ovsx-usr==>REDACTED-BUCKET
+feedback2==>REDACTED-BUCKET
+EOF
+
+# 3. 克隆一个全新裸仓库 (必须!)
+git clone --bare https://github.com/Kayouyou/spine-flutter.git spine-flutter-clean
+cd spine-flutter-clean
+
+# 4. BFG 替换
+bfg --replace-text /tmp/secret-replacements.txt --no-blob-protection
+
+# 5. 清理 + 验证
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+# 6. 检查已无敏感值
+git log -p | grep -E "fn\.jzfeng|192\.168|ovsx-usr" | head -5
+# 应该 0 匹配
+
+# 7. 强推 (会重写历史, 通知所有协作者)
+git push --force --all
+git push --force --tags
+```
+
+#### 方案 B: git filter-branch (BFG 不可用时)
+
+```bash
+git filter-branch --force --index-filter \
+  "git ls-files | grep -E 'http_constant|aliyun_oss' | xargs -r sed -i \
+    -e 's|fn\.jzfeng\.com|REDACTED-HOST|g' \
+    -e 's|192\.168\.[0-9.]*|REDACTED-IP|g' \
+    -e 's|ovsx-usr|REDACTED-BUCKET|g'" \
+  --tag-name-filter cat -- --all
+
+git push --force --all
+```
+
+#### ⚠️ 注意事项
+
+- **强推前**通知所有 fork / 协作者重新克隆
+- **强推后**旧 commit hash 全部失效, 之前的 PR 链接会断
+- 保留备份: 操作前 `cp -r spine-flutter spine-flutter-backup`
+- 如果启用了 GitHub Secret Scanning, 旧值可能已被 GitHub 标记, 需要 `git filter-branch` 后让 GitHub 重新扫描
+
+### 8.11.9 一句话总结
+
+源码层面 L-1 已彻底解决: 8 层防御架构 + 6 个新测试 + 启动期 fail-fast, 142/142 测试通过, 0 analyze issue. **遗留工作: git 历史清理 (BFG), 在 release 前必须完成**.
