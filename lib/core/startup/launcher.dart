@@ -145,32 +145,33 @@ class AppLauncher {
 
   /// 校验所有必需的环境变量已在启动时注入.
   ///
-  /// 缺失时立即抛 [StateError], 防止:
-  /// 1. 静默 fallback 到错误的主机 (例如 dev 配置访问 prod)
-  /// 2. OSS 请求 bucket 为空导致 403
-  /// 3. AccessKey 为空导致签名失败但错误信息模糊
+  /// 行为 (8.15 修订):
+  /// - dev/staging: 仅触发 getter 警告 (占位符 / 空), 不抛错 — IDE 启动场景可跑
+  /// - prod: 立即抛 [StateError], fail-fast
+  ///
+  /// 各 getter 内部已分流 (isProd 路径必填, dev 路径警告).
+  /// 本方法**调用 getter** 触发校验, 然后汇总 prod 必填结果.
   ///
   /// 调用时机: Sentry 初始化之后, setupDependencies 之前.
   /// 这样错误能被 Sentry 捕获上报.
   static void _assertRequiredEnvFields() {
     final missing = <String>[];
 
-    // apiHost: 业务请求主机
-    if (EnvironmentConfig.apiHost.isEmpty) missing.add('API_HOST');
+    // dev/staging: getter 已警告占位符, 这里只需汇总 prod 必填.
+    // 调用 getter 触发警告打印 (仅一次, 见 EnvironmentConfig._warned)
+    final host = EnvironmentConfig.apiHost;
+    final accessKey = EnvironmentConfig.apiAccessKeyId;
+    final bucket = EnvironmentConfig.ossBucket;
+    final endpoint = EnvironmentConfig.ossEndpoint;
+    final ossKey = EnvironmentConfig.ossAccessKey;
 
-    // API_ACCESS_KEY_ID: 请求签名
-    // 注意: dev/staging 环境可为空 (签名关闭), 但 prod 必须非空
-    if (EnvironmentConfig.isProd && EnvironmentConfig.apiAccessKeyId.isEmpty) {
-      missing.add('API_ACCESS_KEY_ID (prod 必需)');
-    }
-
-    // OSS 三件套
-    if (EnvironmentConfig.ossBucket.isEmpty) missing.add('OSS_BUCKET');
-    if (EnvironmentConfig.ossEndpoint.isEmpty) missing.add('OSS_ENDPOINT');
-
-    // OSS_ACCESS_KEY 仅 prod 必需
-    if (EnvironmentConfig.isProd && EnvironmentConfig.ossAccessKey.isEmpty) {
-      missing.add('OSS_ACCESS_KEY (prod 必需)');
+    // isProd 已经在 getter 内抛 StateError, 这里再次汇总提示.
+    if (EnvironmentConfig.isProd) {
+      if (host.contains('placeholder')) missing.add('API_HOST');
+      if (accessKey.isEmpty) missing.add('API_ACCESS_KEY_ID');
+      if (bucket.contains('placeholder')) missing.add('OSS_BUCKET');
+      if (endpoint.isEmpty) missing.add('OSS_ENDPOINT');
+      if (ossKey.isEmpty) missing.add('OSS_ACCESS_KEY');
     }
 
     if (missing.isNotEmpty) {
