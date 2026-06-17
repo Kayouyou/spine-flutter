@@ -10,16 +10,42 @@
 /// ```
 library;
 
-import 'package:api/src/http/http_constant.dart';
+import '../http/api_config.dart';
 
 abstract final class ApiBase {
-  /// 基础 URL（引用 HttpConstant 的环境感知逻辑）
-  static String get baseUrl =>
-      'http${HttpConstant.IsRelease ? 's' : ''}://${HttpConstant.Http_Host}';
+  /// 基础 URL（依赖 ApiConfig 注入, 替代原 HttpConstant 硬编码）.
+  ///
+  /// 调用方必须通过 ApiConfig 注入 host, 否则抛 StateError.
+  /// 推荐: 使用 [baseUrlFrom] 显式传入.
+  static String get baseUrl => baseUrlFrom(_defaultConfig);
+
+  /// 从指定 ApiConfig 构造基础 URL.
+  static String baseUrlFrom(ApiConfig config) =>
+      'http${config.isRelease ? 's' : ''}://${config.host}';
 
   /// Token 续期路径（基础设施共享端点，不属于任何业务域）
   @Deprecated('请使用 ApiEndpoints.tokenRenewal 替代')
   static const String tokenRenewal = '/User/Token/Renewal';
+
+  // 内部 fallback: 调用方未注入 ApiConfig 时使用.
+  // 仅作 fail-fast 占位 — 不应真用, 一旦访问 host 会抛错.
+  static ApiConfig? _injectedConfig;
+  static ApiConfig get _defaultConfig =>
+      _injectedConfig ?? (_throwNoConfig());
+  static ApiConfig _throwNoConfig() {
+    throw StateError(
+      'ApiBase.baseUrl 未注入 ApiConfig. '
+      '请通过 createDio(apiConfig: ...) 或 ApiBase.baseUrlFrom(config) 传入. '
+      '详见 SCAFFOLD_REVIEW_RETROSPECTIVE.md L-1.',
+    );
+  }
+
+  /// 注入默认 ApiConfig (由 dio_factory.dart 启动期调用).
+  /// 避免每个调用方重复传 config.
+  // ignore: use_setters_to_change_properties
+  static void injectConfig(ApiConfig config) {
+    _injectedConfig = config;
+  }
 }
 
 // ─── 按后端路径前缀分组的业务域 ───

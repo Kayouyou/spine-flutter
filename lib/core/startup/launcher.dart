@@ -96,6 +96,12 @@ class AppLauncher {
     );
     StartupProfiler.mark('错误处理器 + Sentry reporter 绑定');
 
+    // ===== 阶段 0.7: 环境配置 fail-fast 校验 =====
+    // AGENTS.md R5: 必需 env 字段缺失时启动崩溃.
+    // 之前 HttpConstant.Http_Host / AliyunOSSConstant.BucketName 硬编码,
+    // 即使 .env 缺失也能跑 (掩盖错误). 现在改为 fail-fast.
+    _assertRequiredEnvFields();
+
     // 依赖注入配置（会跳过 IAppConfig 注册因上面已注册）
     setupDependencies(options: bootstrapOptions);
     StartupProfiler.mark('依赖注入完成');
@@ -126,5 +132,47 @@ class AppLauncher {
     // ===== 阶段 4: 启动 UI =====
     runApp(app);
     StartupProfiler.report();
+  }
+
+  /// 校验所有必需的环境变量已在启动时注入.
+  ///
+  /// 缺失时立即抛 [StateError], 防止:
+  /// 1. 静默 fallback 到错误的主机 (例如 dev 配置访问 prod)
+  /// 2. OSS 请求 bucket 为空导致 403
+  /// 3. AccessKey 为空导致签名失败但错误信息模糊
+  ///
+  /// 调用时机: Sentry 初始化之后, setupDependencies 之前.
+  /// 这样错误能被 Sentry 捕获上报.
+  static void _assertRequiredEnvFields() {
+    final missing = <String>[];
+
+    // apiHost: 业务请求主机
+    if (EnvironmentConfig.apiHost.isEmpty) missing.add('API_HOST');
+
+    // API_ACCESS_KEY_ID: 请求签名
+    // 注意: dev/staging 环境可为空 (签名关闭), 但 prod 必须非空
+    if (EnvironmentConfig.isProd && EnvironmentConfig.apiAccessKeyId.isEmpty) {
+      missing.add('API_ACCESS_KEY_ID (prod 必需)');
+    }
+
+    // OSS 三件套
+    if (EnvironmentConfig.ossBucket.isEmpty) missing.add('OSS_BUCKET');
+    if (EnvironmentConfig.ossEndpoint.isEmpty) missing.add('OSS_ENDPOINT');
+
+    // OSS_ACCESS_KEY 仅 prod 必需
+    if (EnvironmentConfig.isProd && EnvironmentConfig.ossAccessKey.isEmpty) {
+      missing.add('OSS_ACCESS_KEY (prod 必需)');
+    }
+
+    if (missing.isNotEmpty) {
+      throw StateError(
+        'EnvironmentConfig 启动校验失败, 缺失字段:\n'
+        '  ${missing.join(', ')}\n'
+        '请通过 --dart-define-from-file=env/.env.{dev,staging,prod} 注入, '
+        '或在 CI / 部署平台设置.\n'
+        '详见 AGENTS.md R5 + SCAFFOLD_REVIEW_RETROSPECTIVE.md L-1.',
+      );
+    }
+    StartupProfiler.mark('环境配置校验通过');
   }
 }

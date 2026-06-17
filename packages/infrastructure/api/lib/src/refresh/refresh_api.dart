@@ -21,17 +21,20 @@ Future<bool> shouldRenewToken(Response response) async {
 }
 
 /// 重试单个请求, 失败时重试一次
+///
+/// [apiConfig]: 用于重试时读取新 token. 可选, 不传则从原 header 保留.
 Future<Response?> retryRequestWithRetry(
   Dio dio,
   TokenStorage? tokenStorage,
-  RequestOptions requestOptions,
-) async {
+  RequestOptions requestOptions, {
+  ApiConfig? apiConfig,
+}) async {
   try {
-    return await _retryRequest(dio, tokenStorage, requestOptions);
+    return await _retryRequest(dio, tokenStorage, requestOptions, apiConfig: apiConfig);
   } catch (e) {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
-      return await _retryRequest(dio, tokenStorage, requestOptions);
+      return await _retryRequest(dio, tokenStorage, requestOptions, apiConfig: apiConfig);
     } catch (e) {
       return null;
     }
@@ -43,8 +46,9 @@ Future<Response?> retryRequestWithRetry(
 Future<Response> _retryRequest(
   Dio dio,
   TokenStorage? tokenStorage,
-  RequestOptions requestOptions,
-) async {
+  RequestOptions requestOptions, {
+  ApiConfig? apiConfig,
+}) async {
   final token = tokenStorage != null ? await tokenStorage.getToken() : null;
   final headers = requestOptions.headers;
   final token0 = headers['token'];
@@ -78,10 +82,14 @@ Future<Response> _retryRequest(
 }
 
 /// 执行 token 续期
+///
+/// [apiConfig]: 必填 (除非调用方显式接受默认 fallback). 注入后从 ApiConfig 读
+/// host / accessKeyId, 替代原 HttpConstant.Http_Host / AccessKeyId 硬编码.
 Future<bool> performTokenRenewal(
   Dio dio,
   TokenStorage? tokenStorage,
   DateTime? lastRenewalTime, {
+  required ApiConfig? apiConfig,
   AppLoggerInterface? logger,
 }) async {
   try {
@@ -94,12 +102,12 @@ Future<bool> performTokenRenewal(
 
     final username = tokenStorage != null ? await tokenStorage.getUserId() : null;
     final params = <String, dynamic>{
-      'Client': 10,
+      'Client': HttpConstant.Client,
       'UserFlag': username ?? '',
     };
     final headers = <String, dynamic>{
       'Content-type': 'application/json',
-      'accessKeyId': const String.fromEnvironment(''),
+      'accessKeyId': apiConfig?.accessKeyId ?? const String.fromEnvironment(''),
       'version': HttpConstant.Version,
       'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
       'signType': HttpConstant.SignType.toString(),
@@ -111,9 +119,16 @@ Future<bool> performTokenRenewal(
     if (token != null && token.isNotEmpty) {
       headers['token'] = token;
     }
-    final url = (HttpConstant.IsRelease
-            ? Uri.https(HttpConstant.Http_Host, ApiBase.tokenRenewal)
-            : Uri.http(HttpConstant.Http_Host, ApiBase.tokenRenewal))
+
+    // host 必须从 ApiConfig 注入. 缺省时 fail-fast 而非用硬编码.
+    if (apiConfig == null || apiConfig.host.isEmpty) {
+      logger?.error('performTokenRenewal: apiConfig 未注入或 host 为空, 跳过续期');
+      return false;
+    }
+
+    final url = (apiConfig.isRelease
+            ? Uri.https(apiConfig.host, ApiBase.tokenRenewal)
+            : Uri.http(apiConfig.host, ApiBase.tokenRenewal))
         .toString();
 
     final response = await _executeRenewalRequest(
@@ -185,14 +200,20 @@ Future<Response> _executeRenewalRequest({
 }
 
 /// 配置代理
+///
+/// Proxy_Enable / Proxy_Port 从 HttpConstant (技术常量) 读取.
+/// proxyIp 从 dart-define PROXY_IP 读取 (开发者本地配置, 不进脚手架默认值).
+/// 三者都满足才启用代理.
 void _configureProxy(Dio dio) {
   if (!HttpConstant.Proxy_Enable) return;
+  final proxyIp = HttpConstant.proxyIp;
+  if (proxyIp.isEmpty) return;
 
   dio.httpClientAdapter = IOHttpClientAdapter(
     createHttpClient: () {
       final client = HttpClient();
       client.findProxy = (uri) {
-        return 'PROXY ${HttpConstant.proxyIp}:${HttpConstant.Proxy_Port}';
+        return 'PROXY $proxyIp:${HttpConstant.Proxy_Port}';
       };
       client.badCertificateCallback = (cert, host, port) => true;
       return client;

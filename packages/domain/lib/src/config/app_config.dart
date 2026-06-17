@@ -29,4 +29,26 @@ abstract class IAppConfig {
 
   /// App Store ID（空字符串表示不启用更新检查）
   String get appStoreId;
+
+  // ─── 新增: HTTP 主机与凭证 (从 .env 注入, 替代原 HttpConstant 硬编码) ───
+
+  /// HTTP 主机（不含协议）.
+  /// 用于续期/业务请求构造 URL. 启动期已校验非空.
+  String get apiHost;
+
+  /// API 访问密钥 (用于请求签名).
+  /// 启动期已校验非空.
+  String get apiAccessKeyId;
+
+  /// OSS Bucket 名.
+  /// 启动期已校验非空.
+  String get ossBucket;
+
+  /// OSS Endpoint URL.
+  /// 启动期已校验非空.
+  String get ossEndpoint;
+
+  /// OSS 访问密钥.
+  /// 启动期已校验非空.
+  String get ossAccessKey;
 }

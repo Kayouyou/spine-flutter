@@ -54,7 +54,7 @@ void main() {
     test('构造函数可接收TokenStorage', () {
       final dio = Dio(BaseOptions(baseUrl: 'https://test.com'));
       final storage = _TestTokenStorage();
-      final interceptor = TokenRenewalInterceptor(dio, storage);
+      final interceptor = TokenRenewalInterceptor(dio, tokenStorage: storage);
       expect(interceptor, isNotNull);
     });
 

@@ -6,13 +6,14 @@ library;
 export 'src/dio_factory.dart';
 export 'src/http/http_event_bus.dart';
 export 'src/http/http_constant.dart';
+export 'src/http/api_config.dart';
 export 'src/http/token_supplier.dart';
 // Phase 2新增：错误处理
 export 'src/error/dio_mapper.dart';
 // Phase 3.1新增：请求取消管理
 export 'src/cancel/cancel_manager.dart';
 export 'src/cancel/auto_cancel_interceptor.dart';
-export 'src/dio/renewal_token_intercaptor.dart';  // Phase x: Token 续期拦截器
+export 'src/dio/renewal_token_interceptor.dart';  // Phase x: Token 续期拦截器
 export 'src/dio/error_interceptor.dart';  // Phase x: Dio 错误拦截器(上报到 AppErrorHandler)
 // Phase 3d新增：日志接口
 export 'src/http/app_logger.dart';

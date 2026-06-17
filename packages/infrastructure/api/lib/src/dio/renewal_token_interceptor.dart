@@ -16,13 +16,19 @@ import '../../api.dart';
 ///
 /// HTTP 细节委托给 refresh_api.dart，队列管理委托给 refresh_queue.dart
 class TokenRenewalInterceptor extends Interceptor {
-  TokenRenewalInterceptor(this._dio, [TokenStorage? tokenStorage]) {
+  TokenRenewalInterceptor(
+    this._dio, {
+    TokenStorage? tokenStorage,
+    ApiConfig? apiConfig,
+  }) {
     _tokenStorage = tokenStorage;
+    _apiConfig = apiConfig;
     _renewalLock = Lock();
   }
 
   final Dio _dio;
   TokenStorage? _tokenStorage;
+  ApiConfig? _apiConfig;
   late final Lock _renewalLock;
 
   /// 日志输出实例
@@ -34,6 +40,12 @@ class TokenRenewalInterceptor extends Interceptor {
   /// 设置TokenStorage（支持延迟注入）
   set tokenStorage(TokenStorage storage) {
     _tokenStorage = storage;
+  }
+
+  /// 设置ApiConfig（支持延迟注入）.
+  /// 注入后, 续期 URL 将从 ApiConfig.host 读取, 不再依赖 HttpConstant.
+  set apiConfig(ApiConfig config) {
+    _apiConfig = config;
   }
 
   final RefreshQueue _queue = RefreshQueue();
@@ -110,6 +122,7 @@ class TokenRenewalInterceptor extends Interceptor {
           _dio,
           _tokenStorage,
           _lastRenewalTime,
+          apiConfig: _apiConfig,
           logger: _logger,
         );
 
@@ -134,7 +147,7 @@ class TokenRenewalInterceptor extends Interceptor {
   Future<void> _drainRetry() async {
     await _queue.drain<void>(
       (p) async {
-        final response = await retryRequestWithRetry(_dio, _tokenStorage, p.requestOptions);
+        final response = await retryRequestWithRetry(_dio, _tokenStorage, p.requestOptions, apiConfig: _apiConfig);
         if (response != null) {
           p.completer.complete(response);
         } else {

@@ -29,4 +29,21 @@ class EnvAppConfig implements IAppConfig {
 
   @override
   String get appStoreId => EnvironmentConfig.appStoreId;
+
+  // 新增 HTTP 主机 / 凭证 / OSS 配置 — 从 EnvironmentConfig 读取
+  // (启动期已 assert 非空, 此处无需再校验)
+  @override
+  String get apiHost => EnvironmentConfig.apiHost;
+
+  @override
+  String get apiAccessKeyId => EnvironmentConfig.apiAccessKeyId;
+
+  @override
+  String get ossBucket => EnvironmentConfig.ossBucket;
+
+  @override
+  String get ossEndpoint => EnvironmentConfig.ossEndpoint;
+
+  @override
+  String get ossAccessKey => EnvironmentConfig.ossAccessKey;
 }

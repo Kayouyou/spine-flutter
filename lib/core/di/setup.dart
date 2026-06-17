@@ -91,6 +91,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
     logger: sl<AppLogger>(),
     autoCancelInterceptor: autoCancelInterceptor,
     tokenStorage: sl<TokenStorage>(),
+    apiConfig: EnvApiConfig(config),  // 新增: 注入 API/OSS 配置 (替代 HttpConstant 硬编码)
     connectTimeout: Duration(seconds: config.networkTimeout),
     receiveTimeout: Duration(seconds: config.networkTimeout),
   );

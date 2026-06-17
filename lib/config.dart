@@ -23,6 +23,31 @@ class EnvironmentConfig {
     defaultValue: 'https://dev-api.example.com',
   );
 
+  /// HTTP 主机（不含协议），用于续期/业务请求 URL 构造.
+  /// 替代原 HttpConstant.Http_Host 硬编码值.
+  /// 必须在 .env.* 配置, 否则启动抛 StateError (见 launcher.dart).
+  static const _apiHost = String.fromEnvironment('API_HOST');
+
+  /// API 访问密钥 (用于请求签名).
+  /// 替代原 HttpConstant.AccessKeyId 硬编码值.
+  /// 必须在 .env.* 配置, 否则启动抛 StateError.
+  static const _apiAccessKeyId = String.fromEnvironment('API_ACCESS_KEY_ID');
+
+  /// OSS Bucket 名.
+  /// 替代原 AliyunOSSConstant.BucketName 硬编码值.
+  /// 必须在 .env.* 配置, 否则启动抛 StateError.
+  static const _ossBucket = String.fromEnvironment('OSS_BUCKET');
+
+  /// OSS Endpoint.
+  /// 替代原 AliyunOSSConstant.Endpoint 硬编码值.
+  /// 必须在 .env.* 配置, 否则启动抛 StateError.
+  static const _ossEndpoint = String.fromEnvironment('OSS_ENDPOINT');
+
+  /// OSS 访问密钥.
+  /// 替代原 AliyunOSSConstant.AccessKey.
+  /// 必须在 .env.* 配置, 否则启动抛 StateError.
+  static const _ossAccessKey = String.fromEnvironment('OSS_ACCESS_KEY');
+
   /// Sentry DSN（从环境文件读取，生产环境需要配置）
   static const sentryDsn = String.fromEnvironment('SENTRY_DSN');
 
@@ -55,6 +80,39 @@ class EnvironmentConfig {
 
   /// API 基础地址（直接从环境变量读取）
   static String get apiBaseUrl => _apiBaseUrl;
+
+  /// HTTP 主机（不含协议）.
+  /// 必须非空, 由 launcher 启动期 assert 验证.
+  static String get apiHost => _require(_apiHost, 'API_HOST');
+
+  /// API 访问密钥.
+  /// 必须非空, 由 launcher 启动期 assert 验证.
+  static String get apiAccessKeyId => _require(_apiAccessKeyId, 'API_ACCESS_KEY_ID');
+
+  /// OSS Bucket.
+  /// 必须非空, 由 launcher 启动期 assert 验证.
+  static String get ossBucket => _require(_ossBucket, 'OSS_BUCKET');
+
+  /// OSS Endpoint.
+  /// 必须非空, 由 launcher 启动期 assert 验证.
+  static String get ossEndpoint => _require(_ossEndpoint, 'OSS_ENDPOINT');
+
+  /// OSS 访问密钥.
+  /// 必须非空, 由 launcher 启动期 assert 验证.
+  static String get ossAccessKey => _require(_ossAccessKey, 'OSS_ACCESS_KEY');
+
+  /// 校验环境变量非空, 为空则抛 StateError.
+  /// 用于替代原 HttpConstant 的硬编码回退 (fn.jzfeng.com 等).
+  static String _require(String value, String name) {
+    if (value.isEmpty) {
+      throw StateError(
+        'EnvironmentConfig: 必需字段 $name 未配置. '
+        '请通过 --dart-define-from-file=env/.env.{dev,staging,prod} 注入, '
+        '或在 CI / 部署平台设置. 详见 AGENTS.md R5.',
+      );
+    }
+    return value;
+  }
 
   /// 是否启用调试日志
   static bool get enableDebugLog => !isProd;

@@ -5,7 +5,9 @@ import 'package:key_value_storage/key_value_storage.dart';
 import 'cancel/auto_cancel_interceptor.dart';
 import 'dio/error_interceptor.dart';
 import 'dio/latency_monitor_interceptor.dart';
-import 'dio/renewal_token_intercaptor.dart';
+import 'dio/renewal_token_interceptor.dart';
+import 'endpoints/api_endpoints.dart';
+import 'http/api_config.dart';
 import 'http/app_logger.dart';
 
 /// 创建预配置的 Dio 实例
@@ -46,10 +48,16 @@ Dio createDio({
   AppLoggerInterface? logger,
   AutoCancelInterceptor? autoCancelInterceptor,
   TokenStorage? tokenStorage,
+  ApiConfig? apiConfig,
   Duration? connectTimeout,
   Duration? receiveTimeout,
   Alice? alice,
 }) {
+  // 注入 ApiConfig 到 ApiBase (供 Retrofit / 业务代码读 baseUrl)
+  if (apiConfig != null) {
+    ApiBase.injectConfig(apiConfig);
+  }
+
   final dio = Dio(BaseOptions(
     connectTimeout: connectTimeout ?? const Duration(seconds: 10),
     receiveTimeout: receiveTimeout ?? const Duration(seconds: 10),
@@ -62,7 +70,12 @@ Dio createDio({
   }
 
   // [1] Token 续期 — 处理 code=1000102，日志走注入的 AppLogger
-  final renewalInterceptor = TokenRenewalInterceptor(dio, tokenStorage);
+  // 同时传入 apiConfig, 续期 URL 从 ApiConfig.host 读取 (替代原硬编码)
+  final renewalInterceptor = TokenRenewalInterceptor(
+    dio,
+    tokenStorage: tokenStorage,
+    apiConfig: apiConfig,
+  );
   if (logger != null) {
     renewalInterceptor.logger = logger;
   }
