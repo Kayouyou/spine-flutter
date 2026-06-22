@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: 检出代码 (含完整 history, 拿 tag)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -127,7 +127,7 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 取 tag 名
         id: tag

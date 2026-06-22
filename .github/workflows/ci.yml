@@ -14,7 +14,7 @@ jobs:
     name: 静态分析
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.38.10'
@@ -35,7 +35,7 @@ jobs:
     name: 单元测试与 Bloc 测试
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.38.10'
@@ -48,7 +48,7 @@ jobs:
     name: 调试构建
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.38.10'
@@ -60,7 +60,7 @@ jobs:
     name: iOS 调试构建
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.38.10'
