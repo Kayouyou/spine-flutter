@@ -371,7 +371,36 @@ make debug-simulator
 ./ohos_utils/ohos_build.sh debug --env=dev
 ```
 
-产物：`ohos/entry/build/default/outputs/default/entry-default-unsigned.hap`
+产物：`ohos/entry/build/default/outputs/default/entry-default-unsigned.hap`（配置 DevEco 调试签名后为 `entry-default-signed.hap`）
+
+### 通过 make 构建（推荐）
+
+`makefile` 已封装全部 OHOS 与多平台构建目标，无需直接记脚本参数：
+
+```bash
+# OHOS：修复 → 构建(全量) → 安装到设备
+make ohos-deploy OHOS_ENV=dev          # OHOS_ENV: dev / staging / prod
+
+# OHOS：仅构建 debug / release / 快速打包
+make ohos-build                        # 默认 env=dev，全量
+make ohos-build-release OHOS_ENV=prod
+make ohos-build-fast OHOS_ENV=dev      # 仅改 ArkTS 时
+
+# OHOS：运行期调试
+make ohos-devices                      # 列出连接设备
+make ohos-run OHOS_ENV=dev             # 部署 + 抓 hilog 日志 (Ctrl+C 停止)
+make ohos-log-filtered                 # 仅 ERROR/WARN + Flutter 关键字
+
+# 多平台统一入口
+make build-android BUILD_ENV=dev       # APK (dev / staging / prod)
+make build-ios BUILD_ENV=dev           # iOS (无签名)
+make build-web BUILD_ENV=dev           # Web
+make build-ohos BUILD_ENV=dev          # 等价 make ohos-build OHOS_ENV=dev
+```
+
+> make 内部已 `export FLUTTER_SUPPRESS_ANALYTICS=true` 并直接调用 pinned SDK 的
+> `flutter` 二进制，避免坏代理下 `fvm flutter` 卡死。
+
 
 ### 调试签名（必需，一次性）
 `flutter build hap` 默认产出 **未签名** HAP。要装真机需在 DevEco Studio 中：
