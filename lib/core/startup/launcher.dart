@@ -2,6 +2,7 @@
 
 // Dart imports:
 import 'dart:async';
+import 'dart:io';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
@@ -72,7 +73,12 @@ class AppLauncher {
     // 检测到已注册会跳过, 避免冲突.
     sl.registerSingleton<IAppConfig>(EnvAppConfig());
     final sentryDsn = sl<IAppConfig>().sentryDsn;
-    if (sentryDsn.isNotEmpty) {
+    // OHOS 平台无 Sentry 原生 SDK（CPF 无 ohos 分支），若在此初始化会在
+    // MethodChannel 注册无原生 handler 的 binary message listener，导致
+    // 运行时 "undefined is not callable" 告警。故 OHOS 上跳过原生初始化，
+    // 仅使用 Dart 层 ConsoleReporter（见下方 setReporter 守卫）。
+    final bool isOhos = Platform.operatingSystem == 'ohos';
+    if (sentryDsn.isNotEmpty && !isOhos) {
       await SentryFlutter.init(
         (options) {
           options.dsn = sentryDsn;
@@ -99,8 +105,10 @@ class AppLauncher {
         // 自身, 不通过 sl.
       },
     );
+    // OHOS 上 Sentry 原生未初始化，统一用 ConsoleReporter，避免
+    // SentryReporter 调用无原生 handler 的 captureException。
     AppErrorHandler.instance.setReporter(
-      kDebugMode ? ConsoleReporter() : SentryReporter(),
+      (kDebugMode || isOhos) ? ConsoleReporter() : SentryReporter(),
     );
     StartupProfiler.mark('错误处理器 + Sentry reporter 绑定');
 

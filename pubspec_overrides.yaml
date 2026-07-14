@@ -32,3 +32,51 @@ dependency_overrides:
   feature_settings:
     path: packages/features/feature_settings
   test_api: 0.7.10
+  # ===== OHOS 适配：CPF-Flutter 带 ohos 原生实现的插件分支（参照 ovs_upgrade_335）=====
+  # 注意：melos bootstrap 会从 pubspec.yaml 的 dependency_overrides 重新生成本文件，
+  # 因此 pubspec.yaml 中也保留了同样的 git 覆盖，二者保持一致。
+  path_provider:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_packages.git
+      path: packages/path_provider/path_provider
+      ref: br_path_provider-v2.1.5_ohos
+  shared_preferences:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_packages.git
+      path: packages/shared_preferences/shared_preferences
+      ref: br_shared_preferences-v2.5.4_ohos
+  url_launcher:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_packages.git
+      path: packages/url_launcher/url_launcher
+      ref: br_url_launcher-v6.3.2_ohos
+  connectivity_plus:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_plus_plugins.git
+      path: packages/connectivity_plus/connectivity_plus
+      ref: br_connectivity_plus-v6.1.0_ohos
+  device_info_plus:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_plus_plugins.git
+      path: packages/device_info_plus/device_info_plus
+      ref: br_device_info_plus_v11.4.0_ohos
+  package_info_plus:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_plus_plugins.git
+      path: packages/package_info_plus/package_info_plus
+      ref: br_package_info_plus-v8.1.0_ohos
+  sensors_plus:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_plus_plugins.git
+      path: packages/sensors_plus/sensors_plus
+      ref: br_sensors_plus-v6.1.1_ohos
+  share_plus:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_plus_plugins.git
+      path: packages/share_plus/share_plus
+      ref: br_share_plus-v10.1.1_ohos
+  permission_handler:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_permission_handler.git
+      path: permission_handler
+      ref: br_v12.0.1_ohos
