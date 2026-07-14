@@ -56,8 +56,8 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 | 调试 | alice (HTTP) | — |
 | 包管理 | melos | latest |
 | 砖块 | mason | latest |
-| Flutter | 3.38.10 (FVM 锁 stable channel) | — |
-| Dart | 3.x | — |
+| Flutter | 3.35.8-ohos-1.0.1 (FVM 锁 OHOS fork, 用于 OpenHarmony 适配) | — |
+| Dart | 3.9.2 | — |
 
 **升级前必读**: `docs/runtime-infrastructure.md` 和 `openspec/changes/` 里同主题变更。
 

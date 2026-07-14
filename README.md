@@ -350,6 +350,42 @@ make debug-simulator
 
 ---
 
+## OpenHarmony (OHOS) 构建
+
+项目已适配 OpenHarmony，基于 Flutter `3.35.8-ohos-1.0.1`（FVM 锁版本）。
+
+### 前置条件
+- DevEco Studio（提供 SDK 与**调试签名**）
+- 配置 `HOS_SDK_HOME` 指向 OpenHarmony SDK 的 `default/openharmony` 子目录
+- `ohpm`、`hvigorw`（随 DevEco 安装）
+- 本机 FVM 已下载 `3.35.8-ohos-1.0.1`
+
+### 构建 HAP
+使用仓库内置脚本（自动把 `env/.env.*` 的 `KEY=VALUE` 展开为 `--dart-define`，规避 OHOS 不支持 `--dart-define-from-file` 的坑）：
+
+```bash
+# 完整模式：重编 kernel + 注入 dart-define + hvigorw 打包
+./ohos_utils/ohos_build.sh debug --env=dev --full
+
+# 快速模式（仅改 ArkTS，已至少构建过一次 --full）：
+./ohos_utils/ohos_build.sh debug --env=dev
+```
+
+产物：`ohos/entry/build/default/outputs/default/entry-default-unsigned.hap`
+
+### 调试签名（必需，一次性）
+`flutter build hap` 默认产出 **未签名** HAP。要装真机需在 DevEco Studio 中：
+`File → Project Structure → Signing Configs → 勾选 Automatically generate signature`，
+该操作会在 `~/.ohos/config/` 生成绑定本工程 `bundleName` 的调试证书并写回
+`ohos/build-profile.json5` 的 `signingConfigs`。之后重跑构建脚本即可产出 `entry-default-signed.hap`。
+
+### 已知坑
+- `flutter build hap` 会重生成 `GeneratedPluginRegistrant.ets`（已 gitignore），`ohos_fix.sh` 兜底清理 stale lock。
+- OHOS 不支持 `--dart-define-from-file`，env 注入统一走 `ohos_build.sh` 展开。
+- `upgrader` 在 OHOS 上已通过 `shouldWrapUpgrade` 守卫跳过（无应用商店）。
+
+---
+
 ## 分层决策树
 
 ### Q1: 这个模型放哪里？
