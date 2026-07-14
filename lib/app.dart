@@ -1,3 +1,6 @@
+// Dart imports:
+import 'dart:io';
+
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +26,7 @@ import 'core/widgets/network/network_banner.dart';
 import 'core/widgets/request_scope.dart';
 import 'core/routing/go_router_refresh_stream.dart';
 import 'core/widgets/upgrade/upgrade_wrapper.dart';
+import 'core/services/upgrade_guard.dart';
 import 'src/theme/app_theme.dart';
 
 /// 主应用Widget
@@ -171,7 +175,10 @@ class _SpineFlutterState extends State<SpineFlutter> {
           if (options.enableDebugTools) {
             app = DebugToolsWrapper(child: app);
           }
-          if (options.enableUpgradePrompt) {
+          if (shouldWrapUpgrade(
+            enableUpgradePrompt: options.enableUpgradePrompt,
+            isOhos: Platform.operatingSystem == 'ohos',
+          )) {
             app = UpgradeWrapper(child: app);
           }
           return app;
