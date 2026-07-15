@@ -17,11 +17,9 @@ class EnvironmentConfig {
   /// 当前环境名称（从环境文件读取）
   static const _envName = String.fromEnvironment('ENV', defaultValue: 'dev');
 
-  /// API 基础地址（从环境文件读取）
-  static const _apiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'https://dev-api.example.com',
-  );
+  /// API 基础地址 — 派生自 [apiHost] (权威源), 协议固定 https.
+  /// 不再从独立 dart-define 读取, 避免与 [apiHost] 双源不同步.
+  /// (方案 A: 消除 API_BASE_URL 冗余)
 
   /// HTTP 主机（不含协议），用于续期/业务请求 URL 构造.
   /// 替代原 HttpConstant.Http_Host 硬编码值.
@@ -89,8 +87,9 @@ class EnvironmentConfig {
   /// 是否是生产环境
   static bool get isProd => current == AppEnvironment.prod;
 
-  /// API 基础地址（直接从环境变量读取）
-  static String get apiBaseUrl => _apiBaseUrl;
+  /// API 基础地址 — 由 [apiHost] 派生 (https 协议).
+  /// 复用 [apiHost] 的占位符/prod fail-fast 逻辑, 保证 baseUrl 与 host 一致.
+  static String get apiBaseUrl => 'https://$apiHost';
 
   /// HTTP 主机（不含协议）.
   /// dev/staging: 启动期日志警告, 仍允许运行 (使用 placeholder).

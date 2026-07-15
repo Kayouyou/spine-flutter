@@ -106,8 +106,9 @@ EnvApiConfig.host ← IAppConfig.apiHost   →  Dio baseUrl（setup.dart）
 
 | 角色 | 文件 | 说明 |
 |------|------|------|
-| 真实值来源 | `env/.env.{dev,staging,prod}` | 三个环境文件，缺字段启动崩溃(R5) |
+| 真实值来源 | `env/.env.{dev,staging,prod}` | 三个环境文件，缺字段启动崩溃(R5)。`API_HOST` 为 API 根地址**权威源** |
 | 编译期读取(唯一) | `lib/config.dart` → `EnvironmentConfig` | `String.fromEnvironment`；`prod` 对 `API_HOST/API_ACCESS_KEY_ID/OSS_*` fail-fast |
+| 派生 | `EnvironmentConfig.apiBaseUrl` | = `https://$apiHost`（派生，非独立 dart-define；已消除 `API_BASE_URL` 冗余） |
 | 接口契约(干净) | `packages/domain/lib/src/config/app_config.dart` → `IAppConfig` | 不含 dart-define，可单测 |
 | 桥接实现(唯一 reader) | `lib/core/config/app_config.dart` → `EnvAppConfig` | 把 `EnvironmentConfig` 适配成 `IAppConfig` |
 | 网络落地 | `packages/infrastructure/api/.../api_config.dart` → `EnvApiConfig` | `host ← IAppConfig.apiHost`，Dio baseUrl 走 `IAppConfig.apiBaseUrl` |
@@ -116,7 +117,7 @@ EnvApiConfig.host ← IAppConfig.apiHost   →  Dio baseUrl（setup.dart）
 1. `lib/core/config/app_config.dart`（`EnvAppConfig`）—— 设计意图中的唯一 reader。
 2. `lib/core/startup/launcher.dart` —— **启动期校验环境变量**，此时 DI 尚未装配(`setupDependencies` 在它之后)，无法走 `sl<IAppConfig>()`，故直接读 `EnvironmentConfig`。这是合理例外，非违规。
 
-**⚠️ 已知冗余（建议后续 tidy-up，非 bug）：** `API_BASE_URL` 与 `API_HOST` 描述的是同一个 API 根地址（前者带协议，后者不带）。目前 `apiBaseUrl` 喂给 Dio、`apiHost` 喂给 `EnvApiConfig`。建议把 `API_HOST` 视为权威源，未来让 `apiBaseUrl` 派生为 `https://$apiHost`，删除 `API_BASE_URL` 的重复定义（改动 env 契约，需谨慎，本次未动）。
+**单点定义（已消除冗余）：** `API_HOST` 是 API 根地址的**唯一权威源**；`apiBaseUrl` 由 `https://$apiHost` 派生，不再有独立的 `API_BASE_URL` dart-define。改域名只需改 `env/.env.*` 里的 `API_HOST` 一处。
 
 ---
 

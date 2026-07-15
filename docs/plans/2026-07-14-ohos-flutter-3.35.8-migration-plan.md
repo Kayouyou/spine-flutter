@@ -173,11 +173,10 @@ git commit -m "feat(ohos): scaffold OHOS platform via flutter create"
 - Create: `.env.ohos`
 
 **Step 1: 从 `env/.env.dev` 对齐字段写入**
-参考骨架 `EnvironmentConfig` 所需字段（`lib/config.dart`）：`ENV`、`API_BASE_URL`、`API_HOST`、`API_ACCESS_KEY_ID`、`OSS_BUCKET`、`OSS_ENDPOINT`、`OSS_ACCESS_KEY`、`SENTRY_DSN`、`APP_STORE_ID`、`APP_VERSION`、`BUILD_NUMBER`、`ENABLE_AUTH_GUARD`。
+参考骨架 `EnvironmentConfig` 所需字段（`lib/config.dart`）：`ENV`、`API_HOST`（API 根地址权威源，`apiBaseUrl` 由其派生）、`API_ACCESS_KEY_ID`、`OSS_BUCKET`、`OSS_ENDPOINT`、`OSS_ACCESS_KEY`、`SENTRY_DSN`、`APP_STORE_ID`、`APP_VERSION`、`BUILD_NUMBER`、`ENABLE_AUTH_GUARD`。
 ```bash
 cat > .env.ohos <<'EOF'
 ENV=dev
-API_BASE_URL=https://dev-api.example.com
 API_HOST=dev-host.placeholder.invalid
 API_ACCESS_KEY_ID=
 OSS_BUCKET=dev-bucket.placeholder.invalid

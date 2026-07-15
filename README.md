@@ -561,7 +561,7 @@ make prod          # 生产环境（env/.env.prod）
 | 变量 | 说明 |
 |------|------|
 | ENV | 环境名称 |
-| API_BASE_URL | API 地址 |
+| API_HOST | API 根地址（不含协议，权威源；`apiBaseUrl` 由其派生 `https://$API_HOST`） |
 | SENTRY_DSN | Sentry DSN（空=不启用） |
 | APP_STORE_ID | App Store ID（空=不启用更新检查） |
 
