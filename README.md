@@ -412,6 +412,8 @@ make build-ohos BUILD_ENV=dev          # 等价 make ohos-build OHOS_ENV=dev
 - `flutter build hap` 会重生成 `GeneratedPluginRegistrant.ets`（已 gitignore），`ohos_fix.sh` 兜底清理 stale lock。
 - OHOS 不支持 `--dart-define-from-file`，env 注入统一走 `ohos_build.sh` 展开。
 - `upgrader` 在 OHOS 上已通过 `shouldWrapUpgrade` 守卫跳过（无应用商店）。
+- **插件依赖覆盖必须写进 `pubspec_overrides.yaml`**：本项目用 Melos，`pubspec_overrides.yaml` 会接管 `dependency_overrides`，写在 `pubspec.yaml` 里的同名段会被忽略（`flutter pub get` 会打印 `routing ... (overridden in ./pubspec_overrides.yaml)`）。当前已用 CPF-Flutter 的 ohos 分支覆盖 9 个插件（path_provider / shared_preferences / url_launcher / connectivity_plus / device_info_plus / package_info_plus / sensors_plus / share_plus / permission_handler）。AI 视角细节见 `AGENTS.md` 第 2.1 / 13.2 节。
+- **`sentry_flutter` 在 OHOS 上被守卫跳过初始化**：CPF-Flutter 无 sentry 的 ohos 分支，OHOS 上无原生 SDK 可初始化；`lib/core/startup/launcher.dart` 用 `Platform.operatingSystem == 'ohos'` 守卫跳过 `SentryFlutter.init()`，错误上报改走 `ConsoleReporter`。细节见 `AGENTS.md` 第 9.3 节。
 
 ---
 

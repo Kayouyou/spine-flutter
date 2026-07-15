@@ -51,13 +51,21 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 | DI | get_it + injectable | 7.x / 2.x |
 | 网络 | dio + retrofit | 5.x / 4.x |
 | 本地存储 | hive + hive_flutter | 2.x |
-| 错误上报 | sentry_flutter | 7.x |
-| 版本升级 | upgrader | 6.x |
+| 错误上报 | sentry_flutter | 8.14.2 |
+| 版本升级 | upgrader | 10.3.0 |
 | 调试 | alice (HTTP) | — |
 | 包管理 | melos | latest |
 | 砖块 | mason | latest |
-| Flutter | 3.35.8-ohos-1.0.1 (FVM 锁 OHOS fork, 用于 OpenHarmony 适配) | — |
+| Flutter | 3.35.8-ohos-1.0.1 (FVM 锁 **OHOS fork**, 用于 OpenHarmony 适配) | — |
 | Dart | 3.9.2 | — |
+
+### 2.1 OpenHarmony (OHOS) 适配要点
+
+- **Flutter 是 OHOS fork**：`3.35.8-ohos-1.0.1`（由 `.fvmrc` 锁定，与参考项目 `ovs_upgrade_335` 版本**完全一致**）。本骨架在 OHOS 上能跑，依赖 CPF-Flutter 提供带 ohos 原生实现的插件分支。
+- **插件覆盖必须写进 `pubspec_overrides.yaml`（不是 `pubspec.yaml`）**：本项目用 Melos 管理 monorepo，`pubspec_overrides.yaml` 由 melos 自动生成并**接管** `dependency_overrides`。写在 `pubspec.yaml` 的 `dependency_overrides` 会被忽略。`flutter pub get` 时会打印 `routing ... (overridden in ./pubspec_overrides.yaml)`。当前已用 CPF 分支覆盖 9 个插件：`path_provider`、`shared_preferences`、`url_launcher`、`connectivity_plus`、`device_info_plus`、`package_info_plus`、`sensors_plus`、`share_plus`、`permission_handler`（具体分支与版本见 `pubspec_overrides.yaml` 与 `docs/ohos_plugin_compatibility_audit.md`）。
+- **平台检测约定**：本 fork **没有** `Platform.isOHOS`，统一用 `Platform.operatingSystem == 'ohos'` 判断（禁止写 `Platform.isOHOS`）。
+- **OHOS 专用守卫**：`upgrader` 用 `shouldWrapUpgrade()` 跳过（OHOS 无应用商店）；`sentry_flutter` 在 `lib/core/startup/launcher.dart` 用同样的 `isOhos` 守卫跳过 `SentryFlutter.init()`、改用 `ConsoleReporter`（CPF 无 sentry ohos 分支）。
+- **构建走 make**：`make ohos-build` / `make ohos-deploy` / `make ohos-run` 已封装（内部 `FLUTTER_SUPPRESS_ANALYTICS=true` + 直接调 pinned SDK 二进制，规避坏代理下 `fvm flutter` 卡死）。详见 `README.md` 的 OpenHarmony 构建段与本文第 13 节。
 
 **升级前必读**: `docs/runtime-infrastructure.md` 和 `openspec/changes/` 里同主题变更。
 
@@ -184,6 +192,20 @@ flutter run --dart-define=ENV=prod
 - Alice (HTTP 拦截面板): `enableDebugTools: true`
 - 数据预拉 (StartupSyncable): `enableDataSync: true`
 - 弹升级提示 (Upgrader): `enableUpgradePrompt: true`
+
+### 4.5 OpenHarmony (OHOS) 构建
+
+| 需求 | 命令 |
+|---|---|
+| 全量构建 HAP (env=dev) | `make ohos-build` |
+| 全量构建 + 装真机 | `make ohos-deploy OHOS_ENV=dev` |
+| 仅改 ArkTS 时快速打包 | `make ohos-build-fast OHOS_ENV=dev` |
+| release 构建 | `make ohos-build-release OHOS_ENV=prod` |
+| 列设备 / 部署 + 抓日志 | `make ohos-devices` / `make ohos-run OHOS_ENV=dev` |
+| 多平台统一入口 | `make build-android` / `make build-ios` / `make build-web` / `make build-ohos` |
+
+⚠️ 首次构建需在 DevEco Studio 勾选 `Automatically generate signature` 生成调试证书（绑定本工程 `bundleName`）。底层命令与已知坑见 `README.md` OpenHarmony 段和本文第 13 节。
+⚠️ 跑 Flutter 命令请用 make 或裸 `.fvm/flutter_sdk/bin/flutter`，**不要**用 `fvm flutter`（坏代理下会卡死）。
 
 ---
 
@@ -493,6 +515,7 @@ try {
 - `env/.env.prod` 的 `SENTRY_DSN=` 必须填真实 DSN
 - `release` 自动从 `pubspec.yaml` 的 version 读
 - `environment` 从 `ENV` 读 (dev/staging/prod)
+- ⚠️ **OHOS 例外**：`lib/core/startup/launcher.dart` 用 `Platform.operatingSystem == 'ohos'` 守卫跳过 `SentryFlutter.init()`，错误上报改走 `ConsoleReporter`。原因：CPF-Flutter 没有 sentry 的 ohos 分支，OHOS 上无原生 SDK 可初始化。不要在 OHOS 上强行初始化 Sentry。
 
 ---
 
@@ -501,7 +524,7 @@ try {
 | 工具 | 干什么 | 开关 |
 |---|---|---|
 | Sentry | 崩溃 + 性能 | `bootstrap_options.enable_data_sync=false` 不影响, Sentry 永远开 |
-| Upgrader | 弹升级提示 | `bootstrap_options.enable_upgrade_prompt=true` |
+| Upgrader | 弹升级提示 (OHOS 上被 `shouldWrapUpgrade` 守卫跳过, 无应用商店) | `bootstrap_options.enable_upgrade_prompt=true` |
 | Alice | HTTP 拦截面板 | `bootstrap_options.enable_debug_tools=true` (仅 dev) |
 | Dependabot | 周一早上扫依赖, 提 PR | 全自动, 你只需 review |
 | CI | push/PR 触发 | 4 个 check (analyze/test/build/analyze-and-test) |
@@ -523,6 +546,7 @@ try {
 | 文档地图 (按主题分组) | `docs/README.md` |
 | 看设计决策历史 | `openspec/changes/` |
 | 看 AI 学习笔记 | `.sisyphus/notepads/` |
+| OHOS 插件兼容性审计 | `docs/ohos_plugin_compatibility_audit.md` |
 
 ---
 
@@ -567,7 +591,44 @@ try {
 
 ---
 
-## 13. 紧急联系 + 维护
+## 13. OpenHarmony (OHOS) 适配与已知坑
+
+> 完整插件兼容性审计见 `docs/ohos_plugin_compatibility_audit.md`。以下为 AI Agent **改代码 / 加依赖** 时最容易踩的坑，违反会导致空白屏、构建失败或崩溃。
+
+### 13.1 空白屏根因（最高优先级）
+- **现象**：`flutter build hap` 装真机后界面空白，`onAbilityDied` 约 5 秒崩溃。
+- **根因**：`path_provider` / `shared_preferences` 等插件在 pub.dev 镜像版**无 ohos 原生实现**，`AppLauncher` 在 `runApp()` 前调用 `initPlugins`（含 `getApplicationDocumentsDirectory()`）抛异常，原生窗口一直空白。
+- **解决**：用 CPF-Flutter 的 ohos 分支覆盖这些插件（见 2.1）。**加任何新插件都要先确认它有 ohos 支持**，否则同样空白屏。
+
+### 13.2 插件覆盖必须写进 pubspec_overrides.yaml
+- Melos 生成的 `pubspec_overrides.yaml` 会**接管** `dependency_overrides`；写在 `pubspec.yaml` 里的同名段会被忽略。
+- 改依赖覆盖时**两个文件都加**（`pubspec.yaml` 方便人读 + `pubspec_overrides.yaml` 让 melos 生效）。`pubspec_overrides.yaml` 顶部有 `melos_managed_dependency_overrides` 注释，melos 重新 bootstrap 时会**保留**手写段。
+
+### 13.3 sensors_plus 分支改名
+- `br_sensors_plus-v7.0.0_ohos` 分支把 `pubspec.yaml` 的 `name` 改成了 `sensors_plus_ohos`，pub 报 `name doesn't match`。改用 `br_sensors_plus-v6.1.1_ohos`（保持原名，且匹配代码里的 `List<ConnectivityResult>` API，无需升 7.0.0 改代码）。
+
+### 13.4 permission_handler 分支无 ohos 声明
+- `br_v12.0.1_ohos` 分支未在其 `pubspec.yaml` 声明 ohos 平台，覆盖对 ohos **无效**（它只是把版本升到 12.0.1）。OVS 靠手动在 `oh-package.json5` 加 `permission_handler_ohos` 才跑通。本项目业务代码未直接使用 `permission_handler`（仅 transitive），暂不阻塞；若以后要用需补原生包。
+
+### 13.5 fvm 卡死 / 坏代理
+- 坏代理下 `fvm flutter --version` 会卡 ~3 分钟。make/脚本统一用裸 `.fvm/flutter_sdk/bin/flutter` + `FLUTTER_SUPPRESS_ANALYTICS=true`。Agent 跑命令也请用这个，别用 `fvm flutter`。
+
+### 13.6 pre-commit 用错 SDK
+- pre-commit 钩子若用全局 `fvm default` 的旧 SDK，会报上千个 URI 错误。钩子内每条命令 `export PATH="$(pwd)/.fvm/flutter_sdk/bin:$PATH"`，确保走项目 pinned SDK。当前全局 Flutter 也已为 `3.35.8-ohos-1.0.1`，冲突已消除。
+
+### 13.7 签名按 bundleName 绑定
+- 调试签名证书绑定 `bundleName`（本工程 `com.scaffold.spine_flutter`）。**不要**借用别的工程的 `.p7b`/material，否则 `SignHap 00303074`（bundleName 不匹配）。解决：DevEco `Automatically generate signature` 生成匹配证书，写回 `ohos/build-profile.json5`。签名 material 在 `~/.ohos/config/`，机器相关，换机需重新生成。
+
+### 13.8 引擎内部噪声（可忽略）
+- 真机日志里 `undefined is not callable` 来自 `@ohos/flutter_ohos` 引擎自带 `NavigationChannel.ets:167`（`notifyPageChanged` 读 `get` 属性为 null），是 flutter_ohos 3.35.8 fork 的已知内部 bug，**非应用/插件问题**，不影响渲染（页面正常 `page/2 first show`），Dart 侧无法修复，忽略即可。
+
+### 13.9 其他 OHOS 限制
+- OHOS 不支持 `--dart-define-from-file`：env 注入统一走 `ohos_utils/ohos_build.sh` 把 `KEY=VALUE` 展开为 `--dart-define`。
+- `flutter build hap` 会重生成 `GeneratedPluginRegistrant.ets`（已 gitignore），`ohos_utils/ohos_fix.sh` 兜底清理 stale lock。
+
+---
+
+## 14. 紧急联系 + 维护
 
 - 仓库: https://github.com/Kayouyou/spine-flutter
 - 维护者: Kayouyou
