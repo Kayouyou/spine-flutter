@@ -21,6 +21,8 @@ AI Agent 接手时, 第一步是读完本文件, 再动手改代码。
 - 业务模块 (登录/支付/订单 等需要按 feature 自己实现)
 - UI 设计 (component_library 提供基础组件, 业务页面自己拼)
 
+> 🔎 **速查卡**: 硬约束(R1–R10)、Melos/make 命令、架构一瞥、常用工作流 → [`docs/QUICK_REFERENCE.md`](docs/QUICK_REFERENCE.md)。改代码前先看它。
+
 ---
 
 ## 1. 硬规则 (违反任意一条, 你的 commit 会被 pre-commit 拒掉)

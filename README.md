@@ -39,6 +39,7 @@
 - [Login/Register 示例](#loginregister-示例)
 - [测试覆盖率](#测试覆盖率)
 - [Solo + AI 开发指南](docs/solo-ai-scaffold-guide.md)
+- [速查卡 · 硬约束 & 命令](docs/QUICK_REFERENCE.md)
 
 ---
 
