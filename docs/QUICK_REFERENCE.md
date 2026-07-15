@@ -132,3 +132,24 @@ EnvApiConfig.host ← IAppConfig.apiHost   →  Dio baseUrl（setup.dart）
 | 提交前自验 | pre-commit 自动跑(check_deps→l10n→analyze→增量 test) |
 
 > 技术栈版本锁定见 `AGENTS.md` §2;完整理由与反例见 `docs/di-discipline.md`、`docs/architecture-analysis-2026-05-07.md`、`docs/api-layer-guide.md`。
+
+---
+
+## 7. 组件库 & 规范文档
+
+### 组件库（`package:component_library`）
+统一设计令牌 + 通用组件,**调用方只传业务内容、不传样式**。所有尺寸走令牌 / `.sp` / `.r`,禁止裸写绝对像素。
+
+| 组件 | 用途 |
+|------|------|
+| `AppCell` | **列表项**(左图标 + 标题/副标题 + 右箭头/Switch/自定义) → 设置/详情页高频 |
+| `AppCard` / `AppSection` | 卡片容器 / 分组标题 |
+| `AppButton` / `LoadingButton` | 按钮(loading/disabled) |
+| `EmptyState` / `ErrorCard` | 空态 / 错误态 |
+| `AppTextField` / `AppDialog` / `AppToast` / `CustomAppBar` / `AppScaffold` | 输入 / 弹窗 / Toast / 导航栏 / 页面骨架 |
+
+> 文字样式统一用 `context.textStyles.titleLarge` 等语义名(见 `lib/src/theme/app_text_styles.dart`);颜色用 `context.colors.*`。
+
+### 规范文档（新增 API / 缓存时必读）
+- **缓存模型规范**:`docs/cache-model-guide.md` —— DTO⇄Entity⇄CacheModel 边界、何时独立 CacheModel、新增可缓存 API 的 5 步 checklist、迁移框架接法。
+- 依赖注入纪律:`docs/di-discipline.md` · API 层:`docs/api-layer-guide.md` · 路由依赖反转:`docs/routing-dependency-inversion.md` · 鉴权路由守卫:`docs/auth-route-guard.md`
