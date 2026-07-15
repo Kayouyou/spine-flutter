@@ -3,6 +3,7 @@
 // Token
 export 'src/theme/app_colors.dart';
 export 'src/theme/font_size.dart';
+export 'src/theme/app_text_styles.dart';
 export 'src/theme/spacing.dart';
 export 'src/theme/radius.dart';
 export 'src/theme/shadows.dart';

@@ -80,7 +80,47 @@
 
 ---
 
-## 5. 常用工作流
+## 5. Config 存放与流向（单点定义，避免散落硬编码）
+
+**结论：当前存放位置合理。** 配置采用「三层」结构，单一事实来源（`env/.env.*`）→ 编译期读取（`EnvironmentConfig`）→ 接口桥接（`IAppConfig`）→ DI 注入各层。域名(API_HOST)等高频项**只有一个定义入口**，不散落硬编码。
+
+**流向图（箭头 = 数据方向）：**
+
+```
+env/.env.{dev,staging,prod}          ← 真实值唯一来源（API_HOST / OSS_* 等）
+        │  --dart-define-from-file（编译期注入）
+        ▼
+lib/config.dart  →  EnvironmentConfig   ← 运行时唯一读取 dart-define 的地方
+        │  （仅被下面两处 app 层代码直接读，见下注）
+        ▼
+lib/core/config/app_config.dart  →  EnvAppConfig implements IAppConfig   ← 唯一「桥接」实现
+        │  DI 注入（sl<IAppConfig>()）
+        ▼
+packages/domain/.../app_config.dart  →  IAppConfig 接口   ← 干净契约，无 dart-define 依赖，可测
+        │  被 features / services 通过 sl<IAppConfig>() 消费
+        ▼
+EnvApiConfig.host ← IAppConfig.apiHost   →  Dio baseUrl（setup.dart）
+```
+
+**各角色与文件：**
+
+| 角色 | 文件 | 说明 |
+|------|------|------|
+| 真实值来源 | `env/.env.{dev,staging,prod}` | 三个环境文件，缺字段启动崩溃(R5) |
+| 编译期读取(唯一) | `lib/config.dart` → `EnvironmentConfig` | `String.fromEnvironment`；`prod` 对 `API_HOST/API_ACCESS_KEY_ID/OSS_*` fail-fast |
+| 接口契约(干净) | `packages/domain/lib/src/config/app_config.dart` → `IAppConfig` | 不含 dart-define，可单测 |
+| 桥接实现(唯一 reader) | `lib/core/config/app_config.dart` → `EnvAppConfig` | 把 `EnvironmentConfig` 适配成 `IAppConfig` |
+| 网络落地 | `packages/infrastructure/api/.../api_config.dart` → `EnvApiConfig` | `host ← IAppConfig.apiHost`，Dio baseUrl 走 `IAppConfig.apiBaseUrl` |
+
+**直接读 `EnvironmentConfig` 的两处（均为 app 层 bootstrap，符合规则精神）：**
+1. `lib/core/config/app_config.dart`（`EnvAppConfig`）—— 设计意图中的唯一 reader。
+2. `lib/core/startup/launcher.dart` —— **启动期校验环境变量**，此时 DI 尚未装配(`setupDependencies` 在它之后)，无法走 `sl<IAppConfig>()`，故直接读 `EnvironmentConfig`。这是合理例外，非违规。
+
+**⚠️ 已知冗余（建议后续 tidy-up，非 bug）：** `API_BASE_URL` 与 `API_HOST` 描述的是同一个 API 根地址（前者带协议，后者不带）。目前 `apiBaseUrl` 喂给 Dio、`apiHost` 喂给 `EnvApiConfig`。建议把 `API_HOST` 视为权威源，未来让 `apiBaseUrl` 派生为 `https://$apiHost`，删除 `API_BASE_URL` 的重复定义（改动 env 契约，需谨慎，本次未动）。
+
+---
+
+## 6. 常用工作流
 
 | 要做的事 | 命令 / 位置 |
 |----------|------------|

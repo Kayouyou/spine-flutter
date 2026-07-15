@@ -13,6 +13,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locale/locale.dart';
 import 'package:network/network.dart';
@@ -142,35 +143,46 @@ class _SpineFlutterState extends State<SpineFlutter> {
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {
-          Widget app = MaterialApp.router(
-            title: '骨架演示',
-            theme: appLightTheme,
-            darkTheme: appDarkTheme,
-            locale: localeState.locale,
-            supportedLocales: const [
-              Locale('zh'),
-              Locale('en'),
-            ],
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            routerConfig: _router,
-            builder: (context, child) {
-              final easyLoadingBuilder = EasyLoading.init();
-              return easyLoadingBuilder(
-                context,
-                NetworkBanner(
-                  child: MediaQuery(
-                    data: MediaQuery.of(context).copyWith(
-                      textScaler: const TextScaler.linear(1.0),
+          // P0-1: 设计稿基准。此前全仓使用 flutter_screenutil 的 .sp/.r，
+          // 但从未初始化 ScreenUtilInit，designSize 缺失，缩放跑在插件默认值上。
+          // 这里声明设计稿尺寸（375×812，可随设计稿调整），让 .sp/.r 真正按
+          // 设计稿比例缩放，兑现「改一处全局生效」。
+          // 另：下方 MediaQuery 锁 textScaler=1.0 是有意为之，避免与 screenutil
+          // 的 .sp 二次缩放叠加；若需支持系统无障碍字号，见文档 P2-1。
+          Widget app = ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (context, _) => MaterialApp.router(
+              title: '骨架演示',
+              theme: appLightTheme,
+              darkTheme: appDarkTheme,
+              locale: localeState.locale,
+              supportedLocales: const [
+                Locale('zh'),
+                Locale('en'),
+              ],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              routerConfig: _router,
+              builder: (context, child) {
+                final easyLoadingBuilder = EasyLoading.init();
+                return easyLoadingBuilder(
+                  context,
+                  NetworkBanner(
+                    child: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        textScaler: const TextScaler.linear(1.0),
+                      ),
+                      child: child ?? const SizedBox(),
                     ),
-                    child: child ?? const SizedBox(),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
           if (options.enableDebugTools) {
             app = DebugToolsWrapper(child: app);
