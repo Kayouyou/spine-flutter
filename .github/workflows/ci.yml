@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.10'
+          flutter-version: '3.35.8'
           channel: 'stable'
       - run: dart pub global activate melos
       - run: melos bs
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.10'
+          flutter-version: '3.35.8'
           channel: 'stable'
       - run: dart pub global activate melos
       - run: melos bs
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.10'
+          flutter-version: '3.35.8'
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk --debug
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.10'
+          flutter-version: '3.35.8'
           channel: 'stable'
       - run: flutter pub get
       - name: iOS 构建（无签名）
