@@ -12,6 +12,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   connectivity_plus: ^6.0.0
   freezed_annotation: ^2.4.0
+  api:
+    path: ../../infrastructure/api
 
 dev_dependencies:
   flutter_test:

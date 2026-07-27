@@ -12,6 +12,10 @@ extension DioExceptionMapper on DioException {
   /// 根据DioException类型和HTTP状态码映射到对应ErrorCode
   /// HTTP状态码优先，DioException类型其次
   DomainException toDomainException() {
+    // 短路：若底层 error 已是 DomainException（如 envelope 拦截器抛出的
+    // BusinessException），直接原样透传，避免被二次映射成通用 NetworkException。
+    if (error is DomainException) return error as DomainException;
+
     final errorCode = _mapErrorCode(type, response?.statusCode);
     final statusCode = response?.statusCode;
 

@@ -68,6 +68,7 @@ void main() {
             ValidationException _ => 'validation',
             ConflictException _ => 'conflict',
             RateLimitedException _ => 'rate limited',
+            BusinessException _ => 'business',
           };
 
       expect(describe(const NetworkException('x')), equals('network'));
@@ -76,6 +77,7 @@ void main() {
       expect(describe(const ValidationException('x')), equals('validation'));
       expect(describe(const ConflictException()), equals('conflict'));
       expect(describe(const RateLimitedException()), equals('rate limited'));
+      expect(describe(const BusinessException(1, 'x')), equals('business'));
     });
   });
 }

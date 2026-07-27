@@ -52,6 +52,7 @@ void main() {
           ValidationException() => 'validation',
           ConflictException() => 'conflict',
           RateLimitedException() => 'rate_limited',
+          BusinessException() => 'business',
         };
         expect(result, isNotEmpty);
       }

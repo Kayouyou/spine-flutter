@@ -97,3 +97,18 @@ class ConflictException extends DomainException {
 class RateLimitedException extends DomainException {
   const RateLimitedException() : super('请求过于频繁，请稍后再试');
 }
+
+/// 业务层错误 — 后端在成功 HTTP 响应（200）中返回的非 0 业务码
+///
+/// 与基础设施层错误（网络/HTTP 状态）区分：业务错误表示“请求已到达服务端且被处理，
+/// 但业务逻辑判定为失败”（如参数校验不通过、余额不足、业务状态冲突等）。
+///
+/// 由 [ResponseEnvelopeInterceptor] 在检测到 `{code, message, data}` 信封结构且 code != 0
+/// （且非续期码 1000102）时抛出，经 [DioExceptionMapper.toDomainException] 短路原样透传，
+/// 最终被 [FutureResult.toResult] 收口为 `Result.failure`。
+class BusinessException extends DomainException {
+  /// 后端业务码（如 1000102 为续期码、其它为非 0 业务错误码）
+  final int code;
+
+  const BusinessException(this.code, String message) : super(message);
+}

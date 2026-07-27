@@ -76,4 +76,21 @@ class CancelTokenManager {
   void clearAll() {
     _pageTokens.clear();
   }
+
+  /// 全局取消所有页面正在进行的请求
+  ///
+  /// 覆盖「退出 App / 切换账号」等需要立即终止全部在途请求的场景。
+  /// 与 [clearAll] 的区别：本方法会真正对每个 [CancelToken] 触发取消（而非仅清记录），
+  /// 避免切换账号后旧账号的请求仍返回并污染新会话。
+  ///
+  /// 参数：
+  /// - reason: 取消原因（可选，默认"Global cancel"）
+  void cancelAll([String? reason]) {
+    for (final entry in _pageTokens.entries) {
+      for (final token in entry.value) {
+        token.cancel(reason ?? 'Global cancel: ${entry.key}');
+      }
+    }
+    _pageTokens.clear();
+  }
 }

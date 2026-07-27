@@ -49,6 +49,11 @@ class NetworkCubit extends Cubit<NetworkState> {
   /// 获取当前网络质量
   NetworkQuality get currentQuality => _qualityMonitor.currentQuality;
 
+  /// 网络质量变化流（转发给 NetworkQualityMonitor，供桥接层动态超时使用）
+  ///
+  /// 增量新增：仅转发私有 _qualityMonitor 的流，不改动既有监听/emit 逻辑。
+  Stream<NetworkQuality> get qualityStream => _qualityMonitor.qualityStream;
+
   /// 设置网络提示的UI样式
   void setUIStyle(NetworkUIStyle style) {
     emit(state.copyWith(uiStyle: style));

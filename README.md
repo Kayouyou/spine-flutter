@@ -80,7 +80,7 @@ spine_flutter/
 │   │           └── exceptions/   # 领域异常（sealed class）
 │   │
 │   ├── infrastructure/            # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-│   │   ├── api/                  # Dio HTTP 封装
+│   │   ├── api/                  # Dio HTTP 封装（拦截器链/弱网重试/统一信封/缓存/签名，详见 docs/api-layer-guide.md）
 │   │   ├── routing/              # GoRouter 路由模块
 │   │   ├── key_value_storage/    # Hive 本地存储
 │   │   ├── list_cache/           # 列表缓存策略

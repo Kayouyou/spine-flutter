@@ -154,4 +154,4 @@ EnvApiConfig.host ← IAppConfig.apiHost   →  Dio baseUrl（setup.dart）
 - **缓存模型规范**:`docs/cache-model-guide.md` —— DTO⇄Entity⇄CacheModel 边界、何时独立 CacheModel、新增可缓存 API 的 5 步 checklist、迁移框架接法。
 - **字体缩放策略**:`docs/font-scaling-guide.md`(P2-1) —— 锁定系统缩放 + `.sp` 等比自适应的刻意组合、为何不跟随系统字号、要支持无障碍时改哪一处。
 - **模块结构命名映射**:`docs/module-structure-guide.md`(P2-2) —— 团队「presentation/domain/data」↔ 本仓 monorepo 跨包分层(packages/features·domain·infrastructure·services)的对应表与落点速记。
-- 依赖注入纪律:`docs/di-discipline.md` · API 层:`docs/api-layer-guide.md` · 路由依赖反转:`docs/routing-dependency-inversion.md` · 鉴权路由守卫:`docs/auth-route-guard.md`
+- 依赖注入纪律:`docs/di-discipline.md` · API 层:`docs/api-layer-guide.md`（含 11 层拦截器链、弱网重试/熔断/离线队列、统一信封、通用缓存、请求签名、全局取消 `cancelAll`）· 路由依赖反转:`docs/routing-dependency-inversion.md` · 鉴权路由守卫:`docs/auth-route-guard.md`
