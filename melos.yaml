@@ -20,8 +20,13 @@ scripts:
 
   test:affected:
     run: |
-      melos exec --diff=origin/main -- flutter test
-    description: 只测变更相关包
+      if git rev-parse -q --verify refs/remotes/origin/main >/dev/null 2>&1; then
+        melos exec --diff=origin/main -- flutter test
+      else
+        echo "[test:affected] 未找到 origin/main 基线（全新仓库/尚未推送），改跑全量测试"
+        melos exec -- flutter test
+      fi
+    description: 只测变更相关包（新仓库无基线时自动退化为全量测试）
 
   test:coverage:
     run: |
