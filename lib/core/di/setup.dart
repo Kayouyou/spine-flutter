@@ -94,6 +94,7 @@ void setupDependencies({BootstrapOptions options = const BootstrapOptions()}) {
     apiConfig: EnvApiConfig(config),  // 新增: 注入 API/OSS 配置 (替代 HttpConstant 硬编码)
     connectTimeout: Duration(seconds: config.networkTimeout),
     receiveTimeout: Duration(seconds: config.networkTimeout),
+    networkEnvironment: InfraNetworkEnvironment(networkCubit),
   );
   dio.options.baseUrl = config.apiBaseUrl;
   sl.registerSingleton<Dio>(dio);

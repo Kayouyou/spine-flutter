@@ -1,4 +1,9 @@
-.PHONY: get clean debug debug-simulator release lint test coverage-local integration-test create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model create-usecase help scaffold-check
+.PHONY: get clean debug debug-simulator release lint test coverage-local integration-test create-repo create-feature add-api dev staging prod build-prod create-api scaffold-api create-model create-hive-model create-usecase help scaffold-check ohos-fix ohos-build ohos-build-release ohos-build-fast ohos-build-fix ohos-install ohos-log ohos-log-filtered ohos-devices ohos-log-clear ohos-deploy ohos-run build-android build-ios build-web build-ohos
+
+# 抑制 Flutter 工具首次运行的 analytics 网络请求 (避免坏代理下 fvm flutter 卡死)
+export FLUTTER_SUPPRESS_ANALYTICS := true
+# 直接使用 pinned SDK 的 flutter 二进制（绕过 fvm 包装器的网络检查，更稳定）
+FLUTTER ?= .fvm/flutter_sdk/bin/flutter
 
 # ============================================================================
 # 基础命令
@@ -228,6 +233,122 @@ setup:
 	@echo "   - Git hooks: .githooks (pre-commit 检查已启用)"
 	@echo "   - 依赖: melos bootstrap 已完成"
 	@echo "   - 验证: check_deps.sh 已通过"
+
+# ============================================================================
+# OpenHarmony (OHOS) 构建
+# 前置: DevEco Studio + hvigor + ohpm 已安装 (详见 README「OpenHarmony 构建」段)
+#   - HOS_SDK_HOME / DEVECO_SDK_HOME 指向本机 DevEco SDK
+#   - OHOS 签名需在 DevEco 一次性配置 (Project Structure → Signing Configs →
+#     Automatically generate signature)，配置后产出 *-signed.hap
+#   - 未配置签名时产出 *-unsigned.hap，ohos-install 会自动兼容
+# 用法:
+#   make ohos-build            # debug 全量 (env=dev)
+#   make ohos-build OHOS_ENV=prod
+#   make ohos-build-release OHOS_ENV=staging
+#   make ohos-deploy OHOS_ENV=dev   # 修复→构建→安装
+#   make ohos-run OHOS_ENV=dev      # 部署 + 抓日志
+# ============================================================================
+export HOS_SDK_HOME := /Applications/DevEco-Studio.app/Contents/sdk
+export DEVECO_SDK_HOME := /Applications/DevEco-Studio.app/Contents/sdk
+HDC_HOME := $(HOS_SDK_HOME)/default/openharmony/toolchains
+HDC := $(HDC_HOME)/hdc
+OHOS_ENV ?= dev
+HAP_DIR := ohos/entry/build/default/outputs/default
+HAP_SIGNED := $(HAP_DIR)/entry-default-signed.hap
+HAP_UNSIGNED := $(HAP_DIR)/entry-default-unsigned.hap
+BUNDLE_NAME := com.scaffold.spine_flutter
+LOG_FILE := spine_ohos_run.log
+
+# 修复 OHOS 配置 (registrant / lock 兜底)
+ohos-fix:
+	@echo "🔧 修复 OHOS 配置..."
+	@chmod +x ./ohos_utils/ohos_fix.sh
+	./ohos_utils/ohos_fix.sh
+
+# 构建 OHOS HAP (debug 全量；OHOS_ENV=dev|staging|prod 选择环境)
+ohos-build:
+	@echo "🏗️  构建 OHOS HAP (env=$(OHOS_ENV), 全量)..."
+	@chmod +x ./ohos_utils/ohos_build.sh
+	./ohos_utils/ohos_build.sh debug --env=$(OHOS_ENV) --full
+
+# 构建 OHOS HAP (release 全量)
+ohos-build-release:
+	@echo "🏗️  构建 OHOS HAP (release, env=$(OHOS_ENV), 全量)..."
+	@chmod +x ./ohos_utils/ohos_build.sh
+	./ohos_utils/ohos_build.sh release --env=$(OHOS_ENV) --full
+
+# 快速打包 (仅改 ArkTS/ETS 且已做过至少一次 --full 构建时)
+ohos-build-fast:
+	@echo "🏗️  快速打包 OHOS HAP (env=$(OHOS_ENV), 不重编 kernel)..."
+	@chmod +x ./ohos_utils/ohos_build.sh
+	./ohos_utils/ohos_build.sh debug --env=$(OHOS_ENV)
+
+# 构建 + 修复一步到位
+ohos-build-fix: ohos-fix ohos-build
+
+# 安装 HAP 到设备 (自动卸载旧版；签名/未签名自动选择)
+ohos-install:
+	@HAP=$$( [ -f "$(HAP_SIGNED)" ] && echo "$(HAP_SIGNED)" || echo "$(HAP_UNSIGNED)" ); \
+	if [ ! -f "$$HAP" ]; then \
+		echo "❌ HAP 不存在: $$HAP"; \
+		echo "请先执行: make ohos-build"; \
+		exit 1; \
+	fi; \
+	echo "📱 安装 HAP → $$HAP"; \
+	$(HDC) app uninstall $(BUNDLE_NAME) || true; \
+	$(HDC) app install $$HAP
+
+# 抓取 OHOS 运行时日志 (操作 App 后 Ctrl+C 停止)
+ohos-log:
+	@echo "📝 清空设备日志..."
+	$(HDC) shell hilog -r
+	@echo "📲 请启动/操作 App，完成后按 Ctrl+C 停止抓日志"
+	$(HDC) hilog > $(LOG_FILE)
+
+# 实时过滤日志 (仅 ERROR/WARN + Flutter 关键字)
+ohos-log-filtered:
+	@echo "📲 请启动/操作 App，完成后按 Ctrl+C 停止"
+	$(HDC) hilog | grep -E "E |W |Flutter|MethodChannel|PlatformException|SharedPreferences|Permission" > $(LOG_FILE)
+
+# 查看当前连接设备
+ohos-devices:
+	$(HDC) list targets
+
+# 清空设备日志缓存
+ohos-log-clear:
+	$(HDC) shell hilog -r
+
+# 一键: 修复 → 构建 → 安装
+ohos-deploy: ohos-build-fix ohos-install
+	@echo "🚀 OHOS 部署完成，请手动启动 App"
+
+# 一键: 修复 → 构建 → 安装 → 抓日志
+ohos-run: ohos-deploy ohos-log
+
+# ============================================================================
+# 多平台统一构建 (均通过 make 触发)
+# 用法:
+#   make build-android BUILD_ENV=dev        # dev / staging / prod
+#   make build-ios BUILD_ENV=dev
+#   make build-web BUILD_ENV=dev
+#   make build-ohos BUILD_ENV=dev           # 等价于 make ohos-build OHOS_ENV=dev
+# ============================================================================
+BUILD_ENV ?= dev
+
+build-android:
+	@echo "🤖 构建 Android APK (env=$(BUILD_ENV))..."
+	$(FLUTTER) build apk --dart-define-from-file=env/.env.$(BUILD_ENV) --release
+
+build-ios:
+	@echo "🍎 构建 iOS (env=$(BUILD_ENV), 无签名)..."
+	$(FLUTTER) build ios --dart-define-from-file=env/.env.$(BUILD_ENV) --release --no-codesign
+
+build-web:
+	@echo "🌐 构建 Web (env=$(BUILD_ENV))..."
+	$(FLUTTER) build web --dart-define-from-file=env/.env.$(BUILD_ENV)
+
+build-ohos:
+	@$(MAKE) ohos-build OHOS_ENV=$(BUILD_ENV)
 
 # ============================================================================
 # Catch-all 规则（防止未知目标报错）

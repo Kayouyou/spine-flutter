@@ -39,6 +39,7 @@
 - [Login/Register 示例](#loginregister-示例)
 - [测试覆盖率](#测试覆盖率)
 - [Solo + AI 开发指南](docs/solo-ai-scaffold-guide.md)
+- [速查卡 · 硬约束 & 命令](docs/QUICK_REFERENCE.md)
 
 ---
 
@@ -79,7 +80,7 @@ spine_flutter/
 │   │           └── exceptions/   # 领域异常（sealed class）
 │   │
 │   ├── infrastructure/            # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-│   │   ├── api/                  # Dio HTTP 封装
+│   │   ├── api/                  # Dio HTTP 封装（拦截器链/弱网重试/统一信封/缓存/签名，详见 docs/api-layer-guide.md）
 │   │   ├── routing/              # GoRouter 路由模块
 │   │   ├── key_value_storage/    # Hive 本地存储
 │   │   ├── list_cache/           # 列表缓存策略
@@ -350,6 +351,73 @@ make debug-simulator
 
 ---
 
+## OpenHarmony (OHOS) 构建
+
+项目已适配 OpenHarmony，基于 Flutter `3.35.8-ohos-1.0.1`（FVM 锁版本）。
+
+### 前置条件
+- DevEco Studio（提供 SDK 与**调试签名**）
+- 配置 `HOS_SDK_HOME` 指向 OpenHarmony SDK 的 `default/openharmony` 子目录
+- `ohpm`、`hvigorw`（随 DevEco 安装）
+- 本机 FVM 已下载 `3.35.8-ohos-1.0.1`
+
+### 构建 HAP
+使用仓库内置脚本（自动把 `env/.env.*` 的 `KEY=VALUE` 展开为 `--dart-define`，规避 OHOS 不支持 `--dart-define-from-file` 的坑）：
+
+```bash
+# 完整模式：重编 kernel + 注入 dart-define + hvigorw 打包
+./ohos_utils/ohos_build.sh debug --env=dev --full
+
+# 快速模式（仅改 ArkTS，已至少构建过一次 --full）：
+./ohos_utils/ohos_build.sh debug --env=dev
+```
+
+产物：`ohos/entry/build/default/outputs/default/entry-default-unsigned.hap`（配置 DevEco 调试签名后为 `entry-default-signed.hap`）
+
+### 通过 make 构建（推荐）
+
+`makefile` 已封装全部 OHOS 与多平台构建目标，无需直接记脚本参数：
+
+```bash
+# OHOS：修复 → 构建(全量) → 安装到设备
+make ohos-deploy OHOS_ENV=dev          # OHOS_ENV: dev / staging / prod
+
+# OHOS：仅构建 debug / release / 快速打包
+make ohos-build                        # 默认 env=dev，全量
+make ohos-build-release OHOS_ENV=prod
+make ohos-build-fast OHOS_ENV=dev      # 仅改 ArkTS 时
+
+# OHOS：运行期调试
+make ohos-devices                      # 列出连接设备
+make ohos-run OHOS_ENV=dev             # 部署 + 抓 hilog 日志 (Ctrl+C 停止)
+make ohos-log-filtered                 # 仅 ERROR/WARN + Flutter 关键字
+
+# 多平台统一入口
+make build-android BUILD_ENV=dev       # APK (dev / staging / prod)
+make build-ios BUILD_ENV=dev           # iOS (无签名)
+make build-web BUILD_ENV=dev           # Web
+make build-ohos BUILD_ENV=dev          # 等价 make ohos-build OHOS_ENV=dev
+```
+
+> make 内部已 `export FLUTTER_SUPPRESS_ANALYTICS=true` 并直接调用 pinned SDK 的
+> `flutter` 二进制，避免坏代理下 `fvm flutter` 卡死。
+
+
+### 调试签名（必需，一次性）
+`flutter build hap` 默认产出 **未签名** HAP。要装真机需在 DevEco Studio 中：
+`File → Project Structure → Signing Configs → 勾选 Automatically generate signature`，
+该操作会在 `~/.ohos/config/` 生成绑定本工程 `bundleName` 的调试证书并写回
+`ohos/build-profile.json5` 的 `signingConfigs`。之后重跑构建脚本即可产出 `entry-default-signed.hap`。
+
+### 已知坑
+- `flutter build hap` 会重生成 `GeneratedPluginRegistrant.ets`（已 gitignore），`ohos_fix.sh` 兜底清理 stale lock。
+- OHOS 不支持 `--dart-define-from-file`，env 注入统一走 `ohos_build.sh` 展开。
+- `upgrader` 在 OHOS 上已通过 `shouldWrapUpgrade` 守卫跳过（无应用商店）。
+- **插件依赖覆盖必须写进 `pubspec_overrides.yaml`**：本项目用 Melos，`pubspec_overrides.yaml` 会接管 `dependency_overrides`，写在 `pubspec.yaml` 里的同名段会被忽略（`flutter pub get` 会打印 `routing ... (overridden in ./pubspec_overrides.yaml)`）。当前已用 CPF-Flutter 的 ohos 分支覆盖 9 个插件（path_provider / shared_preferences / url_launcher / connectivity_plus / device_info_plus / package_info_plus / sensors_plus / share_plus / permission_handler）。AI 视角细节见 `AGENTS.md` 第 2.1 / 13.2 节。
+- **`sentry_flutter` 在 OHOS 上被守卫跳过初始化**：CPF-Flutter 无 sentry 的 ohos 分支，OHOS 上无原生 SDK 可初始化；`lib/core/startup/launcher.dart` 用 `Platform.operatingSystem == 'ohos'` 守卫跳过 `SentryFlutter.init()`，错误上报改走 `ConsoleReporter`。细节见 `AGENTS.md` 第 9.3 节。
+
+---
+
 ## 分层决策树
 
 ### Q1: 这个模型放哪里？
@@ -472,6 +540,30 @@ melos run validate
 **修改 hook**：编辑 `.githooks/pre-commit`，下次 commit 自动生效。  
 **修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 GitHub Actions 自动加载。
 
+**pre-push 大文件守卫**（`.githooks/pre-push`）：`git push` 时扫描本次将传输的对象，
+单个文件 ≥95MiB 阻断（GitHub 硬限 100MiB 拒收整次推送）、50–95MiB 警告放行。
+阈值可用环境变量临时调整：`GIT_PUSH_MAX_BLOB_MB=50 git push ...`；
+误提交的超大产物按提示 `git rm --cached` 或走 Git LFS，不要长期放大闸。
+
+## New Project Quickstart（用本脚手架创建新 App）
+
+```bash
+git clone <本仓库地址> ../<新项目目录> && cd ../<新项目目录>
+# 1) 预览改名影响面（不落盘）
+python3 scripts/rename_project.py spine_flutter <new_name> com.scaffold <org域> --check
+# 2) 确认后实改（自动完成 8 种命名形式 + Android Kotlin 目录迁移 + 残留校验）
+python3 scripts/rename_project.py spine_flutter <new_name> com.scaffold <org域>
+```
+
+脚本跑完后手工补齐 4 处：① 各端中文显示名（iOS Info.plist / OHOS string.json /
+web manifest / `lib/config.dart` / l10n arb，改完跑 `flutter gen-l10n`）；
+② `env/.env.*` 填新项目 API_HOST/OSS_BUCKET；③ pubspec 版本重置；
+④ OHOS bundleName 变更后必须在 DevEco 重新生成调试签名（§13.7）。
+
+```bash
+melos bs && make scaffold-check && melos test   # 门禁全绿再初始化新仓库
+```
+
 ---
 
 ## 环境配置
@@ -493,7 +585,7 @@ make prod          # 生产环境（env/.env.prod）
 | 变量 | 说明 |
 |------|------|
 | ENV | 环境名称 |
-| API_BASE_URL | API 地址 |
+| API_HOST | API 根地址（不含协议，权威源；`apiBaseUrl` 由其派生 `https://$API_HOST`） |
 | SENTRY_DSN | Sentry DSN（空=不启用） |
 | APP_STORE_ID | App Store ID（空=不启用更新检查） |
 

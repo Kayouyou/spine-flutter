@@ -67,3 +67,19 @@ mason-lock.json
 # Backup files
 *.bak
 *.bak.*
+
+# ===== OHOS (Flutter 3.35 migration) =====
+# OHOS 的 node_modules 等价物 (由 ohpm 重新生成, 含本机绝对路径软链)
+oh_modules/
+**/oh_modules/
+# 自定义 PUB_CACHE (参考项目用于 3.35 worktree, 本骨架暂未启用, 预留)
+.pub-cache-335/
+# hvigor 构建缓存
+ohos/**/.hvigor/
+# 残留 lock (由 ohpm install 重新生成, 写死旧绝对路径会导致 00617202)
+**/oh-package-lock.json5
+# DevEco 本地配置
+ohos/.idea/
+
+# WorkBuddy agent 工作数据 (per-project, 含 memory, 不应入库)
+.workbuddy/

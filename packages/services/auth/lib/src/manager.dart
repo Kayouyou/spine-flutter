@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:api/api.dart';
 import 'package:domain/domain.dart';
 import 'package:key_value_storage/key_value_storage.dart';
 import 'cubit/auth_cubit.dart';
@@ -91,6 +92,8 @@ class AuthManager {
       debugPrint('🚪 [AuthManager] logout: 清理认证信息...');
     }
     await clearAuth();
+    // 全局取消所有在途请求，避免旧账号请求在切换账号/退出后回流污染新会话。
+    CancelTokenManager.instance.cancelAll('用户登出');
     _authCubit.setAuthState(const AuthState());
   }
 
