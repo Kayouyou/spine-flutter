@@ -95,9 +95,12 @@ void main() {
 
       // 恢复连接
       env.emitConnection(true);
-      // 等待异步监听回调执行 flush 与 dio.fetch 完成
-      await Future<void>.delayed(Duration.zero);
-      await Future<void>.delayed(Duration.zero);
+      // 广播流监听回调 -> _onConnectionChanged -> flush -> dio.fetch -> adapter
+      // 这条异步链存在跨宏任务边界的调度（两个 Duration.zero 窗口不够），
+      // 用有界轮询等待链路走完，兼顾确定性与抗 CI 负载抖动。
+      for (var i = 0; i < 200 && adapter.fetchCount == 0; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
 
       expect(queue.flushCount, equals(1));
       expect(queue.fetchInvoked, isTrue);
@@ -109,22 +112,30 @@ void main() {
 
 /// 可手动控制连通性的 NetworkEnvironment fake
 class FakeNetworkEnvironment implements NetworkEnvironment {
-  FakeNetworkEnvironment({this.initialConnected = true});
+  FakeNetworkEnvironment({bool initialConnected = true}) : _connected = initialConnected;
 
-  bool initialConnected;
+  /// 当前连通状态（由 [emitConnection] 同步更新）。
+  ///
+  /// 必须随 emit 变化：恢复连接后 flush 会经 `_dio.fetch` 重入完整拦截器链，
+  /// 若 isConnected() 仍返回离线，请求会被本拦截器再次入队，永远到不了 adapter。
+  bool _connected;
+
   final _connectionController = StreamController<bool>.broadcast();
 
-  void emitConnection(bool connected) => _connectionController.add(connected);
+  void emitConnection(bool connected) {
+    _connected = connected;
+    _connectionController.add(connected);
+  }
 
   @override
-  Future<bool> isConnected() async => initialConnected;
+  Future<bool> isConnected() async => _connected;
 
   @override
   Stream<bool> get connectionChanges => _connectionController.stream;
 
   @override
   NetworkQuality get quality =>
-      initialConnected ? NetworkQuality.good : NetworkQuality.disconnected;
+      _connected ? NetworkQuality.good : NetworkQuality.disconnected;
 
   @override
   Stream<NetworkQuality> get qualityStream => const Stream.empty();

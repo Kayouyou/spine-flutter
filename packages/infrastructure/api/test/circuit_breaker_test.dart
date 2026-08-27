@@ -78,20 +78,27 @@ void main() {
       expect(breaker.failureCount, 3);
     });
 
-    test('半开态探测失败会重新熔断', () {
+    test('半开态探测失败会重新熔断', () async {
+      // 使用真实短冷却时长并等待其过期进入半开；
+      // 不能用 Duration.zero——零冷却下 allowRequest 恒为 true，
+      // 无法验证「重新打开后冷却未过拒绝」这一断言。
       final breaker = CircuitBreaker(
         failureThreshold: 1,
-        resetDuration: Duration.zero,
+        resetDuration: const Duration(milliseconds: 50),
         halfOpenMaxCalls: 2,
       );
 
-      breaker.recordFailure(); // -> open
+      breaker.recordFailure(); // -> open（首轮冷却中）
+      expect(breaker.allowRequest, isFalse); // 冷却未过
+
+      // 等待远超冷却时长的间隔后放行，触发 open -> halfOpen 自动转换
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(breaker.allowRequest, isTrue); // -> halfOpen
       expect(breaker.state, CircuitState.halfOpen);
 
       breaker.recordFailure(); // 半开探测失败 -> 重新 open
       expect(breaker.state, CircuitState.open);
-      expect(breaker.allowRequest, isFalse); // 冷却未过
+      expect(breaker.allowRequest, isFalse); // 新一轮冷却未过，拒绝
     });
   });
 }
