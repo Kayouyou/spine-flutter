@@ -81,7 +81,6 @@ class _FakeAppConfig implements IAppConfig {
     this.apiAccessKeyId = 'fake-key',
     this.ossBucket = 'fake-bucket',
     this.ossEndpoint = 'https://fake.oss.aliyuncs.com',
-    this.ossAccessKey = 'fake-oss-key',
   });
 
   @override
@@ -95,7 +94,7 @@ class _FakeAppConfig implements IAppConfig {
   @override
   final String ossEndpoint;
   @override
-  final String ossAccessKey;
+  final String ossAccessKey = 'fake-oss-key';
 
   @override
   bool get isDev => !isProd;
