@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""rename_project.py <old_snake> <new_snake> <namespace_prefix>
-e.g. rename_project.py spine_flutter spine_flutter com.scaffold
+"""rename_project.py <old_snake> <new_snake> <old_ns> [new_ns] [--check]
 
-按 6 种命名形式全局替换 + git mv Kotlin 目录 + 校验残留。
-排除 .git/ build/ .dart_tool/ .fvm/ .gradle/ ios/Pods/ ios/Flutter/ ios/.symlinks/
-       macos/Pods/ macos/Flutter/ .mason/ mason-lock.json *.lock
+e.g. rename_project.py spine_flutter ifisher com.scaffold com.kayouyou
+     rename_project.py spine_flutter ifisher com.scaffold com.kayouyou --check
+
+按命名形式全局替换 + 迁移 Android Kotlin 包目录 + 校验残留。
+覆盖 8 种形式：{ns}.{snake} / {ns}.{camel} / Title / Pascal / camel /
+kebab(spine-flutter) / snake / 裸 {ns}。new_ns 缺省时沿用 old_ns。
+
+排除 .git/ build/ .dart_tool/ .fvm/ .gradle/ ios/Pods/ ios/Flutter/
+ios/.symlinks/ macos/Pods/ macos/Flutter/ .mason/ mason-lock.json *.lock
 """
 import os
 import sys
@@ -28,31 +33,36 @@ def title(s: str) -> str:
     return ' '.join(p.title() for p in s.split('_'))
 
 
+def kebab(s: str) -> str:
+    """snake → kebab: spine_flutter → spine-flutter"""
+    return s.replace('_', '-')
+
+
 def main():
     dry_run = '--check' in sys.argv
-    if dry_run:
-        sys.argv.remove('--check')
-    if len(sys.argv) != 4:
+    argv = [a for a in sys.argv[1:] if a != '--check']
+    if len(argv) not in (3, 4):
         print(__doc__)
         sys.exit(1)
 
-    old_snake, new_snake, ns = sys.argv[1], sys.argv[2], sys.argv[3]
+    old_snake, new_snake, old_ns = argv[0], argv[1], argv[2]
+    new_ns = argv[3] if len(argv) == 4 else old_ns
 
-    # 6 forms, longest first to prevent overlap
+    # 最具体的（带 ns 前缀）排最前，裸替换放最后，防止短串先替换破坏长串
     replacements = [
-        (f'{ns}.{old_snake}', f'{ns}.{new_snake}'),
-        (f'{ns}.{camel(old_snake)}', f'{ns}.{camel(new_snake)}'),
+        (f'{old_ns}.{old_snake}', f'{new_ns}.{new_snake}'),
+        (f'{old_ns}.{camel(old_snake)}', f'{new_ns}.{camel(new_snake)}'),
         (title(old_snake), title(new_snake)),
         (pascal(old_snake), pascal(new_snake)),
         (camel(old_snake), camel(new_snake)),
+        (kebab(old_snake), kebab(new_snake)),
         (old_snake, new_snake),
+        (old_ns, new_ns),
     ]
 
     exclude_dirs = {'.git', '.dart_tool', '.fvm', '.gradle', '.idea', 'build',
                     'Pods', 'Flutter', '.symlinks', '.mason'}
     exclude_globs = ('*.lock', '*.lock.hash', 'mason-lock.json', 'bricks.json')
-
-    dry_run = False
 
     modified = []
     for root, dirs, files in os.walk('.'):
@@ -75,15 +85,24 @@ def main():
                         fp.write(new_content)
                 modified.append(path)
 
-    # Kotlin 目录 (Android namespace 包路径)
-    ns_parts = ns.split('.')
-    if len(ns_parts) == 2:
-        old_kotlin = f'android/app/src/main/kotlin/{ns_parts[0]}/{ns_parts[1]}/{old_snake}'
-        new_kotlin = f'android/app/src/main/kotlin/{ns_parts[0]}/{ns_parts[1]}/{new_snake}'
-        if os.path.isdir(old_kotlin):
-            if not dry_run:
-                subprocess.run(['git', 'mv', old_kotlin, new_kotlin], check=True)
-            print(f'git mv: {old_kotlin} -> {new_kotlin}')
+    # Kotlin 包目录迁移（支持 ns 段变化: com/scaffold/spine_flutter → com/kayouyou/ifisher）
+    kt_base = 'android/app/src/main/kotlin'
+    old_rel = os.path.join(*[*old_ns.split('.'), old_snake])
+    new_rel = os.path.join(*[*new_ns.split('.'), new_snake])
+    old_kt, new_kt = os.path.join(kt_base, old_rel), os.path.join(kt_base, new_rel)
+    if os.path.isdir(old_kt) and old_rel != new_rel:
+        if not dry_run:
+            os.makedirs(os.path.dirname(new_kt), exist_ok=True)
+            subprocess.run(['git', 'mv', old_kt, new_kt], check=True)
+            # 清理因迁移而空掉的旧父目录
+            probe = os.path.dirname(old_kt)
+            while probe.startswith(kt_base):
+                try:
+                    os.rmdir(probe)
+                except OSError:
+                    break
+                probe = os.path.dirname(probe)
+        print(f'git mv: {old_kt} -> {new_kt}')
 
     print(f'\n{"Would modify" if dry_run else "Modified"} {len(modified)} files:')
     for m in modified:
@@ -92,22 +111,30 @@ def main():
     if not dry_run:
         # 校验残留 (用 grep, 排除已知的生成/缓存目录)
         print('\n=== 残留校验 ===')
+        leftovers = 0
         for old, _ in replacements:
             r = subprocess.run(
-                ['grep', '-rl', '--exclude-dir=.git', '--exclude-dir=.dart_tool',
-                 '--exclude-dir=build', '--exclude-dir=.mason', '--exclude-dir=.gradle',
+                ['grep', '-rl',
+                 '--exclude-dir=.git', '--exclude-dir=.dart_tool',
+                 '--exclude-dir=build', '--exclude-dir=.mason',
+                 '--exclude-dir=.gradle', '--exclude-dir=.fvm',
                  '--exclude-dir=Pods', '--exclude=mason-lock.json',
                  '-l', old, '.'],
                 capture_output=True, text=True
             )
             files = [l for l in r.stdout.strip().split('\n') if l]
             if files:
+                leftovers += len(files)
                 print(f'  {old}: 残留 {len(files)} 个文件')
                 for f in files[:5]:
                     print(f'    {f}')
                 if len(files) > 5:
                     print(f'    ... 还有 {len(files)-5} 个')
+        if leftovers == 0:
+            print('  ✅ 无任何残留')
         print()
+
+        sys.exit(1 if leftovers else 0)
 
 
 if __name__ == '__main__':

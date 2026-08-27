@@ -545,6 +545,25 @@ melos run validate
 阈值可用环境变量临时调整：`GIT_PUSH_MAX_BLOB_MB=50 git push ...`；
 误提交的超大产物按提示 `git rm --cached` 或走 Git LFS，不要长期放大闸。
 
+## New Project Quickstart（用本脚手架创建新 App）
+
+```bash
+git clone <本仓库地址> ../<新项目目录> && cd ../<新项目目录>
+# 1) 预览改名影响面（不落盘）
+python3 scripts/rename_project.py spine_flutter <new_name> com.scaffold <org域> --check
+# 2) 确认后实改（自动完成 8 种命名形式 + Android Kotlin 目录迁移 + 残留校验）
+python3 scripts/rename_project.py spine_flutter <new_name> com.scaffold <org域>
+```
+
+脚本跑完后手工补齐 4 处：① 各端中文显示名（iOS Info.plist / OHOS string.json /
+web manifest / `lib/config.dart` / l10n arb，改完跑 `flutter gen-l10n`）；
+② `env/.env.*` 填新项目 API_HOST/OSS_BUCKET；③ pubspec 版本重置；
+④ OHOS bundleName 变更后必须在 DevEco 重新生成调试签名（§13.7）。
+
+```bash
+melos bs && make scaffold-check && melos test   # 门禁全绿再初始化新仓库
+```
+
 ---
 
 ## 环境配置
