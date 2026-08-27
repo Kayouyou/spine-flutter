@@ -540,6 +540,11 @@ melos run validate
 **修改 hook**：编辑 `.githooks/pre-commit`，下次 commit 自动生效。  
 **修改 CI**：编辑 `.github/workflows/ci.yml`，push 后 GitHub Actions 自动加载。
 
+**pre-push 大文件守卫**（`.githooks/pre-push`）：`git push` 时扫描本次将传输的对象，
+单个文件 ≥95MiB 阻断（GitHub 硬限 100MiB 拒收整次推送）、50–95MiB 警告放行。
+阈值可用环境变量临时调整：`GIT_PUSH_MAX_BLOB_MB=50 git push ...`；
+误提交的超大产物按提示 `git rm --cached` 或走 Git LFS，不要长期放大闸。
+
 ---
 
 ## 环境配置

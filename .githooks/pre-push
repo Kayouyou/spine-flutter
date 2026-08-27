@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#
+# pre-push: 超大文件拦截器
+#
+# 背景：GitHub 单文件超过 100 MiB 时 receive-pack 直接拒绝整次推送
+# ("GH001: Large files detected")；50 MiB 以上出警告。问题往往在本地
+# 增量构建产物 / 字体 / 大 JSON 样例被误提交数天后才暴露，届时清理历史
+# 成本很高。本钩子在 `git push` 发起时扫描「本次将要传输的对象」，
+# 把风险拦在出网之前。
+#
+# 规则（可用环境变量覆盖）：
+#   - 单个 blob >= $GIT_PUSH_MAX_BLOB_MB (默认 95 MiB)：阻断推送
+#   - 单个 blob >= $GIT_PUSH_WARN_BLOB_MB (默认 50 MiB)：警告但放行
+#
+# 用法示例：
+#   GIT_PUSH_MAX_BLOB_MB=50 git push ...
+#   # 手动演练：echo "refs/heads/a <sha> refs/heads/b <sha>" | .githooks/pre-push
+#
+set -u
+
+ZERO="0000000000000000000000000000000000000000"
+BLOCK_MB="${GIT_PUSH_MAX_BLOB_MB:-95}"
+WARN_MB="${GIT_PUSH_WARN_BLOB_MB:-50}"
+BLOCK_BYTES=$((BLOCK_MB * 1024 * 1024))
+WARN_BYTES=$((WARN_MB * 1024 * 1024))
+
+TMP_ALL="$(mktemp "${TMPDIR:-/tmp}/prepush-objs.XXXXXX")"
+TMP_BLOBS="$(mktemp "${TMPDIR:-/tmp}/prepush-blobs.XXXXXX")"
+trap 'rm -f "$TMP_ALL" "$TMP_BLOBS"' EXIT
+
+# ---- 第一步：收集每个待推引用将引入的新对象 ------------------------------
+while read -r LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
+  [ -n "${LOCAL_REF:-}" ] || continue
+
+  # 删除远端分支不产生新对象
+  [ "$LOCAL_SHA" = "$ZERO" ] && continue
+
+  case "$LOCAL_REF" in
+    refs/tags/*) continue ;; # 标签推送不在大文件防线关注范围内
+  esac
+
+  if [ "$REMOTE_SHA" = "$ZERO" ]; then
+    # 新建远端分支：尚未被任何远程跟踪分支包含的对象都要传
+    git rev-list --objects "$LOCAL_SHA" --not --remotes >>"$TMP_ALL"
+  else
+    git rev-list --objects "$REMOTE_SHA..$LOCAL_SHA" >>"$TMP_ALL"
+  fi
+done
+
+[ -s "$TMP_ALL" ] || {
+  echo "🛡️  pre-push ✓ 无需传输新对象"
+  exit 0
+}
+
+# ---- 第二步：按 blob 尺寸过滤（size 为未压缩字节数）-----------------------
+cut -d' ' -f1 "$TMP_ALL" |
+  git cat-file --batch-check='%(objecttype) %(objectsize) %(objectname)' |
+  awk '$1 == "blob" {print $2, $3}' >"$TMP_BLOBS"
+
+BLOCKED=$(awk -v limit="$BLOCK_BYTES" '$1 >= limit' "$TMP_BLOBS" | wc -l | tr -d ' ')
+WARNED=$(awk -v low="$WARN_BYTES" -v high="$BLOCK_BYTES" \
+  '$1 >= low && $1 < high' "$TMP_BLOBS" | wc -l | tr -d ' ')
+TOTAL_COUNT=$(wc -l <"$TMP_BLOBS" | tr -d ' ')
+TOTAL_BYTES=$(awk '{s += $1} END {print s + 0}' "$TMP_BLOBS")
+
+fmt_mb() { awk -v b="$1" 'BEGIN {printf "%.1f", b / 1048576}'; }
+
+list_blobs() {
+  # $1=下限字节 $2=上限字节(可空) — 打印 "大小 路径" 列表到 stderr
+  # TMP_BLOBS 每行两列: <未压缩字节数> <sha>；TMP_ALL 每行: <sha> <路径>
+  awk -v low="$1" -v high="${2:-}" '
+    NR == FNR { sz[$2] = $1; next }
+    ($1 in sz) {
+      s = sz[$1]
+      if (high != "" && s >= high) next
+      if (s < low) next
+      printf "     %8.1f MB  %s\n", s / 1048576, substr($0, index($0, " ") + 1)
+    }' "$TMP_BLOBS" "$TMP_ALL" >&2
+}
+
+# ---- 第三步：结果判定 ------------------------------------------------------
+rc=0
+
+if [ "$BLOCKED" -gt 0 ]; then
+  rc=1
+  echo "⛔ pre-push ✗ 发现 $BLOCKED 个超过 ${BLOCK_MB}MiB 的文件，已阻断推送：" >&2
+  list_blobs "$BLOCK_BYTES"
+  cat >&2 <<EOF
+
+   处理办法（三选一）：
+   1) 误提交的构建产物/缓存 → 从索引移除并补 .gitignore：
+        git rm --cached '<file>' && git commit -m 'chore: drop generated artifact'
+   2) 必须入库的大资源 → 启用 Git LFS：
+        git lfs install && git lfs track '*.bin' && git add .gitattributes
+   3) 已存在于多个提交的历史 → git filter-repo 清理后重推
+   （临时放行仅限自查：GIT_PUSH_MAX_BLOB_MB=<更大的值> git push ...）
+EOF
+fi
+
+if [ "$WARNED" -gt 0 ]; then
+  echo "⚠️  pre-push 有 $WARNED 个文件介于 ${WARN_MB}-${BLOCK_MB}MiB（接近硬限），建议确认是否应入库：" >&2
+  list_blobs "$WARN_BYTES" "$BLOCK_BYTES"
+fi
+
+if [ "$rc" -eq 0 ]; then
+  echo "🛡️  pre-push ✓ 通过: 新增 $TOTAL_COUNT 个文件, 共 $(fmt_mb "$TOTAL_BYTES") MB (拒绝阈值 ${BLOCK_MB}MiB)"
+fi
+
+exit "$rc"
